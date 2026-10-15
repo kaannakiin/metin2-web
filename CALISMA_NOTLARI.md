@@ -69,7 +69,7 @@ GM hesabı: login `kaannakiin`, karakter `numan` (IMPLEMENTOR), silme kodu `1234
 
 ---
 
-## 4. Veritabanı — `sql/` (repoda, commit'lenmedi)
+## 4. Veritabanı — `sql/`
 
 Orijinal dump yoktu; şema C++ sorgularından çıkarıldı. Hepsi `utf8mb4` (client çok dilli modda UTF-8 gönderiyor).
 
@@ -87,7 +87,7 @@ VM'de hepsi yüklü. Coolify'daki test MariaDB'si kapatıldı (6671 kapalı).
 
 ---
 
-## 5. Web client (WASM) — DEVAM EDİYOR ⏳
+## 5. Web client (WASM) — DERLENDİ ✅
 
 Kullanılan kit: <https://github.com/nairoad/Metin2-WebClient> (GPL-2.0, TMP4 client için yazılmış). Kod tarandı: ağ erişimi yalnızca LZO + CPython indirmesi (SHA-256 sabit), şüpheli bir şey yok.
 
@@ -149,7 +149,7 @@ Kapatılmayıp yamalanan Windows'a özel kısımlar: görev çubuğu gruplama (k
 | ------------------------------------------------ | ------------------------------------------------------------------------------------- |
 | lzo, cryptopp, python, stage, eterbase, eterpack | ✅                                                                                    |
 | engine, unpack, scripts, rewrite, uiscript       | ✅                                                                                    |
-| corpus, data, link                               | ⏳                                                                                    |
+| corpus, data, link, package                      | ✅                                                                                    |
 | trees, gr2                                       | atlanacak (SpeedTree/Granny DLL'leri yok — ağaç yok, modellerin ~%1'i eksik olabilir) |
 
 Komutlar (container içinde): `cd /work/kit && source /work/emsdk/emsdk_env.sh && python3.13 webclient.py build --only <adım>` (`--only` tek adım alır). Log: `/work/step_<adım>.log`. Toplu script: `/work/build1.sh`.
@@ -160,13 +160,30 @@ Komutlar (container içinde): `cd /work/kit && source /work/emsdk/emsdk_env.sh &
 
 ---
 
-## 6. Sıradaki adımlar
+## 6. Yayın — CANLI ✅ <https://metin2.kaanakin.dev>
 
-1. `engine` hatalarını gruplayıp çöz (yama ekle → `Tools/web/kit/stage_port.py` + sunucuya kopyala → `stage` + `engine`).
-2. Script adımları: Python 2→3 dönüşümü; kitin script yamaları TMP4'e göre, bizim `root/*.py` için uyarlanacak. Pack isimleri: kit `root`, `locale_en`, `locale_pl` bekliyor (`unpack_packs.py` `TO_UNPACK`), bizde `root` + `locale`.
-3. `corpus`, `data`, `link` → `client.html/js/wasm/data` + `corpus/`.
-4. Yayın: bridge'i **host'ta** çalıştır (Docker container'ları libvirt FORWARD kuralları yüzünden VM'e yeni bağlantı açamayabilir), Node 20, systemd. Web dosyaları + `/to/` → bridge yönlendirmesi Coolify/Traefik ile `metin2.kaanakin.dev` altında.
-5. İlk giriş testi (`kaannakiin` / `numan`).
+```
+tarayıcı ─https─▶ Traefik (coolify-proxy, Let's Encrypt)
+                   ├─ /        ─▶ m2web-site  (nginx:1.27-alpine, coolify ağı, dist/site salt okunur)
+                   └─ /to/...  ─▶ m2web-bridge (node:20-alpine, --network host, 10.0.1.1:11496)
+                                   └─ TCP ─▶ VM 192.168.122.10 (sadece 30001/30003/30101/30103/30105)
+```
+
+- `/` → `/client.html?deflang=tr` (Türkçe).
+- Bridge sadece `https://metin2.kaanakin.dev` origin'ini kabul ediyor, izin listesi dışındaki adresleri TCP açmadan reddediyor (test edildi: `:22` → `unknown_target`, yabancı origin → 401).
+- Bridge host ağında, çünkü coolify ağındaki container'lar libvirt VM'ine ulaşamıyor (test edildi).
+- UFW: `10.0.1.0/24 → 10.0.1.1:11496` (sadece Traefik'in ağı; internetten kapalı).
+- Traefik: `/data/coolify/proxy/dynamic/metin2.yaml` (yeni dosya, diğer servislere dokunulmadı).
+- Sunucu adresi/portları client'a stage yamasıyla gömülü (`ENABLE_BINARY_SERVERINFO`): `webclient.toml` `[server] address/ch1_port/auth_port`.
+- Kopyalar: `Tools/web/deploy/` (`deploy.sh`, `site-nginx.conf`, `metin2.yaml`). Yeniden yayın: container'da `webclient.py package` + `tools/bridge_config.py --site https://metin2.kaanakin.dev`, host'ta `deploy.sh`.
+- Container'lar `--restart unless-stopped`; VM autostart açık → host yeniden başlarsa her şey kalkar.
+
+## 7. Sıradaki adımlar
+
+1. **İlk giriş testi** (`kaannakiin` / `numan`) — tarayıcıda; hata olursa tarayıcı konsolu + `docker logs m2web-bridge` + VM'deki syslog'lar.
+2. GM şifresini değiştir (sohbette geçti).
+3. Oyun içi özellikleri adım adım test et (switchbot, wiki, pet, gaya, aura, kuşak…).
+4. Ağaçlar (SpeedTree) yok — dış haritalarda ağaç görünmeyecek; ileride ele alınabilir.
 
 ### Bilinen eksikler (sonra)
 
@@ -179,7 +196,7 @@ Komutlar (container içinde): `cd /work/kit && source /work/emsdk/emsdk_env.sh &
 
 ---
 
-## 7. Dikkat / tuzaklar
+## 8. Dikkat / tuzaklar
 
 - Kaynaklar **cp1254**: `grep` binary sanıp atlar → `LC_ALL=C grep -a`. Edit aracı bu dosyalara yazamaz; `perl -i` ile satır ekle (CRLF'i koru).
 - Host SSH ara ara zaman aşımına düşüyor (fail2ban aktif). Bekleme döngüleri seyrek olsun (≥2 dk).

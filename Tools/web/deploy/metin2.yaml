@@ -1,0 +1,40 @@
+http:
+  routers:
+    metin2-http:
+      entryPoints:
+        - http
+      rule: Host(`metin2.kaanakin.dev`)
+      middlewares:
+        - metin2-to-https
+      service: metin2-site
+    metin2-https:
+      entryPoints:
+        - https
+      rule: Host(`metin2.kaanakin.dev`)
+      service: metin2-site
+      tls:
+        certresolver: letsencrypt
+    metin2-bridge:
+      entryPoints:
+        - https
+      rule: Host(`metin2.kaanakin.dev`) && PathPrefix(`/to/`)
+      priority: 100
+      service: metin2-bridge
+      tls:
+        certresolver: letsencrypt
+
+  services:
+    metin2-site:
+      loadBalancer:
+        servers:
+          - url: 'http://m2web-site:80'
+    metin2-bridge:
+      loadBalancer:
+        servers:
+          - url: 'http://10.0.1.1:11496'
+
+  middlewares:
+    metin2-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true

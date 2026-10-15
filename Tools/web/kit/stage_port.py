@@ -1108,6 +1108,30 @@ PATCHES.append((
     'calls it by the TMP4 name',
 ))
 
+_SERVER_ADDRESS = workspace.server_address()
+if _SERVER_ADDRESS:
+    PATCHES.append((
+        'UserInterface/PythonNetworkStreamModule.cpp',
+        '\t{"127.0.0.1", \t"Anka2"},',
+        '\t{"%s", \t"Anka2"},' % _SERVER_ADDRESS,
+        'ENABLE_BINARY_SERVERINFO keeps the server address in the binary; '
+        'it comes from [server] address in webclient.toml',
+    ))
+
+PATCHES.append((
+    'UserInterface/PythonNetworkStreamModule.cpp',
+    '\t{30002},\t//ch1\n',
+    '\t{%d},\t//ch1\n' % int(workspace.setting('server', 'ch1_port', default=30002)),
+    'channel 1 port of ENABLE_BINARY_SERVERINFO, from [server] ch1_port in webclient.toml',
+))
+
+PATCHES.append((
+    'UserInterface/PythonNetworkStreamModule.cpp',
+    '\t{30001}\t\t//auth\n',
+    '\t{%d}\t\t//auth\n' % int(workspace.setting('server', 'auth_port', default=30001)),
+    'auth port of ENABLE_BINARY_SERVERINFO, from [server] auth_port in webclient.toml',
+))
+
 def apply_patches(stage):
     """Applies every entry of PATCHES to the staged tree: the pattern must occur
     exactly as many times as declared (default once) or the script stops, so a
