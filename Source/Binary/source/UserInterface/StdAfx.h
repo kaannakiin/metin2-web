@@ -1,6 +1,13 @@
+#ifdef __EMSCRIPTEN__
+#pragma once
+
+#define _HAS_AUTO_PTR_ETC 0
+#pragma warning(disable:4067)
+#else
 #pragma once
 
 #pragma warning(disable:4067)
+#endif
 #pragma warning(disable:4172)
 #pragma warning(disable:4267)
 #pragma warning(disable:4305)

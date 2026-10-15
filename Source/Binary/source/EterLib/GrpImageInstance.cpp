@@ -400,11 +400,19 @@ D3DXCOLOR CGraphicImageInstance::GetPixelColor(int x, int y)
 	if (!pTexture)
 		return dxClr;
 
+#ifdef __EMSCRIPTEN__
+	LPDIRECT3DTEXTURE8 d3dTexture = pTexture->GetD3DTexture();
+#else
 	LPDIRECT3DTEXTURE9 d3dTexture = pTexture->GetD3DTexture();
+#endif
 	if (!d3dTexture)
 		return dxClr;
 
+#ifdef __EMSCRIPTEN__
+	IDirect3DSurface8* surface;
+#else
 	IDirect3DSurface9* surface;
+#endif
 	D3DSURFACE_DESC desc;
 	D3DLOCKED_RECT rect;
 	RECT rc;

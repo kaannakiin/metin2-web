@@ -4,7 +4,9 @@
 #include "PythonSlotWindow.h"
 #include "PythonWindowManager.h"
 #include <gif_lib.h>
+#ifndef __EMSCRIPTEN__
 #include <wingdi.h>
+#endif
 #include <array>
 #include <unordered_set>
 

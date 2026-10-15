@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <memory.h>
 
+#ifdef __EMSCRIPTEN__
+#define HAVE_BOOLEAN
+#endif
 #include <libjpeg-turbo/jpeglib.h>
 
 #pragma comment( lib, "turbojpeg-static.lib" )

@@ -10,15 +10,24 @@
 #if defined(_DEBUG)
 std::string szModuleArrayOld[] = { "net", "chr", "chrmgr", "app", "pack", "player"};
 #endif
+#ifdef __EMSCRIPTEN__
+std::string szModuleArray[MODULE_MAX] = { "net", "chr", "chrmgr", "app", "pack", "player" };
+#else
 std::string szModuleArray[MODULE_MAX] = {};
+#endif
 
 __forceinline const char *GetCallerReference_FileName()
 {
+#ifdef __EMSCRIPTEN__
+	const CM2wPythonFrame kFrame(PyEval_GetFrame());
+	return kFrame.FileName();
+#else
 	PyThreadState* pThreadState = PyThreadState_Get();
 	PyFrameObject* pFrameObject = pThreadState->frame;
 
 	char const* c_szCallerFileName = PyString_AsString(pFrameObject->f_code->co_filename);
 	return c_szCallerFileName;
+#endif
 }
 
 #if defined(_DEBUG)

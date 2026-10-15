@@ -1,6 +1,10 @@
 #include "StdAfx.h"
 #include "Resource.h"
+#ifdef __EMSCRIPTEN__
+#include <shellapi.h>
+#else
 #include <Shellapi.h>
+#endif
 #include "PythonApplication.h"
 
 #include "../EterLib/Camera.h"

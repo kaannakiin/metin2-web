@@ -155,6 +155,13 @@ unsigned int GetCodePage()
 #endif
 }
 
+#ifdef __EMSCRIPTEN__
+unsigned int LocaleService_GetCodePage()
+{
+	return GetCodePage();
+}
+#endif
+
 int StringCompareCI(LPCSTR szStringLeft, LPCSTR szStringRight, size_t sizeLength)
 {
 	return strnicmp (szStringLeft, szStringRight, sizeLength);

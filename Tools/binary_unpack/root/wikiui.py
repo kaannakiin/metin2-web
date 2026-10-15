@@ -14,6 +14,7 @@ import chat
 import localeInfo
 import playersettingmodule
 import item
+import skill
 import nonplayer
 import uiToolTip
 import renderTarget

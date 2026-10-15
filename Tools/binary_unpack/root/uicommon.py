@@ -9,6 +9,7 @@ import localeInfo
 import ime
 import chat
 import item
+import shop
 import wndMgr
 import uiScriptLocale
 import uiToolTip

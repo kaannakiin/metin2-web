@@ -205,13 +205,35 @@ tarayıcı ─https─▶ Traefik (coolify-proxy, Let's Encrypt)
 
 **Şu anki durum:** giriş ✅, karakter seçimi ✅ (numan modeli görünüyor), oyuna giriş ✅ (harita, karakter, arayüz, sohbet görüldü). **Ama birkaç saniye/dakika içinde çöküyor.**
 
-### AÇIK SORUN: bellek bozulması (heap corruption)
+### Bellek bozulması — ÇÖZÜLDÜ (2026-10-15/16)
 
-- Belirtiler değişken: `free()` içinde abort (texture bırakılırken), Python GC'de `memory access out of bounds` (`deduce_unreachable`, `dict_dealloc`), `~CAniImageBox`, `malloc` içinde OOB.
-- `/dbg/client.html` (canlı client + `PYTHONMALLOC=debug`, `PYTHONTRACEMALLOC=8`; `www/dbg/` sembolik bağlantılar, `publish.sh` siler) ile: çökme **oyuna girmeden, girişten sonraki ön yükleme sırasında `malloc` içinde** → dlmalloc kayıtları eziliyor = **C/C++ heap taşması**, Python refcount hatası değil.
-- Elenen şüpheliler: Oodle1 çözücü (yazmalar sınırlı), baked font yapıştırma (sınırlı), `SaveColorMap`, `UnloadGif`, `CreateFromTexturePointer`, `pSrcInfo`.
-- **Sıradaki adım:** ASan sürümü güncel kodla derlendi ve `/asan/client.html?deflang=tr` adresinde (EMCC_CFLAGS=`-fsanitize=address -sMAXIMUM_MEMORY=4294967296`, `/home/m2web/build_asan.sh`, `publish_asan.sh`). Açılışı ~10 dk. Giriş yapıp ön yüklemeyi bekle; konsolda `AddressSanitizer: heap-buffer-overflow` satırı ve yığın izi taşan yeri gösterecek.
-- **DİKKAT:** ASan derlemesi `libeterbase.a`, `libeterpack.a` ve `obj/gamelib`'i ASan'lı bıraktı. Normal yayından önce `eterbase eterpack engine link` normal (EMCC_CFLAGS'siz) yeniden derlenmeli (`/home/m2web/build9.sh` adımlarına ekle).
+ASan (`/asan/`, `build_asan.sh`, `publish_asan.sh`) ile bulunup düzeltilen hatalar:
+
+- `TraceError`: 1 KB'tan uzun mesajlar `szBuf[len]` ile yığın tamponunun dışına yazıyordu (C99 `vsnprintf` tam uzunluk döndürür). Asıl rastgele bozulma buydu. compat'ta `_vsnprintf`/`_snprintf` artık MSVC gibi kesilince -1 döner.
+- `CDXTCImage::Copy`: DDS'in bildirdiği `dwLinearSize` gerçek blok boyutundan büyükse doku tamponu taşıyordu.
+- DDS başlığı 128 bayttan küçük dosyalarda tampon dışından okunuyordu (sihirli sayı kontrolü fork'ta yorumda).
+- `ReservingMotionProcess`: `pop_front` sonrası silinmiş düğüm okunuyordu.
+- `CAniImageBox`: ayarlar heap'teki `std::function` yerine düz değerler (oyun içi `~CAniImageBox` çökmesi).
+- `DestroyWindow`: aynı karede ve sonraki karede ikinci silmeye karşı koruma (loga Python yığını basar).
+
+ASan notları: seçenekler `compat/stubs.cpp` içinde `__asan_default_options` ile gömülü (sayfa `ENV`'i geç kalıyor). `malloc_context_size=0` olmadan açılış ~8 dk. `MAXIMUM_MEMORY` 2 GB olmalı: 2 GB üstü adresleri JS köprüsü bozuyor (dosyalar gölge bellek baytlarıyla geliyordu).
+
+### Yamaların kaynağa taşınması
+
+- `stage_port.py` 129 → 77 yama. 26 gerçek hata koşulsuz, 26 web uyarlaması `#ifdef __EMSCRIPTEN__` ile kaynakta. Kalanlar: kitin TMP4 temel yamaları, sunucu adresi/portları (derleme anında `webclient.toml`'dan), kitin sabit listesindeki `Stl.h` ve bir kit yamasına bağlı `PythonPackModule`.
+- Taşıma betiği: scratchpad `migrate_patches.py` (yama metni + açıklama ile eşleşir, `--ifdef`, önce kontrol modu). Önişlemci satırı içeren desenlerde elle kontrol gerek (`minIni.c`, `EterPackManager::isExist` bozulmuştu, düzeltildi).
+- Stage artık yamalı dosyaları `latin-1` okuyup yazıyor; önceden `utf-8 errors=ignore` cp1254 Türkçe karakterleri siliyordu.
+- Sunucudaki derleme kaynağı `/home/m2web/websrc` (public klondan bir kez kopyalandı). Kaynakta değişen dosyalar oraya `scp` ile eşitlenmeli (`Locale_inc.h` hariç: web'de kapatılan flag'ler orada).
+- `script_patches.py` 29 → 24: kalanlar Python 3'e özel (Windows istemcisi Python 2.7). `serverInfo`, `introLogin` kanal yedeği, `localeInfo` kaçış hatası Python 2 kaynağına (`Tools/binary_unpack/root`) taşındı.
+- `pyflakes` taramasıyla bulunan script hataları kaynakta düzeltildi: `FASLE`, `apply`, `dstSlotPos`, `tchat`, `RACE_FLAG_DICT`, eksik `import shop/item/chat/skill`. Ölü kod (`guildbank`, `uiPickETC`, `uiEvent.DeleteButton`) bırakıldı.
+
+### Haritada binalar yoktu — düzeltildi
+
+`property_create.xml` eskiydi: `property/` klasöründeki 10081 dosyanın 5713'ü pakete girmiyordu (binalar `property/b`, `property/c`). Henüz hiçbir dosyanın sağlamadığı CRC'leri getiren 2007 dosya XML'e eklendi (mevcut 88 CRC çakışması değişmesin diye). Dizin 4366 → 6374 kayıt; haritanın istediği eksik 127 binanın hepsi geldi. Yeniden üretim: `make_eterpacks.py --only property`, ardından property paketini `client_files`'a açma (`/home/m2web/props2.py`), sonra `corpus` ve `data` adımları.
+
+### Dururken karakterin bozulması — düzeltildi
+
+Granny 2.11 (sürüm 7) dosyaları animasyon eğrilerini sıkıştırılmış `curve2` biçimlerinde tutuyor; kit yalnızca eski `Degree/Knots/Controls` biçimini okuyordu. Okunamayan eğri dinlenme pozuna düşüyordu (savaşçı `general/wait.gr2` sürüm 7, `run.gr2` sürüm 6). `compat/gr2_to_granny.cpp` `DecodeCurve2`: DaIdentity, sabitler, DaK32fC32f, DaKeyframes32f, DaK16u/8u, D3K16u/8u, D3I1K*, D9I1/I3K*, D4nK16uC15u/D4nK8uC7u (quaternion açma LSLib ile aynı). Keyframe eğrilerinin zaman birimi (`TimeStep` varsayıldı) oyunda doğrulanmadı.
 
 ### Diğer açık işler (yayına etkisi küçük)
 

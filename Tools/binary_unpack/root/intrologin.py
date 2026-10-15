@@ -820,6 +820,8 @@ class LoginWindow(ui.ScriptWindow):
 
 	def __OpenServerBoard(self):
 		loadRegionID, loadServerID, loadChannelID = self.__LoadChannelInfo()
+		if loadServerID not in serverInfo.REGION_DICT.get(loadRegionID, {}):
+			loadRegionID, loadServerID, loadChannelID = 0, 1, 1
 
 		serverIndex = self.__ServerIDToServerIndex(loadRegionID, loadServerID)
 

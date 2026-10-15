@@ -428,6 +428,9 @@ bool CEterPackManager::isExist(const char *c_szFileName)
 
 	if (_access(c_szFileName, 0) == 0)
 		return true;
+#else
+	if (_access(c_szFileName, 0) == 0)
+		return true;
 #endif
 
 	return isExistInPack(c_szFileName);

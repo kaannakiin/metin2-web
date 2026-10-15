@@ -13,7 +13,7 @@ import debugInfo
 
 SRV1 = {
 	"host" : sv1_ip,
-	"name" : sv1_name + " ~ Windows",
+	"name" : sv1_name,
 	"auth1" : auth_port,
 	"ch1" : ch1_port,
 	"ch2" : ch2_port,
@@ -168,30 +168,6 @@ SERVER1_CHANNEL_DICT = {
 		"udp_port" : SRV1["ch1"],
 		"state" : STATE_NONE,
 	},
-	2 : {
-		"key" : 12,
-		"name":"CH2   ",
-		"ip" : SRV1["host"],
-		"tcp_port" : SRV1["ch2"],
-		"udp_port" : SRV1["ch2"],
-		"state" : STATE_NONE,
-	},
-	3 : {
-		"key" : 13,
-		"name" : "CH3   ",
-		"ip" : SRV1["host"],
-		"tcp_port" : SRV1["ch3"],
-		"udp_port" : SRV1["ch3"],
-		"state" : STATE_NONE,
-	},
-	4 : {
-		"key" : 14,
-		"name" : "CH4   ",
-		"ip" : SRV1["host"],
-		"tcp_port" : SRV1["ch4"],
-		"udp_port" : SRV1["ch4"],
-		"state" : STATE_NONE,
-	},
 }
 
 SERVER2_CHANNEL_DICT = {
@@ -259,16 +235,6 @@ REGION_DICT = {
 			"state" : "NEW",
 			"name" : SRV1["name"],
 			"channel" : SERVER1_CHANNEL_DICT,
-		},
-		2 : {
-			"state" : "SPECIAL",
-			"name" : SRV2["name"],
-			"channel" : SERVER2_CHANNEL_DICT,
-		},
-		3 : {
-			"state" : "SPECIAL",
-			"name" : SRV3["name"],
-			"channel" : SERVER3_CHANNEL_DICT,
 		},
 	},
 }

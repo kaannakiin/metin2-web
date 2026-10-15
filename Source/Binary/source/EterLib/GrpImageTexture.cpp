@@ -305,6 +305,7 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void * c_pvB
     else
     {
         D3DXIMAGE_INFO imageInfo;
+#ifndef __EMSCRIPTEN__
 //#ifdef ENABLE_DIRECTX9_UPDATE
         if (FAILED(D3DXGetImageInfoFromFileInMemory(c_pvBuf, bufSize, &imageInfo)))
         {
@@ -312,15 +313,21 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void * c_pvB
             return false;
         }
 //#endif
+#endif
 
         if (FAILED(D3DXCreateTextureFromFileInMemoryEx(
                     ms_lpd3dDevice,
                     c_pvBuf,
                     bufSize,
+#ifdef __EMSCRIPTEN__
+                    D3DX_DEFAULT,
+                    D3DX_DEFAULT,
+#else
 //#ifdef ENABLE_DIRECTX9_UPDATE
                     imageInfo.Width,
                     imageInfo.Height,
 //#endif
+#endif
                     D3DX_DEFAULT,
                     0,
                     d3dFmt,

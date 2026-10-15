@@ -231,16 +231,6 @@ PATCHES_SCRIPTS = [
         TAB + TAB + 'self.state = self.BUTTON_STATE_UP  # PORT: in Py2 None >= int was False, in Py3 it is a TypeError\n' + TAB + TAB + 'self.buttonText = None',
         'None >= int raises TypeError in Python 3 - the chat button overturned the interface render every frame',
     ),
-    # -------------------------------------------------------------------
-    # syserr: `localeInfo.py:34: SyntaxWarning: invalid escape
-    # sequence '\['` - in Py2 an unknown escape stayed literal, in Py3 it is a
-    # warning at every start. The same string in raw form.
-    (
-        'localeInfo.py',
-        "VIRTUAL_KEY_NUMBERS    = \"1234567890-=\\[];',./`\"",
-        "VIRTUAL_KEY_NUMBERS    = r\"1234567890-=\\[];',./`\"  # PORT: a raw string, no SyntaxWarning",
-        'an unknown escape in a string - SyntaxWarning in Python 3 at every start',
-    ),
 ]
 
 
@@ -260,14 +250,10 @@ FORK_ANCHORS = {
         'def __pack_import(name,globals=None,locals=None,fromlist=None, level=-1):',
     TAB * 3 + 'self.OnCloseEvent = lambda z=[self.OnCloseEvent, f]:list(map(apply,z))':
         TAB * 3 + 'self.OnCloseEvent = lambda z = [self.OnCloseEvent, f] : list(map(apply, z))',
-    'VIRTUAL_KEY_NUMBERS    = "1234567890-=\\[];\',./`"':
-        'VIRTUAL_KEY_NUMBERS' + TAB * 5 + '= "1234567890-=\\[];\',./`"',
 }
 FORK_REPLACEMENTS = {
     'import marshal' + NL + 'import imp' + NL + 'import pack':
         'import marshal' + NL + 'import types' + NL + 'import importlib.util' + NL,
-    'VIRTUAL_KEY_NUMBERS    = "1234567890-=\\[];\',./`"':
-        'VIRTUAL_KEY_NUMBERS' + TAB * 5 + '= r"1234567890-=\\[];\',./`"',
 }
 
 
@@ -304,35 +290,6 @@ PATCHES_SCRIPTS += [
      'def get_reg(name):' + NL + TAB + 'try:',
      'def get_reg(name):' + NL + TAB + 'if winreg is None:' + NL + TAB + TAB + 'return None' + NL + TAB + 'try:',
      'no registry - nothing saved to read back'),
-]
-
-# Anka2 serverInfo.py lists the author's test servers (192.168.1.156) next to
-# the one from the binary, and four channels; our server runs channel 1 only.
-PATCHES_SCRIPTS += [
-    ('serverInfo.py',
-     '"name" : sv1_name + " ~ Windows",',
-     '"name" : sv1_name,',
-     'the server name without the author\'s platform tag'),
-    ('serverInfo.py',
-     '\t2 : {\n\t\t"key" : 12,\n\t\t"name":"CH2   ",\n\t\t"ip" : SRV1["host"],\n\t\t"tcp_port" : SRV1["ch2"],\n\t\t"udp_port" : SRV1["ch2"],\n\t\t"state" : STATE_NONE,\n\t},\n\t3 : {\n\t\t"key" : 13,\n\t\t"name" : "CH3   ",\n\t\t"ip" : SRV1["host"],\n\t\t"tcp_port" : SRV1["ch3"],\n\t\t"udp_port" : SRV1["ch3"],\n\t\t"state" : STATE_NONE,\n\t},\n\t4 : {\n\t\t"key" : 14,\n\t\t"name" : "CH4   ",\n\t\t"ip" : SRV1["host"],\n\t\t"tcp_port" : SRV1["ch4"],\n\t\t"udp_port" : SRV1["ch4"],\n\t\t"state" : STATE_NONE,\n\t},\n',
-     '',
-     'only channel 1 runs on our server'),
-    ('serverInfo.py',
-     '\t\t2 : {\n\t\t\t"state" : "SPECIAL",\n\t\t\t"name" : SRV2["name"],\n\t\t\t"channel" : SERVER2_CHANNEL_DICT,\n\t\t},\n\t\t3 : {\n\t\t\t"state" : "SPECIAL",\n\t\t\t"name" : SRV3["name"],\n\t\t\t"channel" : SERVER3_CHANNEL_DICT,\n\t\t},\n',
-     '',
-     'the author\'s test servers (192.168.1.156) are not ours - the bridge refuses them'),
-]
-
-# channel.inf in the client package remembers the author's last choice
-# (server 2), which our trimmed list no longer has - the login window then
-# selects nothing and never asks for the channel states.
-PATCHES_SCRIPTS += [
-    ('introLogin.py',
-     '\t\tloadRegionID, loadServerID, loadChannelID = self.__LoadChannelInfo()\n',
-     '\t\tloadRegionID, loadServerID, loadChannelID = self.__LoadChannelInfo()\n'
-     '\t\tif loadServerID not in serverInfo.REGION_DICT.get(loadRegionID, {}):\n'
-     '\t\t\tloadRegionID, loadServerID, loadChannelID = 0, 1, 1\n',
-     'a remembered server that is not in the list falls back to server 1, channel 1'),
 ]
 
 # pickle needs binary files in Python 3, and the pickles shipped with the

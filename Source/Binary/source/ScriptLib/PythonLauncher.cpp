@@ -119,6 +119,18 @@ static PyObject* print_binary(PyObject* self, PyObject* args)
 	if (!PyArg_ParseTuple(args, "s", &msg))
 		return NULL;
 
+#ifdef __EMSCRIPTEN__
+	PyFrameObject *frame = PyEval_GetFrame();
+	if (frame == NULL)
+	{
+		PyErr_SetString(PyExc_RuntimeError, "Failed to get current frame");
+		return NULL;
+	}
+
+	const CM2wPythonFrame kFrame(frame);
+	int line = kFrame.LineNumber();
+	PyObject *filename_obj = kFrame.Code()->co_filename;
+#else
 	PyThreadState *tstate = PyThreadState_GET();
 	if (tstate == NULL || tstate->frame == NULL)
 	{
@@ -129,6 +141,7 @@ static PyObject* print_binary(PyObject* self, PyObject* args)
 	PyFrameObject *frame = tstate->frame;
 	int line = PyCode_Addr2Line(frame->f_code, frame->f_lasti);
 	PyObject *filename_obj = frame->f_code->co_filename;
+#endif
 
 	PyObject *string_filename = PyObject_Str(filename_obj);
 	if (string_filename == NULL)

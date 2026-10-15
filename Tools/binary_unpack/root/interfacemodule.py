@@ -10,6 +10,7 @@ import constInfo
 import systemSetting
 import wndMgr
 import chat
+import item
 import uiTaskBar
 import uiCharacter
 import uiInventory

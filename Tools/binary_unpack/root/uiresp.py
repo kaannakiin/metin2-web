@@ -58,6 +58,7 @@ TOOLTIP_TEXT_DICT = {
 #    nonplayer.RACE_FLAG_DESERT: localeInfo.TARGET_RACE_FLAG_DESERT,
 #    nonplayer.RACE_FLAG_TREE: localeInfo.TARGET_RACE_FLAG_TREE
 #}
+RACE_FLAG_DICT = {}
 
 log = dbg.TraceError
 

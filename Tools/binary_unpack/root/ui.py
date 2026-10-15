@@ -15,6 +15,7 @@ import localeInfo
 import dbg
 # MARK_BUG_FIX
 import guild
+import chat
 # END_OF_MARK_BUG_FIX
 
 from _weakref import proxy
@@ -1944,7 +1945,7 @@ class AniImageBox(Window):
 		def OnEndFrame(self):
 			if self.endFrameArgs == None:
 				if self.endFrameEvent:
-					apply(self.endFrameEvent)
+					self.endFrameEvent()
 			else:
 				if self.endFrameEvent:
 					apply(self.endFrameEvent, self.endFrameArgs)

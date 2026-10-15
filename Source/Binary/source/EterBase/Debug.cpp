@@ -326,7 +326,9 @@ void OpenLogFile(bool bUseLogFIle)
 	#ifdef ENABLE_SYSERR_BY_PID
 	freopen(fmt::format("./syserr/syserr-{}.txt", GetCurrentProcessId()).c_str(), "w", stderr);
 	#else
+#ifndef __EMSCRIPTEN__
 	freopen(str, "w", stderr);
+#endif
 	#endif
 
 	if (bUseLogFIle)
@@ -343,7 +345,9 @@ void OpenLogFile(bool bUseLogFIle)
 	#ifdef ENABLE_SYSERR_BY_PID
 	freopen(fmt::format("./syserr/syserr-{}.txt", GetCurrentProcessId()).c_str(), "w", stderr);
 	#else
+#ifndef __EMSCRIPTEN__
 	freopen("syserr.txt", "w", stderr);
+#endif
 	#endif
 
 	if (bUseLogFIle)

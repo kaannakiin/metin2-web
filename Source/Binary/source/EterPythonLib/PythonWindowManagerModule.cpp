@@ -2867,11 +2867,16 @@ PyObject *wndMgrGetColorAtPosition(PyObject *poSelf, PyObject *poArgs)
 	if (!b)
 		return Py_BuildException();
 
+#ifdef __EMSCRIPTEN__
+	color = 0;
+	return Py_BuildException();
+#else
 	color = GetPixel(hDC, p.x, p.y);
 	if (color == CLR_INVALID)
 		return Py_BuildException();
 
 	ReleaseDC(GetDesktopWindow(), hDC);
+#endif
 	return Py_BuildValue("iii", GetRValue(color), GetGValue(color), GetBValue(color));
 }
 #endif

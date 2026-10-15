@@ -1367,8 +1367,7 @@ class InventoryWindow(ui.ScriptWindow):
 		elif (player.GetItemFlags(srcSlotPos) & ITEM_FLAG_APPLICABLE) == ITEM_FLAG_APPLICABLE:
 			return TRUE
 		elif app.ENABLE_STYLE_ATTRIBUTE_SYSTEM and player.GetItemIndex(srcSlotPos) == 71051:
-			if self.__CanPutNewAttribute(dstSlotPos):
-				return TRUE
+			return TRUE
 		else:
 			if app.ENABLE_EXTEND_TIME_COSTUME_SYSTEM:
 				if player.GetItemIndex(srcSlotPos) >= 84014 and player.GetItemIndex(srcSlotPos) <= 84016:

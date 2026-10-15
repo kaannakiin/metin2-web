@@ -307,7 +307,7 @@ class MessengerFriendItem(MessengerMemberItem):
 	if app.ENABLE_TELEPORT_TO_A_FRIEND:
 		def CanWarp(self):
 			if not self.IsOnline():
-				return FASLE
+				return FALSE
 			return TRUE
 
 		def OnWarp(self):
@@ -322,7 +322,7 @@ if app.ENABLE_MESSENGER_TEAM:
 			return FALSE
 
 		def OnRemove(self):
-			return FASLE
+			return FALSE
 
 if app.ENABLE_MESSENGER_BLOCK:
 	class MessengerBlockFriendItem(MessengerMemberItem):

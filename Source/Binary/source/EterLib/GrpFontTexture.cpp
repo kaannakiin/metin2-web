@@ -269,7 +269,11 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 	{
 		for (nChrX=0; nChrX<nChrWidth; ++nChrX)
 		{
+#ifdef __EMSCRIPTEN__
+			{ const DWORD dwCover = pdwDIBRow[nChrX] & 0xff; pdwDIBRow[nChrX] = dwCover ? (0x0fff | ((dwCover >> 4) << 12)) : 0; }
+#else
 			pdwDIBRow[nChrX]=(pdwDIBRow[nChrX]&0xff) ? 0xffff : 0;
+#endif
 		}
 	}
 

@@ -107,7 +107,11 @@ class CPythonPlayerSettingsModule : public CSingleton<CPythonPlayerSettingsModul
 		{
 			if (!m_loadedThread)
 			{
+#ifdef __EMSCRIPTEN__
+				Load();
+#else
 				m_loadThread = std::thread(&CPythonPlayerSettingsModule::Load, this);
+#endif
 				m_loadedThread = true;
 			}
 		}

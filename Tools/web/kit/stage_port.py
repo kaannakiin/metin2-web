@@ -881,158 +881,12 @@ def resolve_ci(root, rel):
 
 
 PATCHES.append((
-    'EterPack/EterPackManager.cpp',
-    '\tif (_access(c_szFileName, 0) == 0)\n\t\treturn true;\n#endif\n\n\treturn isExistInPack(c_szFileName);',
-    '\tif (_access(c_szFileName, 0) == 0)\n\t\treturn true;\n#else\n\tif (_access(c_szFileName, 0) == 0)\n\t\treturn true;\n#endif\n\n\treturn isExistInPack(c_szFileName);',
-    'isExist checks loose (corpus) files through _access also without FoxFS, as TMP4 does - '
-    'otherwise every existence check misses the streamed corpus (item icons stay empty)',
-))
-
-PATCHES.append((
-    'eterLib/GrpImageInstance.cpp',
-    'LPDIRECT3DTEXTURE9 d3dTexture = pTexture->GetD3DTexture();',
-    'LPDIRECT3DTEXTURE8 d3dTexture = pTexture->GetD3DTexture();',
-    'GetPixelColor was written for the D3D9 build only; GetD3DTexture returns the D3D8 type here',
-))
-
-PATCHES.append((
-    'eterLib/GrpImageInstance.cpp',
-    'IDirect3DSurface9* surface;',
-    'IDirect3DSurface8* surface;',
-    'GetPixelColor surface type, as above',
-))
-
-PATCHES.append((
-    'eterLib/GrpImageTexture.cpp',
-    '        D3DXIMAGE_INFO imageInfo;\n//#ifdef ENABLE_DIRECTX9_UPDATE\n        if (FAILED(D3DXGetImageInfoFromFileInMemory(c_pvBuf, bufSize, &imageInfo)))\n        {\n            TraceError("CreateFromMemoryFile: Cannot get image info");\n            return false;\n        }\n//#endif\n',
-    '        D3DXIMAGE_INFO imageInfo;\n',
-    'D3DXGetImageInfoFromFileInMemory is D3DX9-only; the D3D8 call takes D3DX_DEFAULT sizes as in TMP4',
-))
-
-PATCHES.append((
-    'eterLib/GrpImageTexture.cpp',
-    '//#ifdef ENABLE_DIRECTX9_UPDATE\n                    imageInfo.Width,\n                    imageInfo.Height,\n//#endif\n',
-    '                    D3DX_DEFAULT,\n                    D3DX_DEFAULT,\n',
-    'texture size from the image itself, as in TMP4 (see the patch above)',
-))
-
-PATCHES.append((
-    'eterLib/MSWindow.cpp',
-    '#define DISABLE_TASKBAR_GROUPING\n',
-    '',
-    'taskbar grouping is a Windows 7 shell feature (Shobjidl.h, AppUserModelID) - no taskbar in the browser',
-))
-
-PATCHES.append((
-    'eterLib/JpegFile.cpp',
-    '#include <libjpeg-turbo/jpeglib.h>',
-    '#define HAVE_BOOLEAN\n#include <libjpeg-turbo/jpeglib.h>',
-    'boolean already comes from compat/rpcndr.h (unsigned char, the Windows convention); '
-    'HAVE_BOOLEAN is the libjpeg-turbo switch for exactly this case',
-))
-
-PATCHES.append((
-    'UserInterface/PythonApplicationModule.cpp',
-    '#include <Shellapi.h>',
-    '#include <shellapi.h>',
-    'compat provides shellapi.h (ShellExecute opens a new tab); the fork spells it with a capital S',
-))
-
-PATCHES.append((
-    'EterPythonLib/PythonWindow.cpp',
-    '#include <wingdi.h>\n',
-    '',
-    'GDI colour macros already come from compat/win32_compat.h',
-))
-
-PATCHES.append((
-    'EterPythonLib/PythonWindowManagerModule.cpp',
-    '\tcolor = GetPixel(hDC, p.x, p.y);\n\tif (color == CLR_INVALID)\n\t\treturn Py_BuildException();\n\n\tReleaseDC(GetDesktopWindow(), hDC);\n',
-    '\tcolor = 0;\n\treturn Py_BuildException();\n',
-    'reading a pixel of the desktop through GDI - the browser gives no access to the screen',
-))
-
-PATCHES.append((
-    'UserInterface/minIni.c',
-    '#include "../../Extern/include/minini_12b/minIni.h"',
-    '#include <minini_12b/minIni.h>',
-    'the relative path assumes the Windows tree layout; extern/include is on the include path',
-))
-
-PATCHES.append((
     'UserInterface/PythonPackModule.cpp',
     'LocaleService_GetCodePage()',
     'GetCodePage()',
     'the fork renamed LocaleService_GetCodePage; it returns 1254 for the Turkish (cp1254) locale files',
 ))
 
-PATCHES.append((
-    'UserInterface/PythonDynamicModuleNames.cpp',
-    'std::string szModuleArray[MODULE_MAX] = {};',
-    'std::string szModuleArray[MODULE_MAX] = { "net", "chr", "chrmgr", "app", "pack", "player" };',
-    'random module names are an anti-cheat measure, and the caller check behind them looks '
-    'scripts up in packs - the corpus files are not in packs, so the names are the real ones',
-))
-
-PATCHES.append((
-    'UserInterface/PythonDynamicModuleNames.cpp',
-    '\tPyThreadState* pThreadState = PyThreadState_Get();\n\tPyFrameObject* pFrameObject = pThreadState->frame;\n\n\tchar const* c_szCallerFileName = PyString_AsString(pFrameObject->f_code->co_filename);\n\treturn c_szCallerFileName;',
-    '\tconst CM2wPythonFrame kFrame(PyEval_GetFrame());\n\treturn kFrame.FileName();',
-    'PyFrameObject is opaque in Python 3 - caller file through the guard',
-))
-
-PATCHES.append((
-    'ScriptLib/PythonLauncher.cpp',
-    '\tPyThreadState *tstate = PyThreadState_GET();\n\tif (tstate == NULL || tstate->frame == NULL)\n\t{\n\t\tPyErr_SetString(PyExc_RuntimeError, "Failed to get current frame");\n\t\treturn NULL;\n\t}\n\n\tPyFrameObject *frame = tstate->frame;\n\tint line = PyCode_Addr2Line(frame->f_code, frame->f_lasti);\n\tPyObject *filename_obj = frame->f_code->co_filename;',
-    '\tPyFrameObject *frame = PyEval_GetFrame();\n\tif (frame == NULL)\n\t{\n\t\tPyErr_SetString(PyExc_RuntimeError, "Failed to get current frame");\n\t\treturn NULL;\n\t}\n\n\tconst CM2wPythonFrame kFrame(frame);\n\tint line = kFrame.LineNumber();\n\tPyObject *filename_obj = kFrame.Code()->co_filename;',
-    'printb (fork addition): frame fields through the guard',
-))
-
-PATCHES.append((
-    'UserInterface/PythonApplication.cpp',
-    '    PyThreadState* tstate = PyThreadState_GET();\n    if (tstate)\n    {\n        for (PyFrameObject* frame = tstate->frame; frame; frame = frame->f_back)\n        {\n            PyCodeObject* f_code = frame->f_code;\n            if (!f_code || !f_code->co_filename || !f_code->co_name)\n                continue;\n\n            const char* filename = PyString_AsString(f_code->co_filename);\n            const char* funcname = PyString_AsString(f_code->co_name);\n            int line = PyFrame_GetLineNumber(frame);\n            TraceError("filename=%s, name=%s, line=%d", filename, funcname, line);\n        }\n    }\n',
-    '    PyFrameObject* frame = PyEval_GetFrame();\n    Py_XINCREF(frame);\n    while (frame)\n    {\n        {\n            const CM2wPythonFrame kFrame(frame);\n            TraceError("filename=%s, name=%s, line=%d", kFrame.FileName(), kFrame.FunctionName(), kFrame.LineNumber());\n        }\n        PyFrameObject* back = PyFrame_GetBack(frame);\n        Py_DECREF(frame);\n        frame = back;\n    }\n',
-    'Abort traceback (fork addition): PyFrame_GetBack returns a new reference, '
-    'so each frame is released after its line is printed',
-))
-
-
-PATCHES.append((
-    'UserInterface/PythonApplication.cpp',
-    '\tHWND hWnd = GetWindowHandle();\n\tFLASHWINFO fi;\n\tfi.cbSize = sizeof(FLASHWINFO);\n\tfi.hwnd = hWnd;\n\tfi.dwFlags = FLASHW_ALL | FLASHW_TIMERNOFG;\n\tfi.uCount = 0;\n\tfi.dwTimeout = 0;\n\tFlashWindowEx(&fi);\n',
-    '',
-    'ENABLE_BLINK_ALERT flashes the Windows taskbar button - there is none in the browser',
-))
-
-PATCHES.append((
-    'UserInterface/StdAfx.h',
-    '#pragma once\n\n#pragma warning(disable:4067)\n',
-    '#pragma once\n\n#define _HAS_AUTO_PTR_ETC 0\n#pragma warning(disable:4067)\n',
-    'boost 1.67 hash_base derives from std::unary_function (gone in C++17 libc++) unless '
-    '_HAS_AUTO_PTR_ETC is 0 - the switch MSVC sets in C++17 mode',
-))
-
-PATCHES.append((
-    'UserInterface/minIni.c',
-    '#if defined __linux || defined __linux__\n',
-    '#if defined __linux || defined __linux__ || defined __EMSCRIPTEN__\n',
-    'minIni maps strnicmp to strncasecmp only on platforms it knows',
-))
-
-PATCHES.append((
-    'UserInterface/PythonApplication.cpp',
-    '\tHICON exeIcon = bStatus ? LoadIcon(ms_hInstance, MAKEINTRESOURCE(IDI_METIN2)) : LoadIcon(ms_hInstance, MAKEINTRESOURCE(BLOCK_METIN2));\n\tSendMessage(GetWindowHandle(), WM_SETICON, ICON_BIG, (LPARAM)exeIcon);\n',
-    '',
-    'ENABLE_MULTI_FARM_BLOCK swaps the window icon to show the farm-block state - no window icon in the browser',
-))
-
-PATCHES.append((
-    'UserInterface/Locale.cpp',
-    'int StringCompareCI(LPCSTR szStringLeft',
-    'unsigned int LocaleService_GetCodePage()\n{\n\treturn GetCodePage();\n}\n\nint StringCompareCI(LPCSTR szStringLeft',
-    'the fork renamed LocaleService_GetCodePage to GetCodePage; compat (python2_bridge, ime_web) '
-    'calls it by the TMP4 name',
-))
 
 _SERVER_ADDRESS = workspace.server_address()
 if _SERVER_ADDRESS:
@@ -1058,54 +912,6 @@ PATCHES.append((
     'auth port of ENABLE_BINARY_SERVERINFO, from [server] auth_port in webclient.toml',
 ))
 
-PATCHES.append((
-    'UserInterface/UserInterface.cpp',
-    'PyObject *builtins = PyImport_ImportModule("__builtin__");',
-    'PyObject *builtins = PyImport_ImportModule("builtins");',
-    'the fork registers __DEBUG__/__USE_DYNAMIC_MODULE__ here as well - with the Python 2 name '
-    'the import is NULL, the constants never exist and system.py stops on its first line',
-))
-
-PATCHES.append((
-    'EterBase/Debug.cpp',
-    '\tfreopen(str, "w", stderr);\n',
-    '',
-    'the fork sends stderr to ./syserr/<date>-syserr.txt; that directory does not exist in the '
-    'browser, freopen fails and closes stderr - every TraceError and MessageBox vanished. '
-    'In the browser stderr is the console',
-))
-
-PATCHES.append((
-    'EterBase/Debug.cpp',
-    '\tfreopen("syserr.txt", "w", stderr);\n',
-    '',
-    'the same for the second OpenLogFile variant',
-))
-
-PATCHES.append((
-    'UserInterface/PythonSystem.cpp',
-    '\t\t\tint config_height = m_Config.height;\n\t\t\tint difference = (config_height-screen_height)+7;\n\t\t\tm_Config.height = config_height - difference;\n',
-    '\t\t\tm_Config.height = screen_height;\n',
-    'the 7 px taken off the height make room for a Windows title bar; the browser page has none, '
-    'and compat/locale_web.cpp writes the exact window size into metin2.cfg',
-))
-
-PATCHES.append((
-    'eterLib/GrpFontTexture.cpp',
-    'pdwDIBRow[nChrX]=(pdwDIBRow[nChrX]&0xff) ? 0xffff : 0;',
-    '{ const DWORD dwCover = pdwDIBRow[nChrX] & 0xff; pdwDIBRow[nChrX] = dwCover ? (0x0fff | ((dwCover >> 4) << 12)) : 0; }',
-    'glyph coverage as alpha: the 1-bit threshold suited GDI without anti-aliasing, but the browser '
-    'canvas anti-aliases and every edge pixel turned opaque - thick, jagged text',
-))
-
-PATCHES.append((
-    'UserInterface/PythonPlayerSettingsModule.h',
-    '\t\t\t\tm_loadThread = std::thread(&CPythonPlayerSettingsModule::Load, this);\n',
-    '\t\t\t\tLoad();\n',
-    'ENABLE_CLIENT_PERFORMANCE preloads the race data on a std::thread after login; the wasm build '
-    'has no threads (std::thread throws, the client aborts) - the load runs in the main loop as in TMP4',
-))
-
 def apply_patches(stage):
     """Applies every entry of PATCHES to the staged tree: the pattern must occur
     exactly as many times as declared (default once) or the script stops, so a
@@ -1119,7 +925,7 @@ def apply_patches(stage):
         rel, old, new, why = entry[0], entry[1], entry[2], entry[3]
         expected_values = entry[4] if len(entry) > 4 else 1
         path = resolve_ci(stage, rel)
-        with open(path, encoding='utf-8', errors='ignore') as fh:
+        with open(path, encoding='latin-1') as fh:
             text = fh.read()
         # The pattern must occur EXACTLY ONCE. Once the pattern
         # 'int pos = 0;' hit TWO places - one was a
@@ -1140,7 +946,7 @@ def apply_patches(stage):
                 '  searched: ' + old + '\n'
                 '  reason for the patch: ' + why + '\n'
                 '  The TMP4 source has changed or the patch is no longer needed.')
-        with open(path, 'w', encoding='utf-8') as fh:
+        with open(path, 'w', encoding='latin-1') as fh:
             fh.write(text.replace(old, new, expected_values))
         print(f'  patch: {rel}  <- {why.split(" - ")[0][:60]}')
 

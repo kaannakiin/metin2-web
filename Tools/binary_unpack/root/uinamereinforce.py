@@ -107,7 +107,7 @@ class NameReinforceWindow(ui.ScriptWindow):
 		
 		if len( self.petNameEdit.GetText() ) < 4:
 			self.petNameEdit.SetText("")
-			tchat(uiScriptLocale.NAME_REINFORCE_MORE)
+			chat.AppendChat(chat.CHAT_TYPE_INFO, uiScriptLocale.NAME_REINFORCE_MORE)
 			return
 			
 		if self.whichWindow == 2:

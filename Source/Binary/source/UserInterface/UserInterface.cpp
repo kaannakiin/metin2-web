@@ -455,7 +455,11 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char *lpCmdLine)
 
 	NANOBEGIN
 
+#ifdef __EMSCRIPTEN__
+	PyObject *builtins = PyImport_ImportModule("builtins");
+#else
 	PyObject *builtins = PyImport_ImportModule("__builtin__");
+#endif
 #ifdef _DEBUG
 	PyModule_AddIntConstant(builtins, "__DEBUG__", 1);
 #else

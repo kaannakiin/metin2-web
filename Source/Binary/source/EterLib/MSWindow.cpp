@@ -3,7 +3,9 @@
 
 #include <windowsx.h>
 
+#ifndef __EMSCRIPTEN__
 #define DISABLE_TASKBAR_GROUPING
+#endif
 #ifdef DISABLE_TASKBAR_GROUPING
 	#include <Shobjidl.h>
 #endif

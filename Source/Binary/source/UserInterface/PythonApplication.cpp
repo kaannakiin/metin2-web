@@ -237,6 +237,19 @@ void CPythonApplication::Abort()
     TraceError("============================================================================================================");
     TraceError("Abort!!!!\n\n");
 
+#ifdef __EMSCRIPTEN__
+    PyFrameObject* frame = PyEval_GetFrame();
+    Py_XINCREF(frame);
+    while (frame)
+    {
+        {
+            const CM2wPythonFrame kFrame(frame);
+            TraceError("filename=%s, name=%s, line=%d", kFrame.FileName(), kFrame.FunctionName(), kFrame.LineNumber());
+        }
+        PyFrameObject* back = PyFrame_GetBack(frame);
+        Py_DECREF(frame);
+        frame = back;
+#else
     PyThreadState* tstate = PyThreadState_GET();
     if (tstate)
     {
@@ -251,6 +264,7 @@ void CPythonApplication::Abort()
             int line = PyFrame_GetLineNumber(frame);
             TraceError("filename=%s, name=%s, line=%d", filename, funcname, line);
         }
+#endif
     }
 
     PostQuitMessage(0);
@@ -1635,6 +1649,7 @@ void CPythonApplication::Clear()
 #include <Windows.h>
 void CPythonApplication::FlashApplication()	//@fixme403
 {
+#ifndef __EMSCRIPTEN__
 	HWND hWnd = GetWindowHandle();
 	FLASHWINFO fi;
 	fi.cbSize = sizeof(FLASHWINFO);
@@ -1643,14 +1658,17 @@ void CPythonApplication::FlashApplication()	//@fixme403
 	fi.uCount = 0;
 	fi.dwTimeout = 0;
 	FlashWindowEx(&fi);
+#endif
 }
 #endif
 
 #ifdef ENABLE_MULTI_FARM_BLOCK
 void CPythonApplication::MultiFarmBlockIcon(BYTE bStatus)
 {
+#ifndef __EMSCRIPTEN__
 	HICON exeIcon = bStatus ? LoadIcon(ms_hInstance, MAKEINTRESOURCE(IDI_METIN2)) : LoadIcon(ms_hInstance, MAKEINTRESOURCE(BLOCK_METIN2));
 	SendMessage(GetWindowHandle(), WM_SETICON, ICON_BIG, (LPARAM)exeIcon);
+#endif
 }
 #endif
 

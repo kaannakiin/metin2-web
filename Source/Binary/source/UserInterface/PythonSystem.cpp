@@ -765,9 +765,13 @@ bool CPythonSystem::LoadConfig()
 		}
 		if (m_Config.height >= screen_height) //Fix
 		{
+#ifdef __EMSCRIPTEN__
+			m_Config.height = screen_height;
+#else
 			int config_height = m_Config.height;
 			int difference = (config_height-screen_height)+7;
 			m_Config.height = config_height - difference;
+#endif
 		}
 	}
 

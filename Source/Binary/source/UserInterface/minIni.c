@@ -31,7 +31,11 @@
 
 #define MININI_IMPLEMENTATION
 //#include "minIni.h"
+#ifdef __EMSCRIPTEN__
+#include <minini_12b/minIni.h>
+#else
 #include "../../Extern/include/minini_12b/minIni.h"
+#endif
 #if defined NDEBUG
   #define assert(e)
 #else
@@ -64,7 +68,7 @@
   #define _trename  rename
 #endif
 
-#if defined __linux || defined __linux__
+#if defined __linux || defined __linux__ || defined __EMSCRIPTEN__
   #define __LINUX__
 #elif defined FREEBSD && !defined __FreeBSD__
   #define __FreeBSD__
