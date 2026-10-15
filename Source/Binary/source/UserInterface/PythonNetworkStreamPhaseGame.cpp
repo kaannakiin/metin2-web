@@ -1889,7 +1889,7 @@ bool CPythonNetworkStream::RecvChatPacket()
 				if (id > 900)
 				{
 					std::string c_szStringChat = GetLocaleStringVnum(id);
-					PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_SetBigControlMessage", Py_BuildValue("(s)", c_szStringChat));
+					PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_SetBigControlMessage", Py_BuildValue("(s)", c_szStringChat.c_str()));
 					CPythonChat::Instance().AppendChat(kChat.type, c_szStringChat.c_str());
 				}
 				else

@@ -1172,23 +1172,6 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 				akVertex[2].v = sv;
 				akVertex[3].u = eu;
 				akVertex[3].v = ev;
-#else
-#ifdef ENABLE_FIX_MOBS_LAG
-				const auto tex = pFontTexture->GetTexture(pCurCharInfo->index);
-				auto & batchVertices = verticesMap[tex];
-#else
-				pFontTexture->SelectTexture(pCurCharInfo->index);
-				STATEMANAGER.SetTexture(0, pFontTexture->GetD3DTexture());
-#endif
-
-				akVertex[0].u=pCurCharInfo->left;
-				akVertex[0].v=pCurCharInfo->top;
-				akVertex[1].u=pCurCharInfo->left;
-				akVertex[1].v=pCurCharInfo->bottom;
-				akVertex[2].u=pCurCharInfo->right;
-				akVertex[2].v=pCurCharInfo->top;
-				akVertex[3].u=pCurCharInfo->right;
-				akVertex[3].v=pCurCharInfo->bottom;
 #endif
 
 #ifdef ENABLE_FIX_MOBS_LAG

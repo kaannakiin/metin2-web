@@ -3,8 +3,11 @@
 #include "PythonSlotWindow.h"
 #include "PythonGridSlotWindow.h"
 #include "PythonWindowManager.h"
+#include <unordered_set>
 
 BOOL g_bShowOverInWindowName = FALSE;
+
+extern std::unordered_set<const void*> g_kSetDeletedWindow;
 
 namespace UI
 {
@@ -349,6 +352,17 @@ namespace UI
 
 	void CWindowManager::DestroyWindow(CWindow * pWin)
 	{
+		if (std::find(m_ReserveDeleteWindowList.begin(), m_ReserveDeleteWindowList.end(), pWin) != m_ReserveDeleteWindowList.end())
+		{
+			TraceError("DestroyWindow: window %p destroyed twice in one frame - ignored", (void*)pWin);
+			return;
+		}
+		if (g_kSetDeletedWindow.count(pWin))
+		{
+			TraceError("DestroyWindow: window %p was already deleted - ignored", (void*)pWin);
+			PyRun_SimpleString("import traceback, sys; traceback.print_stack(file=sys.stderr)");
+			return;
+		}
 		NotifyDestroyWindow(pWin);
 		if (pWin->HasParent())
 		{

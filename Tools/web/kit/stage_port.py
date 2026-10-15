@@ -889,22 +889,6 @@ PATCHES.append((
 ))
 
 PATCHES.append((
-    'eterLib/GrpImageTexture.h',
-    '\n#ifndef ENABLE_DIRECTX9_UPDATE\n        bool CreateDDSTexture(CDXTCImage& image, const BYTE* c_pbBuf);\n#endif\n',
-    '\n',
-    'second CreateDDSTexture declaration - the fork only ever built with ENABLE_DIRECTX9_UPDATE, '
-    'so this D3D8-only duplicate of the line above never compiled',
-))
-
-PATCHES.append((
-    'eterLib/GrpTextInstance.cpp',
-    '#else\n#ifdef ENABLE_FIX_MOBS_LAG\n\t\t\t\tconst auto tex = pFontTexture->GetTexture(pCurCharInfo->index);\n\t\t\t\tauto & batchVertices = verticesMap[tex];\n#else\n\t\t\t\tpFontTexture->SelectTexture(pCurCharInfo->index);\n\t\t\t\tSTATEMANAGER.SetTexture(0, pFontTexture->GetD3DTexture());\n#endif\n\n\t\t\t\takVertex[0].u=pCurCharInfo->left;\n\t\t\t\takVertex[0].v=pCurCharInfo->top;\n\t\t\t\takVertex[1].u=pCurCharInfo->left;\n\t\t\t\takVertex[1].v=pCurCharInfo->bottom;\n\t\t\t\takVertex[2].u=pCurCharInfo->right;\n\t\t\t\takVertex[2].v=pCurCharInfo->top;\n\t\t\t\takVertex[3].u=pCurCharInfo->right;\n\t\t\t\takVertex[3].v=pCurCharInfo->bottom;\n#endif\n',
-    '#endif\n',
-    'a second #else after the ENABLE_CLIP_MASKING #else - MSVC drops the dead branch silently, '
-    'clang refuses it; the clip-masking branch above is the one MSVC compiled',
-))
-
-PATCHES.append((
     'eterLib/GrpImageInstance.cpp',
     'LPDIRECT3DTEXTURE9 d3dTexture = pTexture->GetD3DTexture();',
     'LPDIRECT3DTEXTURE8 d3dTexture = pTexture->GetD3DTexture();',
@@ -969,34 +953,6 @@ PATCHES.append((
 ))
 
 PATCHES.append((
-    'UserInterface/PythonChatModule.cpp',
-    '\t\t\t\t\tresults[16],\n',
-    '\t\t\t\t\tresults[16].c_str(),\n',
-    'std::string passed to snprintf for %s - undefined behaviour under MSVC too, a hard error under clang',
-))
-
-PATCHES.append((
-    'UserInterface/PythonNetworkStreamPhaseGame.cpp',
-    'Py_BuildValue("(s)", c_szStringChat)',
-    'Py_BuildValue("(s)", c_szStringChat.c_str())',
-    'std::string passed to Py_BuildValue for "s" - see the PythonChatModule patch',
-))
-
-PATCHES.append((
-    'UserInterface/PythonGameEventManager.cpp',
-    'const tm* t = localtime(&eventTable.startTime);',
-    'const time_t tStart = eventTable.startTime;\n\t\tconst tm* t = localtime(&tStart);',
-    'startTime is a long, localtime takes time_t* - the same width only on 32-bit MSVC',
-))
-
-PATCHES.append((
-    'UserInterface/PythonNetworkStreamModule.cpp',
-    '\tsize_t id;\n\tif (!PyTuple_GetUnsignedInteger(poArgs, 0, &id))',
-    '\tunsigned int id;\n\tif (!PyTuple_GetUnsignedInteger(poArgs, 0, &id))',
-    'size_t is unsigned long on wasm32, not unsigned int as on 32-bit MSVC',
-))
-
-PATCHES.append((
     'UserInterface/minIni.c',
     '#include "../../Extern/include/minini_12b/minIni.h"',
     '#include <minini_12b/minIni.h>',
@@ -1042,21 +998,6 @@ PATCHES.append((
 
 
 PATCHES.append((
-    'eterLib/GrpBase.cpp',
-    '#ifdef ENABLE_FIX_MOBS_LAG\nbool CGraphicBase::SetPDTStream(SPDTVertexRaw* pSrcVertices, UINT uVtxCount)\n',
-    'bool CGraphicBase::SetPDTStream(SPDTVertexRaw* pSrcVertices, UINT uVtxCount)\n',
-    'the whole SetPDTStream sits in ENABLE_FIX_MOBS_LAG but its closing brace does not - the fork '
-    'only ever built with the flag on; the body has its own non-flag branch',
-))
-
-PATCHES.append((
-    'eterLib/GrpBase.cpp',
-    '\treturn true;\n#endif\n#endif\n}\n',
-    '\treturn true;\n#endif\n}\n',
-    'the matching #endif of the patch above',
-))
-
-PATCHES.append((
     'UserInterface/PythonApplication.cpp',
     '\tHWND hWnd = GetWindowHandle();\n\tFLASHWINFO fi;\n\tfi.cbSize = sizeof(FLASHWINFO);\n\tfi.hwnd = hWnd;\n\tfi.dwFlags = FLASHW_ALL | FLASHW_TIMERNOFG;\n\tfi.uCount = 0;\n\tfi.dwTimeout = 0;\n\tFlashWindowEx(&fi);\n',
     '',
@@ -1083,21 +1024,6 @@ PATCHES.append((
     '\tHICON exeIcon = bStatus ? LoadIcon(ms_hInstance, MAKEINTRESOURCE(IDI_METIN2)) : LoadIcon(ms_hInstance, MAKEINTRESOURCE(BLOCK_METIN2));\n\tSendMessage(GetWindowHandle(), WM_SETICON, ICON_BIG, (LPARAM)exeIcon);\n',
     '',
     'ENABLE_MULTI_FARM_BLOCK swaps the window icon to show the farm-block state - no window icon in the browser',
-))
-
-PATCHES.append((
-    'GameLib/PropertyManager.cpp',
-    '#ifdef ENABLE_FOXFS_ENCRYPT\nbool CPropertyManager::Put(',
-    'bool CPropertyManager::Put(',
-    'Put/Erase exist only under ENABLE_FOXFS_ENCRYPT although they use only m_pack, '
-    'which the non-FoxFS branch has as well; Property.cpp needs Put',
-))
-
-PATCHES.append((
-    'GameLib/PropertyManager.cpp',
-    '\treturn false;\n}\n#endif\n\nvoid CPropertyManager::Clear()',
-    '\treturn false;\n}\n\nvoid CPropertyManager::Clear()',
-    'the matching #endif of the patch above',
 ))
 
 PATCHES.append((
@@ -1178,143 +1104,6 @@ PATCHES.append((
     '\t\t\t\tLoad();\n',
     'ENABLE_CLIENT_PERFORMANCE preloads the race data on a std::thread after login; the wasm build '
     'has no threads (std::thread throws, the client aborts) - the load runs in the main loop as in TMP4',
-))
-
-PATCHES.append((
-    'eterLib/GrpImageInstance.cpp',
-    '\t\t\tbreak;\n\t}\n\tsurface->UnlockRect();\n\n\treturn dxClr;',
-    '\t\t\tbreak;\n\t}\n\tsurface->UnlockRect();\n\tsurface->Release();\n\n\treturn dxClr;',
-    'GetPixelColor never released the surface from GetSurfaceLevel - every hover test kept '
-    'a reference to the texture',
-))
-
-PATCHES.append((
-    'EterPythonLib/PythonWindowManager.cpp',
-    '\tvoid CWindowManager::DestroyWindow(CWindow * pWin)\n\t{\n\t\tNotifyDestroyWindow(pWin);\n',
-    '\tvoid CWindowManager::DestroyWindow(CWindow * pWin)\n\t{\n'
-    '\t\tif (std::find(m_ReserveDeleteWindowList.begin(), m_ReserveDeleteWindowList.end(), pWin) != m_ReserveDeleteWindowList.end())\n'
-    '\t\t{\n\t\t\tTraceError("DestroyWindow: window %p destroyed twice in one frame - ignored", (void*)pWin);\n\t\t\treturn;\n\t\t}\n'
-    '\t\tNotifyDestroyWindow(pWin);\n',
-    'a window destroyed twice before the deferred delete ran was deleted twice - '
-    'the second delete walked freed memory (crash in ~CAniImageBox on entering the game)',
-))
-
-PATCHES.append((
-    'EterBase/Debug.cpp',
-    '\tlen = _vsnprintf(szBuf + len, sizeof(szBuf) - (len + 1), c_szFormat, args) + len;\n',
-    '\t{\n\t\tconst int iWritten = _vsnprintf(szBuf + len, sizeof(szBuf) - (len + 1), c_szFormat, args);\n'
-    '\t\tlen = iWritten < 0 ? (int)sizeof(szBuf) - 2 : len + iWritten;\n\t}\n',
-    'TraceError: a message longer than the buffer wrote "\\n\\0" at szBuf[len] far past the '
-    'stack buffer (ASan: stack-buffer-overflow) - the heap corruption seen after login',
-))
-
-PATCHES.append((
-    'EterImageLib/DXTCImage.cpp',
-    '\tmemcpy(pbDest, m_pbCompBufferByLevels[miplevel], m_lPitch >> (miplevel * 2));\n',
-    '\t{\n'
-    '\t\tconst long lLevelW = max(1, m_nWidth >> miplevel);\n'
-    '\t\tconst long lLevelH = max(1, m_nHeight >> miplevel);\n'
-    '\t\tconst long lLevelBytes = ((lLevelW + 3) / 4) * ((lLevelH + 3) / 4) * (m_CompFormat == PF_DXT1 ? 8 : 16);\n'
-    '\t\tmemcpy(pbDest, m_pbCompBufferByLevels[miplevel], min(m_lPitch >> (miplevel * 2), lLevelBytes));\n'
-    '\t}\n',
-    'DDS files whose dwLinearSize is larger than the real block data overran the texture level '
-    '(ASan: heap-buffer-overflow in CDXTCImage::Copy); a D3D driver lock tolerated the excess',
-))
-
-PATCHES.append((
-    'GameLib/ActorInstanceMotion.cpp',
-    '\tDWORD dwMotionKey=rReservingMotionNode.dwMotionKey;\n',
-    '\tDWORD dwMotionKey=rReservingMotionNode.dwMotionKey;\n\tconst float fReservedStartTime=rReservingMotionNode.fStartTime;\n',
-    'ReservingMotionProcess read the front node after pop_front (ASan: container-overflow)',
-))
-PATCHES.append((
-    'eterLib/GrpImageTexture.cpp',
-    '    if (image.LoadHeaderFromMemory((const BYTE *) c_pvBuf))\n',
-    '    if (bufSize >= 128 && image.LoadHeaderFromMemory((const BYTE *) c_pvBuf))\n',
-    'the DDS magic check is commented out, so every image was parsed as a 128-byte DDS header - '
-    'past the end of smaller files (ASan: heap-buffer-overflow in LoadHeaderFromMemory)',
-))
-
-PATCHES.append((
-    'EterPythonLib/PythonWindow.h',
-    '\t\t\tstd::function<void(CGraphicExpandedImageInstance*)> m_SetRenderingRect, m_SetRenderingMode, m_SetDiffuseColor;\n',
-    '\t\t\tbool m_bRenderingRect = false, m_bRenderingMode = false, m_bDiffuseColor = false;\n'
-    '\t\t\tfloat m_afRenderingRect[4] = {}, m_afDiffuseColor[4] = {};\n'
-    '\t\t\tint m_iRenderingMode = 0;\n',
-    'CAniImageBox kept its settings in heap std::function objects; the in-game crash was '
-    '~CAniImageBox calling destroy_deallocate through a zeroed vtable - plain values instead',
-))
-PATCHES.append((
-    'EterPythonLib/PythonWindow.cpp',
-    '\t\tm_SetDiffuseColor = std::bind(&CGraphicExpandedImageInstance::SetDiffuseColor, std::placeholders::_1, r, g, b, a);\n'
-    '\t\tstd::for_each(m_ImageVector.begin(), m_ImageVector.end(), m_SetDiffuseColor);\n',
-    '\t\tm_bDiffuseColor = true;\n\t\tm_afDiffuseColor[0] = r; m_afDiffuseColor[1] = g; m_afDiffuseColor[2] = b; m_afDiffuseColor[3] = a;\n'
-    '\t\tfor (CGraphicExpandedImageInstance* pInstance : m_ImageVector)\n\t\t\tpInstance->SetDiffuseColor(r, g, b, a);\n',
-    'CAniImageBox::SetDiffuseColor without std::function',
-))
-PATCHES.append((
-    'EterPythonLib/PythonWindow.cpp',
-    '\t\tm_SetRenderingRect = std::bind(&CGraphicExpandedImageInstance::SetRenderingRect, std::placeholders::_1, fLeft, fTop, fRight, fBottom);\n'
-    '\t\tstd::for_each(m_ImageVector.begin(), m_ImageVector.end(), m_SetRenderingRect);\n',
-    '\t\tm_bRenderingRect = true;\n\t\tm_afRenderingRect[0] = fLeft; m_afRenderingRect[1] = fTop; m_afRenderingRect[2] = fRight; m_afRenderingRect[3] = fBottom;\n'
-    '\t\tfor (CGraphicExpandedImageInstance* pInstance : m_ImageVector)\n\t\t\tpInstance->SetRenderingRect(fLeft, fTop, fRight, fBottom);\n',
-    'CAniImageBox::SetRenderingRect without std::function',
-))
-PATCHES.append((
-    'EterPythonLib/PythonWindow.cpp',
-    '\t\tm_SetRenderingMode = std::bind(&CGraphicExpandedImageInstance::SetRenderingMode, std::placeholders::_1, iMode);\n'
-    '\t\tstd::for_each(m_ImageVector.begin(), m_ImageVector.end(), m_SetRenderingMode);\n',
-    '\t\tm_bRenderingMode = true;\n\t\tm_iRenderingMode = iMode;\n'
-    '\t\tfor (CGraphicExpandedImageInstance* pInstance : m_ImageVector)\n\t\t\tpInstance->SetRenderingMode(iMode);\n',
-    'CAniImageBox::SetRenderingMode without std::function',
-))
-PATCHES.append((
-    'EterPythonLib/PythonWindow.cpp',
-    '\t\t\t\t\tif (m_SetRenderingRect)\n\t\t\t\t\t\tm_SetRenderingRect(pImageInstance);\n\n'
-    '\t\t\t\t\tif (m_SetRenderingMode)\n\t\t\t\t\t\tm_SetRenderingMode(pImageInstance);\n\n'
-    '\t\t\t\t\tif (m_SetDiffuseColor)\n\t\t\t\t\t\tm_SetDiffuseColor(pImageInstance);\n',
-    '\t\t\t\t\tif (m_bRenderingRect)\n\t\t\t\t\t\tpImageInstance->SetRenderingRect(m_afRenderingRect[0], m_afRenderingRect[1], m_afRenderingRect[2], m_afRenderingRect[3]);\n\n'
-    '\t\t\t\t\tif (m_bRenderingMode)\n\t\t\t\t\t\tpImageInstance->SetRenderingMode(m_iRenderingMode);\n\n'
-    '\t\t\t\t\tif (m_bDiffuseColor)\n\t\t\t\t\t\tpImageInstance->SetDiffuseColor(m_afDiffuseColor[0], m_afDiffuseColor[1], m_afDiffuseColor[2], m_afDiffuseColor[3]);\n',
-    'CAniImageBox::OnUpdate applies the stored settings to a new frame',
-))
-
-PATCHES.append((
-    'EterPythonLib/PythonWindow.cpp',
-    'BOOL g_bOutlineBoxEnable = FALSE;\n',
-    'BOOL g_bOutlineBoxEnable = FALSE;\n\n#include <unordered_set>\nstd::unordered_set<const void*> g_m2wDeadWindows;\n',
-    'addresses of deleted windows, so a second wndMgr.Destroy of the same handle is caught',
-))
-PATCHES.append((
-    'EterPythonLib/PythonWindow.cpp',
-    '\t\tm_windowType = WINDOW_TYPE_WINDOW;\n\t}\n\n\tCWindow::~CWindow()\n\t{\n\t}\n',
-    '\t\tm_windowType = WINDOW_TYPE_WINDOW;\n\t\tg_m2wDeadWindows.erase(this);\n\t}\n\n'
-    '\tCWindow::~CWindow()\n\t{\n\t\tg_m2wDeadWindows.insert(this);\n\t}\n',
-    'a window marks its address dead when deleted and live again when the address is reused',
-))
-PATCHES.append((
-    'EterPythonLib/PythonWindowManager.cpp',
-    '\t\t\tTraceError("DestroyWindow: window %p destroyed twice in one frame - ignored", (void*)pWin);\n\t\t\treturn;\n\t\t}\n',
-    '\t\t\tTraceError("DestroyWindow: window %p destroyed twice in one frame - ignored", (void*)pWin);\n\t\t\treturn;\n\t\t}\n'
-    '\t\tif (g_m2wDeadWindows.count(pWin))\n\t\t{\n'
-    '\t\t\tTraceError("DestroyWindow: window %p was already deleted - ignored", (void*)pWin);\n'
-    '\t\t\tPyRun_SimpleString("import traceback, sys; traceback.print_stack(file=sys.stderr)");\n'
-    '\t\t\treturn;\n\t\t}\n',
-    'a handle destroyed again in a later frame deleted the window twice (ASan: ~CAniImageBox '
-    'called destroy_deallocate through a zeroed vtable) - the in-game crash',
-))
-PATCHES.append((
-    'EterPythonLib/PythonWindowManager.cpp',
-    'BOOL g_bShowOverInWindowName = FALSE;\n',
-    'BOOL g_bShowOverInWindowName = FALSE;\n\n#include <unordered_set>\nextern std::unordered_set<const void*> g_m2wDeadWindows;\n',
-    'the dead-window set lives in PythonWindow.cpp',
-))
-
-PATCHES.append((
-    'GameLib/ActorInstanceMotion.cpp',
-    '\tfloat fStartTime = rReservingMotionNode.fStartTime;\n',
-    '\tfloat fStartTime = fReservedStartTime;\n',
-    'ReservingMotionProcess: the start time saved before pop_front',
 ))
 
 def apply_patches(stage):

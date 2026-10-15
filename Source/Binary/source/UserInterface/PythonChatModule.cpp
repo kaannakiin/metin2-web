@@ -526,7 +526,7 @@ PyObject *chatGetLinkFromHyperlink(PyObject *poSelf, PyObject *poArgs)
 					htoi(results[13].c_str()),
 					htoi(results[14].c_str()),
 					htoi(results[15].c_str()),
-					results[16],
+					results[16].c_str(),
 					htoi(results[15].c_str()),
 					htoi(results[16].c_str()),
 					htoi(results[17].c_str()),

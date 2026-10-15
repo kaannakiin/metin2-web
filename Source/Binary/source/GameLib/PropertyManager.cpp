@@ -303,7 +303,6 @@ bool CPropertyManager::Get(DWORD dwCRC, CProperty ** ppProperty)
 	return true;
 }
 
-#ifdef ENABLE_FOXFS_ENCRYPT
 bool CPropertyManager::Put(const char *c_pszFileName, const char *c_pszSourceFileName)
 {
 	if (!CopyFile(c_pszSourceFileName, c_pszFileName, FALSE))
@@ -364,7 +363,6 @@ bool CPropertyManager::Erase(const char *c_pszFileName)
 
 	return false;
 }
-#endif
 
 void CPropertyManager::Clear()
 {

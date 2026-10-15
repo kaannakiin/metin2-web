@@ -279,7 +279,12 @@ bool CDXTCImage::Copy(int miplevel, BYTE * pbDest, long lDestPitch)
 	}
 	*/
 
-	memcpy(pbDest, m_pbCompBufferByLevels[miplevel], m_lPitch >> (miplevel * 2));
+	{
+		const long lLevelW = max(1, m_nWidth >> miplevel);
+		const long lLevelH = max(1, m_nHeight >> miplevel);
+		const long lLevelBytes = ((lLevelW + 3) / 4) * ((lLevelH + 3) / 4) * (m_CompFormat == PF_DXT1 ? 8 : 16);
+		memcpy(pbDest, m_pbCompBufferByLevels[miplevel], min(m_lPitch >> (miplevel * 2), lLevelBytes));
+	}
 	pbDest += lDestPitch;
 	return true;
 }

@@ -1731,7 +1731,7 @@ PyObject* netSendRespFetchRespPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendRespTeleportPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	size_t id;
+	unsigned int id;
 	if (!PyTuple_GetUnsignedInteger(poArgs, 0, &id))
 		return Py_BuildException();
 

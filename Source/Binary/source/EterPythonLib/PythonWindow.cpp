@@ -6,6 +6,7 @@
 #include <gif_lib.h>
 #include <wingdi.h>
 #include <array>
+#include <unordered_set>
 
 #ifdef ENABLE_RENDER_TARGET
 	#include "../EterLib/RenderTargetManager.h"
@@ -16,6 +17,8 @@
 #endif
 
 BOOL g_bOutlineBoxEnable = FALSE;
+
+std::unordered_set<const void*> g_kSetDeletedWindow;
 
 #ifdef ENABLE_FISH_GAME
 #include "../eterBase/Random.h"
@@ -144,10 +147,12 @@ namespace UI
 		memset(&m_rMaskRect, 0, sizeof(m_rMaskRect));
 #endif
 		m_windowType = WINDOW_TYPE_WINDOW;
+		g_kSetDeletedWindow.erase(this);
 	}
 
 	CWindow::~CWindow()
 	{
+		g_kSetDeletedWindow.insert(this);
 	}
 
 	DWORD CWindow::Type()
@@ -2321,8 +2326,10 @@ namespace UI
 
 	void CAniImageBox::SetDiffuseColor(float r, float g, float b, float a)
 	{
-		m_SetDiffuseColor = std::bind(&CGraphicExpandedImageInstance::SetDiffuseColor, std::placeholders::_1, r, g, b, a);
-		std::for_each(m_ImageVector.begin(), m_ImageVector.end(), m_SetDiffuseColor);
+		m_bDiffuseColor = true;
+		m_afDiffuseColor[0] = r; m_afDiffuseColor[1] = g; m_afDiffuseColor[2] = b; m_afDiffuseColor[3] = a;
+		for (CGraphicExpandedImageInstance* pInstance : m_ImageVector)
+			pInstance->SetDiffuseColor(r, g, b, a);
 	}
 
 	void CAniImageBox::AppendImage(const char* c_szFileName)
@@ -2341,8 +2348,10 @@ namespace UI
 
 	void CAniImageBox::SetRenderingRect(float fLeft, float fTop, float fRight, float fBottom)
 	{
-		m_SetRenderingRect = std::bind(&CGraphicExpandedImageInstance::SetRenderingRect, std::placeholders::_1, fLeft, fTop, fRight, fBottom);
-		std::for_each(m_ImageVector.begin(), m_ImageVector.end(), m_SetRenderingRect);
+		m_bRenderingRect = true;
+		m_afRenderingRect[0] = fLeft; m_afRenderingRect[1] = fTop; m_afRenderingRect[2] = fRight; m_afRenderingRect[3] = fBottom;
+		for (CGraphicExpandedImageInstance* pInstance : m_ImageVector)
+			pInstance->SetRenderingRect(fLeft, fTop, fRight, fBottom);
 	}
 
 	struct FSetRenderingRectWithScale
@@ -2375,8 +2384,10 @@ namespace UI
 
 	void CAniImageBox::SetRenderingMode(int iMode)
 	{
-		m_SetRenderingMode = std::bind(&CGraphicExpandedImageInstance::SetRenderingMode, std::placeholders::_1, iMode);
-		std::for_each(m_ImageVector.begin(), m_ImageVector.end(), m_SetRenderingMode);
+		m_bRenderingMode = true;
+		m_iRenderingMode = iMode;
+		for (CGraphicExpandedImageInstance* pInstance : m_ImageVector)
+			pInstance->SetRenderingMode(iMode);
 	}
 
 	struct FSetAniImgScale
@@ -2426,14 +2437,14 @@ namespace UI
 				{
 					pImageInstance->SetPosition(m_rect.left, m_rect.top);
 
-					if (m_SetRenderingRect)
-						m_SetRenderingRect(pImageInstance);
+					if (m_bRenderingRect)
+						pImageInstance->SetRenderingRect(m_afRenderingRect[0], m_afRenderingRect[1], m_afRenderingRect[2], m_afRenderingRect[3]);
 
-					if (m_SetRenderingMode)
-						m_SetRenderingMode(pImageInstance);
+					if (m_bRenderingMode)
+						pImageInstance->SetRenderingMode(m_iRenderingMode);
 
-					if (m_SetDiffuseColor)
-						m_SetDiffuseColor(pImageInstance);
+					if (m_bDiffuseColor)
+						pImageInstance->SetDiffuseColor(m_afDiffuseColor[0], m_afDiffuseColor[1], m_afDiffuseColor[2], m_afDiffuseColor[3]);
 
 					m_ImageVector.push_back(pImageInstance);
 				}

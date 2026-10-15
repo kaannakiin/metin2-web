@@ -101,7 +101,8 @@ void InGameEventManager::AddEventData(std::vector<TEventTable>& eventVec)
 	for (std::vector<TEventTable>::const_iterator itor = eventVec.begin(); itor < eventVec.end(); ++itor)
 	{
 		const TEventTable eventTable = *itor;
-		const tm* t = localtime(&eventTable.startTime);
+		const time_t tStart = eventTable.startTime;
+		const tm* t = localtime(&tStart);
 
 		m_map_Event[t->tm_mday].emplace_back(eventTable);
 	}

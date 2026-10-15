@@ -210,7 +210,10 @@ void TraceError(const char * c_szFormat, ...)
 
 	va_list args;
 	va_start(args, c_szFormat);
-	len = _vsnprintf(szBuf + len, sizeof(szBuf) - (len + 1), c_szFormat, args) + len;
+	{
+		const int iWritten = _vsnprintf(szBuf + len, sizeof(szBuf) - (len + 1), c_szFormat, args);
+		len = iWritten < 0 ? (int)sizeof(szBuf) - 2 : len + iWritten;
+	}
 	va_end(args);
 
 	szBuf[len] = '\n';

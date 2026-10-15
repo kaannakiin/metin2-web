@@ -433,6 +433,7 @@ D3DXCOLOR CGraphicImageInstance::GetPixelColor(int x, int y)
 			break;
 	}
 	surface->UnlockRect();
+	surface->Release();
 
 	return dxClr;
 }

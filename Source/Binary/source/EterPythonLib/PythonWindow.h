@@ -603,7 +603,9 @@ namespace UI
 			std::vector<CGraphicExpandedImageInstance*> m_ImageVector;
 
 			std::queue<std::string> m_ImageFileNames;
-			std::function<void(CGraphicExpandedImageInstance*)> m_SetRenderingRect, m_SetRenderingMode, m_SetDiffuseColor;
+			bool m_bRenderingRect = false, m_bRenderingMode = false, m_bDiffuseColor = false;
+			float m_afRenderingRect[4] = {}, m_afDiffuseColor[4] = {};
+			int m_iRenderingMode = 0;
 
 			float m_fScaleX;
 			float m_fScaleY;

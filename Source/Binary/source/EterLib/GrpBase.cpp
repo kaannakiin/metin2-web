@@ -173,7 +173,6 @@ bool CGraphicBase::SetPDTStream(SPDTVertex* pVertices, UINT uVtxCount)
 	return SetPDTStream((SPDTVertexRaw*)pVertices, uVtxCount);
 }
 
-#ifdef ENABLE_FIX_MOBS_LAG
 bool CGraphicBase::SetPDTStream(SPDTVertexRaw* pSrcVertices, UINT uVtxCount)
 {
 	if (!uVtxCount)
@@ -263,7 +262,6 @@ bool CGraphicBase::SetPDTStream(SPDTVertexRaw* pSrcVertices, UINT uVtxCount)
 	plpd3dFillRectVB->Unlock();
 	STATEMANAGER.SetStreamSource(0, plpd3dFillRectVB, sizeof(TPDTVertex));
 	return true;
-#endif
 #endif
 }
 

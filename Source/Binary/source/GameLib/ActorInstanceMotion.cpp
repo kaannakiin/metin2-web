@@ -86,6 +86,7 @@ void CActorInstance::ReservingMotionProcess()
 	float fBlendTime=rReservingMotionNode.fBlendTime;
 
 	DWORD dwMotionKey=rReservingMotionNode.dwMotionKey;
+	const float fReservedStartTime=rReservingMotionNode.fStartTime;
 
 	m_MotionDeque.pop_front();
 
@@ -126,7 +127,7 @@ void CActorInstance::ReservingMotionProcess()
 
 	//float fDurationTime=rReservingMotionNode.fDuration;
 	float fDurationTime = GetMotionDuration(dwRealMotionKey) / fSpeedRatio;
-	float fStartTime = rReservingMotionNode.fStartTime;
+	float fStartTime = fReservedStartTime;
 	float fEndTime = fStartTime + fDurationTime;
 
 	if (dwRealMotionKey == 16777473)
