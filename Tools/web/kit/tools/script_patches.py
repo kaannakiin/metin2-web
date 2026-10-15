@@ -306,6 +306,23 @@ PATCHES_SCRIPTS += [
      'no registry - nothing saved to read back'),
 ]
 
+# Anka2 serverInfo.py lists the author's test servers (192.168.1.156) next to
+# the one from the binary, and four channels; our server runs channel 1 only.
+PATCHES_SCRIPTS += [
+    ('serverInfo.py',
+     '"name" : sv1_name + " ~ Windows",',
+     '"name" : sv1_name,',
+     'the server name without the author\'s platform tag'),
+    ('serverInfo.py',
+     '\t2 : {\n\t\t"key" : 12,\n\t\t"name":"CH2   ",\n\t\t"ip" : SRV1["host"],\n\t\t"tcp_port" : SRV1["ch2"],\n\t\t"udp_port" : SRV1["ch2"],\n\t\t"state" : STATE_NONE,\n\t},\n\t3 : {\n\t\t"key" : 13,\n\t\t"name" : "CH3   ",\n\t\t"ip" : SRV1["host"],\n\t\t"tcp_port" : SRV1["ch3"],\n\t\t"udp_port" : SRV1["ch3"],\n\t\t"state" : STATE_NONE,\n\t},\n\t4 : {\n\t\t"key" : 14,\n\t\t"name" : "CH4   ",\n\t\t"ip" : SRV1["host"],\n\t\t"tcp_port" : SRV1["ch4"],\n\t\t"udp_port" : SRV1["ch4"],\n\t\t"state" : STATE_NONE,\n\t},\n',
+     '',
+     'only channel 1 runs on our server'),
+    ('serverInfo.py',
+     '\t\t2 : {\n\t\t\t"state" : "SPECIAL",\n\t\t\t"name" : SRV2["name"],\n\t\t\t"channel" : SERVER2_CHANNEL_DICT,\n\t\t},\n\t\t3 : {\n\t\t\t"state" : "SPECIAL",\n\t\t\t"name" : SRV3["name"],\n\t\t\t"channel" : SERVER3_CHANNEL_DICT,\n\t\t},\n',
+     '',
+     'the author\'s test servers (192.168.1.156) are not ours - the bridge refuses them'),
+]
+
 # The PATCHES_SCRIPTS table describes places; these rules describe NAMES. Only
 # replacements that are unambiguous in the whole language and need no reading
 # of the context belong here - otherwise they would go into the table.
@@ -380,7 +397,9 @@ def apply_all(directory):
             old_ones = old_ones.replace(NL, chr(13) + NL)
             new_ones = new_ones.replace(NL, chr(13) + NL)
 
-        if new_ones in content:
+        # a removal (empty replacement) is done when its pattern is gone;
+        # '' is "in" every file, so the check below would skip it for good
+        if (new_ones in content) if new_ones else (old_ones not in content):
             print('  already there: %s <- %s' % (name, why_needed))
             continue
 
