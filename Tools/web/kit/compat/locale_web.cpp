@@ -30,6 +30,63 @@ EM_JS(int, m2w_browser_language, (char* pszBuffer, int iSize), {
     return r.codePage;
 });
 
+EM_JS(int, m2w_config_window_size, (int iHeight), { return m2w.windowSize(iHeight); });
+
+/// Anka2's metin2.cfg fixes WIDTH/HEIGHT (1280x768), and the login window is
+/// laid out once at that size; the device then follows the browser window,
+/// leaving the interface in a corner. So the window size goes into the
+/// config before the client reads it.
+void SetScreenSizeConfig()
+{
+    const int iWidth = m2w_config_window_size(0);
+    const int iHeight = m2w_config_window_size(1);
+    if (iWidth <= 0 || iHeight <= 0)
+        return;
+
+    char szOut[8192];
+    size_t uOut = 0;
+    bool bWidth = false, bHeight = false;
+    FILE* fIn = fopen("metin2.cfg", "rb");
+    if (fIn)
+    {
+        char szLine[512];
+        while (fgets(szLine, sizeof(szLine), fIn))
+        {
+            const char* pszLine = szLine;
+            char szNew[64];
+            if (strncmp(szLine, "WIDTH", 5) == 0 && (szLine[5] == ' ' || szLine[5] == '\t'))
+            {
+                snprintf(szNew, sizeof(szNew), "WIDTH\t\t\t\t\t\t%d\n", iWidth);
+                pszLine = szNew;
+                bWidth = true;
+            }
+            else if (strncmp(szLine, "HEIGHT", 6) == 0 && (szLine[6] == ' ' || szLine[6] == '\t'))
+            {
+                snprintf(szNew, sizeof(szNew), "HEIGHT\t\t\t\t\t\t%d\n", iHeight);
+                pszLine = szNew;
+                bHeight = true;
+            }
+            const size_t uLen = strlen(pszLine);
+            if (uOut + uLen >= sizeof(szOut) - 64)
+                break;
+            memcpy(szOut + uOut, pszLine, uLen);
+            uOut += uLen;
+        }
+        fclose(fIn);
+    }
+    if (!bWidth)
+        uOut += snprintf(szOut + uOut, sizeof(szOut) - uOut, "WIDTH\t\t\t\t\t\t%d\n", iWidth);
+    if (!bHeight)
+        uOut += snprintf(szOut + uOut, sizeof(szOut) - uOut, "HEIGHT\t\t\t\t\t\t%d\n", iHeight);
+
+    FILE* fOut = fopen("metin2.cfg", "wb");
+    if (!fOut)
+        return;
+    fwrite(szOut, 1, uOut, fOut);
+    fclose(fOut);
+    printf("m2w screen: metin2.cfg %dx%d (browser window)\n", iWidth, iHeight);
+}
+
 }  // namespace
 
 /// Writes `/locale.cfg` from the page address. Called from `main`, before
@@ -72,4 +129,6 @@ void M2W_SetLocale()
     fprintf(f, "%s\n", szLine);
     fclose(f);
     printf("m2w locale: locale.cfg = '%s'\n", szLine);
+
+    SetScreenSizeConfig();
 }

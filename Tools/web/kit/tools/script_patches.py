@@ -323,6 +323,18 @@ PATCHES_SCRIPTS += [
      'the author\'s test servers (192.168.1.156) are not ours - the bridge refuses them'),
 ]
 
+# channel.inf in the client package remembers the author's last choice
+# (server 2), which our trimmed list no longer has - the login window then
+# selects nothing and never asks for the channel states.
+PATCHES_SCRIPTS += [
+    ('introLogin.py',
+     '\t\tloadRegionID, loadServerID, loadChannelID = self.__LoadChannelInfo()\n',
+     '\t\tloadRegionID, loadServerID, loadChannelID = self.__LoadChannelInfo()\n'
+     '\t\tif loadServerID not in serverInfo.REGION_DICT.get(loadRegionID, {}):\n'
+     '\t\t\tloadRegionID, loadServerID, loadChannelID = 0, 1, 1\n',
+     'a remembered server that is not in the list falls back to server 1, channel 1'),
+]
+
 # The PATCHES_SCRIPTS table describes places; these rules describe NAMES. Only
 # replacements that are unambiguous in the whole language and need no reading
 # of the context belong here - otherwise they would go into the table.

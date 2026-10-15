@@ -14,9 +14,12 @@ docker rm -f m2web-bridge >/dev/null 2>&1 || true
 docker run -d --name m2web-bridge --restart unless-stopped --network host --user 1000:1000 --read-only \
     -v /home/m2web/bridge:/app:ro -w /app node:20-alpine node src/index.js bridge-site.json
 
+# the site serves /home/m2web/www, filled only by publish.sh (checks the package first)
+/home/m2web/publish.sh
+
 docker rm -f m2web-site >/dev/null 2>&1 || true
 docker run -d --name m2web-site --restart unless-stopped --network coolify \
-    -v /home/m2web/kit/dist/site:/usr/share/nginx/html:ro \
+    -v /home/m2web/www:/usr/share/nginx/html:ro \
     -v /home/m2web/site-nginx.conf:/etc/nginx/conf.d/default.conf:ro nginx:1.27-alpine
 
 # one-time, already applied:

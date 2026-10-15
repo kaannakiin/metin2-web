@@ -1156,6 +1156,38 @@ PATCHES.append((
     'the same for the second OpenLogFile variant',
 ))
 
+PATCHES.append((
+    'UserInterface/PythonSystem.cpp',
+    '\t\t\tint config_height = m_Config.height;\n\t\t\tint difference = (config_height-screen_height)+7;\n\t\t\tm_Config.height = config_height - difference;\n',
+    '\t\t\tm_Config.height = screen_height;\n',
+    'the 7 px taken off the height make room for a Windows title bar; the browser page has none, '
+    'and compat/locale_web.cpp writes the exact window size into metin2.cfg',
+))
+
+PATCHES.append((
+    'eterLib/GrpFontTexture.cpp',
+    'pdwDIBRow[nChrX]=(pdwDIBRow[nChrX]&0xff) ? 0xffff : 0;',
+    '{ const DWORD dwCover = pdwDIBRow[nChrX] & 0xff; pdwDIBRow[nChrX] = dwCover ? (0x0fff | ((dwCover >> 4) << 12)) : 0; }',
+    'glyph coverage as alpha: the 1-bit threshold suited GDI without anti-aliasing, but the browser '
+    'canvas anti-aliases and every edge pixel turned opaque - thick, jagged text',
+))
+
+PATCHES.append((
+    'UserInterface/PythonPlayerSettingsModule.h',
+    '\t\t\t\tm_loadThread = std::thread(&CPythonPlayerSettingsModule::Load, this);\n',
+    '\t\t\t\tLoad();\n',
+    'ENABLE_CLIENT_PERFORMANCE preloads the race data on a std::thread after login; the wasm build '
+    'has no threads (std::thread throws, the client aborts) - the load runs in the main loop as in TMP4',
+))
+
+PATCHES.append((
+    'eterLib/GrpImageInstance.cpp',
+    '\t\t\tbreak;\n\t}\n\tsurface->UnlockRect();\n\n\treturn dxClr;',
+    '\t\t\tbreak;\n\t}\n\tsurface->UnlockRect();\n\tsurface->Release();\n\n\treturn dxClr;',
+    'GetPixelColor never released the surface from GetSurfaceLevel - every hover test kept '
+    'a reference to the texture',
+))
+
 def apply_patches(stage):
     """Applies every entry of PATCHES to the staged tree: the pattern must occur
     exactly as many times as declared (default once) or the script stops, so a
