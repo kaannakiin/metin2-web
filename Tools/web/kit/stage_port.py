@@ -1132,6 +1132,30 @@ PATCHES.append((
     'auth port of ENABLE_BINARY_SERVERINFO, from [server] auth_port in webclient.toml',
 ))
 
+PATCHES.append((
+    'UserInterface/UserInterface.cpp',
+    'PyObject *builtins = PyImport_ImportModule("__builtin__");',
+    'PyObject *builtins = PyImport_ImportModule("builtins");',
+    'the fork registers __DEBUG__/__USE_DYNAMIC_MODULE__ here as well - with the Python 2 name '
+    'the import is NULL, the constants never exist and system.py stops on its first line',
+))
+
+PATCHES.append((
+    'EterBase/Debug.cpp',
+    '\tfreopen(str, "w", stderr);\n',
+    '',
+    'the fork sends stderr to ./syserr/<date>-syserr.txt; that directory does not exist in the '
+    'browser, freopen fails and closes stderr - every TraceError and MessageBox vanished. '
+    'In the browser stderr is the console',
+))
+
+PATCHES.append((
+    'EterBase/Debug.cpp',
+    '\tfreopen("syserr.txt", "w", stderr);\n',
+    '',
+    'the same for the second OpenLogFile variant',
+))
+
 def apply_patches(stage):
     """Applies every entry of PATCHES to the staged tree: the pattern must occur
     exactly as many times as declared (default once) or the script stops, so a

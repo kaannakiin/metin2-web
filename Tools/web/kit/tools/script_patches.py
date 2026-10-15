@@ -288,6 +288,24 @@ def _for_fork(entry):
 PATCHES_SCRIPTS = [_for_fork(e) for e in PATCHES_SCRIPTS]
 
 
+# Anka2: introLogin.py keeps the "remember account" data in the Windows
+# registry (winreg) and catches WindowsError - neither exists in the browser.
+# Without a registry the helpers report "nothing saved".
+PATCHES_SCRIPTS += [
+    ('introLogin.py',
+     'import winreg' + NL,
+     'try:' + NL + TAB + 'import winreg' + NL + 'except ImportError:' + NL + TAB + 'winreg = None' + NL,
+     'winreg (Windows registry) does not exist in the browser'),
+    ('introLogin.py',
+     'def set_reg(name, value):' + NL + TAB + 'try:',
+     'def set_reg(name, value):' + NL + TAB + 'if winreg is None:' + NL + TAB + TAB + 'return FALSE' + NL + TAB + 'try:',
+     'no registry - the saved login is not stored'),
+    ('introLogin.py',
+     'def get_reg(name):' + NL + TAB + 'try:',
+     'def get_reg(name):' + NL + TAB + 'if winreg is None:' + NL + TAB + TAB + 'return None' + NL + TAB + 'try:',
+     'no registry - nothing saved to read back'),
+]
+
 # The PATCHES_SCRIPTS table describes places; these rules describe NAMES. Only
 # replacements that are unambiguous in the whole language and need no reading
 # of the context belong here - otherwise they would go into the table.
