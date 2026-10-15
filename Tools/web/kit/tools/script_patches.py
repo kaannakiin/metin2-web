@@ -335,6 +335,37 @@ PATCHES_SCRIPTS += [
      'a remembered server that is not in the list falls back to server 1, channel 1'),
 ]
 
+# pickle needs binary files in Python 3, and the pickles shipped with the
+# client were written by Python 2 (str = bytes) - read them as latin-1 and
+# treat a file that does not unpickle as missing. uiresp.py opened its file
+# in text mode: the interface stopped half-built on entering the game.
+PATCHES_SCRIPTS += [
+    ('uiresp.py',
+     '            file = open(CONFIG_FILENAME, "r")\n\n            try:\n                data = pickle.load(file)\n',
+     '            file = open(CONFIG_FILENAME, "rb")\n\n            try:\n                data = pickle.load(file, encoding="latin1")\n',
+     'pickle reads binary files in Python 3'),
+    ('uiresp.py',
+     '            except ValueError:\n                pass\n\n            except EOFError:\n',
+     '            except (ValueError, pickle.UnpicklingError, UnicodeDecodeError, TypeError):\n                pass\n\n            except EOFError:\n',
+     'a settings file from the Python 2 client counts as no settings'),
+    ('uiresp.py',
+     '        file = open(CONFIG_FILENAME, "w")\n        file.write(pickle.dumps(data))\n        file.write("\\n")\n',
+     '        file = open(CONFIG_FILENAME, "wb")\n        file.write(pickle.dumps(data))\n        file.write(b"\\n")\n',
+     'pickle.dumps gives bytes in Python 3'),
+    ('uiDungeonTrack.py',
+     '\t\tcurrentSettings = pickle.load(f)\n',
+     '\t\tcurrentSettings = pickle.load(f, encoding="latin1")\n',
+     'Python 2 pickles hold byte strings'),
+    ('uiDungeonTrack.py',
+     '\t\t\t\tdungeonInfo["selected"] = settingData["selected"]\n\texcept IOError:\n\t\tpass\n',
+     '\t\t\t\tdungeonInfo["selected"] = settingData["selected"]\n\texcept (IOError, ValueError, EOFError, KeyError, pickle.UnpicklingError, UnicodeDecodeError):\n\t\tpass\n',
+     'an unreadable track file counts as no settings'),
+    ('uiSwitchbot.py',
+     "\t\t\t\tself.dict = pickle.load(f)\n\t\texcept IOError:\n",
+     "\t\t\t\tself.dict = pickle.load(f, encoding=\"latin1\")\n\t\texcept (IOError, ValueError, EOFError, pickle.UnpicklingError, UnicodeDecodeError):\n",
+     'an unreadable switchbot file counts as no configurations'),
+]
+
 # The PATCHES_SCRIPTS table describes places; these rules describe NAMES. Only
 # replacements that are unambiguous in the whole language and need no reading
 # of the context belong here - otherwise they would go into the table.

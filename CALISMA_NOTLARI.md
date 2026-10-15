@@ -184,26 +184,53 @@ tarayıcı ─https─▶ Traefik (coolify-proxy, Let's Encrypt)
 
 1. `__builtin__` → `builtins` (fork aynı satırı `UserInterface.cpp`'de de kullanıyor).
 2. Fork `OpenLogFile` stderr'i `./syserr/` klasörüne yönlendiriyordu → klasör yok, stderr kapanıyordu, hiçbir hata görünmüyordu. Web'de stderr = konsol.
-3. `locale.cfg`: fork iki alan okuyor (`1254 tr`), kit üç alan yazıyordu (`10002 1254 tr`) → "cp10002" hatası.
-4. `introLogin.py` Windows kayıt defteri (`winreg`) kullanıyor → yoksa "kayıtlı hesap yok".
-5. PNG desteği (fork arayüzü PNG, kit sadece TGA/BMP/JPEG/DDS okuyordu) → libpng.
-6. **Kod sayfası 1254 tablosu yoktu** → bütün Türkçe metinler boş çiziliyordu.
-7. `serverInfo.py`: yazarın test sunucuları (192.168.1.156) çıkarıldı, tek kanal; `channel.inf` hatırlanan sunucu yoksa 1/1.
+3. `locale.cfg`: fork iki alan okuyor (`1254 tr`), kit üç alan yazıyordu → "cp10002" hatası (`compat/locale_web.cpp`).
+4. `introLogin.py` Windows kayıt defteri (`winreg`) kullanıyor → yoksa "kayıtlı hesap yok" ("hesabı hatırla" web'de çalışmaz).
+5. PNG desteği (fork arayüzü PNG; kit sadece TGA/BMP/JPEG/DDS) → `compat/d3d8_image.cpp` + `-sUSE_LIBPNG=1`. TGA/BMP/PNG'ye 8192 px boyut sınırı (güvenlik).
+6. **Kod sayfası 1254 tablosu yoktu** → bütün Türkçe metinler boş çiziliyordu (`compat/codepages.cpp`, Python cp1254 codec'inden üretildi).
+7. `serverInfo.py`: yazarın test sunucuları (192.168.1.156) çıkarıldı, tek kanal; `channel.inf` hatırlanan sunucu yoksa 1/1. Silme yamalarının "zaten var" sanılması hatası (`script_patches.apply_all`) düzeltildi.
 8. Tam ekran: açılışta tarayıcı penceresi boyutu `metin2.cfg`'ye yazılıyor; 7 px başlık çubuğu kırpması kaldırıldı.
-9. **Fontlar:** Windows GDI yerine FreeType mono+hinting ile `TMP4FNT1` bin'leri (`tools/bake_fonts_ft.py`, OS/2 win metrikleri) → orijinal piksel font görünümü.
-10. Girişte `std::thread` çökmesi (`ENABLE_CLIENT_PERFORMANCE` ön yükleme) → ana döngüde senkron yükleme.
-11. Kanal "Offline": yukarıdaki 7 ile çözüldü.
+9. **Fontlar:** Windows GDI yerine FreeType mono+hinting ile `TMP4FNT1` bin'leri (`tools/bake_fonts_ft.py`, OS/2 win metrikleri, wine `tahoma.ttf`/`tahomabd.ttf`; container'a `freetype-py==2.5.1` kuruldu) → orijinal piksel font görünümü. Canvas yedeği için glif kapsamı = alfa.
+10. Girişte `std::thread` çökmesi (`ENABLE_CLIENT_PERFORMANCE` ön yükleme) → ana döngüde senkron `Load()` (girişten sonra ~5000 dosya; bu sürede donma var).
+11. **Granny `.gr2` sürüm 7 (Granny 2.11):** modellerin yarısı (8434/16347) reddediliyordu (karakter animasyonları, canavarlar, haritalar, kostümler).
+    - Okuyucu v7 magic/sürümünü kabul ediyor (`compat/gr2_file.cpp`, `tools/gr2.py`); veri düzeni aynı.
+    - BitKnit2 sıkıştırmalı 4032 dosya `Tools/web/kit/gr2_bitknit/gr2_unbitknit` ile sıkıştırmasız yazılıp `build/port/repaired_gr2/`'ye konuyor (corpus overlay). Çözücü libbg3/ooz (GPL-3.0, sadece build aracı).
+    - Sonuç: reddedilen 422 → 22 (kalan 22 = kitin Oodle1 çözücüsünün açamadığı dosyalar: bazı emote'lar, `damage`, `skill_charge`, `jumagap`).
+    - `gr2_file.cpp` relocation/kök pointer sınırları 64 bit kontrol (güvenlik).
+12. `numan` yanlışlıkla `gm01` hesabında oluşmuştu → kullanıcı onayıyla `kaannakiin`'e taşındı (player.account_id=1, player_index id1 pid1=1 empire=3).
+13. `uiresp.py` pickle'ı metin modunda açıyordu → arayüz yarım kalıyordu; `uiDungeonTrack`/`uiSwitchbot` pickle'ları sağlamlaştırıldı.
+14. `best_system` pack'i (`System/Dungeon/script/tabledungeon.py`) script adımına eklendi (`TO_UNPACK`).
+15. `CWindowManager::DestroyWindow` aynı karede iki kez çağrılırsa yok sayılıyor (tetiklendiği görülmedi; zararsız koruma).
+16. `GetPixelColor` surface sızıntısı kapatıldı.
 
-**Açık:** krallık seçiminden sonra `free()` içinde abort (bellek bozulması / çift serbest bırakma). ASan teşhis derlemesi `/asan/` adresinde (`EMCC_CFLAGS=-fsanitize=address`, 4 GB bellek; açılış ~10 dk).
+**Şu anki durum:** giriş ✅, karakter seçimi ✅ (numan modeli görünüyor), oyuna giriş ✅ (harita, karakter, arayüz, sohbet görüldü). **Ama birkaç saniye/dakika içinde çöküyor.**
 
-Yayın: `/home/m2web/publish.sh` (paket eksiksiz değilse canlıya dokunmaz), site `/home/m2web/www`'den sunuluyor.
+### AÇIK SORUN: bellek bozulması (heap corruption)
+
+- Belirtiler değişken: `free()` içinde abort (texture bırakılırken), Python GC'de `memory access out of bounds` (`deduce_unreachable`, `dict_dealloc`), `~CAniImageBox`, `malloc` içinde OOB.
+- `/dbg/client.html` (canlı client + `PYTHONMALLOC=debug`, `PYTHONTRACEMALLOC=8`; `www/dbg/` sembolik bağlantılar, `publish.sh` siler) ile: çökme **oyuna girmeden, girişten sonraki ön yükleme sırasında `malloc` içinde** → dlmalloc kayıtları eziliyor = **C/C++ heap taşması**, Python refcount hatası değil.
+- Elenen şüpheliler: Oodle1 çözücü (yazmalar sınırlı), baked font yapıştırma (sınırlı), `SaveColorMap`, `UnloadGif`, `CreateFromTexturePointer`, `pSrcInfo`.
+- **Sıradaki adım:** ASan sürümü güncel kodla derlendi ve `/asan/client.html?deflang=tr` adresinde (EMCC_CFLAGS=`-fsanitize=address -sMAXIMUM_MEMORY=4294967296`, `/home/m2web/build_asan.sh`, `publish_asan.sh`). Açılışı ~10 dk. Giriş yapıp ön yüklemeyi bekle; konsolda `AddressSanitizer: heap-buffer-overflow` satırı ve yığın izi taşan yeri gösterecek.
+- **DİKKAT:** ASan derlemesi `libeterbase.a`, `libeterpack.a` ve `obj/gamelib`'i ASan'lı bıraktı. Normal yayından önce `eterbase eterpack engine link` normal (EMCC_CFLAGS'siz) yeniden derlenmeli (`/home/m2web/build9.sh` adımlarına ekle).
+
+### Diğer açık işler (yayına etkisi küçük)
+
+- Yüklemede fare donuyor → donanım imlecine geç (`metin2.cfg` `SOFTWARE_CURSOR 0` ya da `?cursor=hardware`).
+- "İstemci yükleniyor"/"bağlanıyorsun" kutusundaki **kara bant**: 4'ün katı olmayan DXT texture'ı WebGL reddediyor (`glCompressedTexImage2D ... not multiples of 4`) → compat'ta bu boyutlarda CPU'da açıp RGBA yükle (`compat/dxt.cpp` var).
+- Ana döngü yükleme sırasında bloklanınca auth WebSocket'i zaman aşımına düşebiliyor ("Sunucuya bağlanıyorsun" takılması) → tekrar deneyince geçiyor.
+- Ağaçlar: SpeedTree `.spt` (Windows'a özel SpeedTreeRT) → Windows'ta kitin `trees` adımı ya da açık kaynak okuyucu. `property/shyeonline/trees/*.prt` "File format error" bununla ilgili.
+- Harita adı Almanca görünüyor ("Gebiet Pyungmoo") → harita adları locale dosyası (de/tr) kontrol edilmeli.
+- Kalan 22 Oodle1 `.gr2` (kitin çözücüsü açamıyor).
+- Python: `OnRecvEventInformation` arayüzden önce gelirse `wndEvent` yok hatası (zararsız).
+- Sunucu: `INSERT DELAYED` MariaDB'de desteklenmiyor (log/loginlog tabloları yazılmıyor) → `DELAYED` kaldırılmalı.
 
 ## 7. Sıradaki adımlar
 
-1. **İlk giriş testi** (`kaannakiin` / `numan`) — tarayıcıda; hata olursa tarayıcı konsolu + `docker logs m2web-bridge` + VM'deki syslog'lar.
-2. GM şifresini değiştir (sohbette geçti).
-3. Oyun içi özellikleri adım adım test et (switchbot, wiki, pet, gaya, aura, kuşak…).
-4. Ağaçlar (SpeedTree) yok — dış haritalarda ağaç görünmeyecek; ileride ele alınabilir.
+1. ASan ile heap taşmasını bul ve düzelt (yukarıdaki "AÇIK SORUN").
+2. Normal kütüphaneleri yeniden derle + yayınla; `kaannakiin`/`numan` ile oyuna girip birkaç dakika stabil kaldığını doğrula.
+3. Fare/kara bant/DXT, ağaçlar, harita adı dili.
+4. GM şifresini değiştir (sohbette geçti).
+5. Oyun içi özellikleri adım adım test et (switchbot, wiki, pet, gaya, aura, kuşak…).
 
 ### Bilinen eksikler (sonra)
 
@@ -223,3 +250,8 @@ Yayın: `/home/m2web/publish.sh` (paket eksiksiz değilse canlıya dokunmaz), si
 - `docker exec` heredoc için `-i` gerekir; izin kuralı `docker exec m2web-build` ile başlayan komutları kapsıyor → script'i önce `/home/m2web/` altına yaz, sonra `docker exec m2web-build bash /work/x.sh`.
 - `~/.claude/settings.json`'a eklenen izin kuralı: `Bash(ssh -o BatchMode=yes root@88.99.1.151 'docker exec m2web-build:*)`.
 - Host'ta canlı servisler var (mailcow, Coolify, foodhunch tunnel'ları) — onlara dokunma.
+- Build scriptleri (host `/home/m2web/`, container'da `/work/`): `build9.sh` (adım listesi `for s in ...` satırında, `sed` ile değiştiriliyor), `build_asan.sh`, `publish.sh` (canlı), `publish_asan.sh`. Uzun işler: `(nohup bash -c 'docker exec m2web-build bash /work/X.sh && /home/m2web/publish.sh ...' &)`.
+- Kit değişikliklerinin repo kopyaları `Tools/web/kit/{stage_port.py,compat/,tools/,site/,gr2_bitknit/}`; sunucudaki kit `/home/m2web/kit` (= container `/work/kit`). Değişikliği hem scratchpad/repo'ya hem `scp` ile sunucuya koy.
+- Tarayıcı testi (1920×899 pencere): kullanıcı adı alanı (958,395), şifre (958,465), giriş butonu (960,523), karakter seçiminde başlat (1020,788). Tıklamalar `mouse.down`/`up` arasında ~100 ms beklemeyle; hızlı tıklama algılanmıyor. Ekran görüntüsü aracı bazen eski kareyi döndürüyor → tekrar al.
+- zsh'de `$c:refs` gibi ifadeler `:r` değiştiricisi olarak yorumlanıyor → `${c}` yaz ya da bash script kullan.
+- Kaynak dosyalar stage'de UTF-8 okunuyor (`errors='ignore'`) → yama desenleri ASCII olmalı.

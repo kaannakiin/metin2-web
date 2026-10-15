@@ -40,7 +40,7 @@ EMSDK = workspace.EMSDK
 # Pack names - without extension. `CEterPack` adds `.eix` and `.epk` itself.
 # `locale_pl` - the language of the user's server (`?deflang=pl`). Without
 # this pack, choosing Polish ended in a crash on `locale/pl/ui/LoginWindow.py`.
-TO_UNPACK = ('root', 'locale')
+TO_UNPACK = ('root', 'locale', 'best_system')
 
 
 def tool_name(name):

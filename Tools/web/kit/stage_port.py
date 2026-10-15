@@ -1188,6 +1188,17 @@ PATCHES.append((
     'a reference to the texture',
 ))
 
+PATCHES.append((
+    'EterPythonLib/PythonWindowManager.cpp',
+    '\tvoid CWindowManager::DestroyWindow(CWindow * pWin)\n\t{\n\t\tNotifyDestroyWindow(pWin);\n',
+    '\tvoid CWindowManager::DestroyWindow(CWindow * pWin)\n\t{\n'
+    '\t\tif (std::find(m_ReserveDeleteWindowList.begin(), m_ReserveDeleteWindowList.end(), pWin) != m_ReserveDeleteWindowList.end())\n'
+    '\t\t{\n\t\t\tTraceError("DestroyWindow: window %p destroyed twice in one frame - ignored", (void*)pWin);\n\t\t\treturn;\n\t\t}\n'
+    '\t\tNotifyDestroyWindow(pWin);\n',
+    'a window destroyed twice before the deferred delete ran was deleted twice - '
+    'the second delete walked freed memory (crash in ~CAniImageBox on entering the game)',
+))
+
 def apply_patches(stage):
     """Applies every entry of PATCHES to the staged tree: the pattern must occur
     exactly as many times as declared (default once) or the script stops, so a
