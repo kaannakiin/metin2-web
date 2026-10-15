@@ -483,7 +483,7 @@ bool CFile::ApplyRelocations(const uint8_t* c_pbyFile, uint32_t uSize,
                 m_c_szError = "relocation points at a section that does not exist";
                 return false;
             }
-            if (uFrom + 4 > m_vecSectionSizes[i] ||
+            if ((uint64_t)uFrom + sizeof(uint8_t*) > m_vecSectionSizes[i] ||
                 uToOffset > m_vecSectionSizes[uToSection])
             {
                 m_c_szError = "relocation past the end of a section";
@@ -541,8 +541,8 @@ bool CFile::Load(const uint8_t* c_pbyFile, uint32_t uSize)
         m_c_szError = "nonsensical section count";
         return false;
     }
-    const uint32_t uTableEnd =
-        uBase + uSectionOffset + uSections * c_uSectionEntrySize;
+    const uint64_t uTableEnd =
+        (uint64_t)uBase + uSectionOffset + (uint64_t)uSections * c_uSectionEntrySize;
     if (uTableEnd > uSize)
     {
         m_c_szError = "section table past the end of the file";
@@ -559,6 +559,12 @@ bool CFile::Load(const uint8_t* c_pbyFile, uint32_t uSize)
         !m_vecSections[uTypeSection] || !m_vecSections[uObjectSection])
     {
         m_c_szError = "root points at a section that does not exist";
+        return false;
+    }
+    if (uTypeOffset >= m_vecSectionSizes[uTypeSection] ||
+        uObjectOffset >= m_vecSectionSizes[uObjectSection])
+    {
+        m_c_szError = "root points past the end of its section";
         return false;
     }
     m_pRootType = (granny_data_type_definition*)
