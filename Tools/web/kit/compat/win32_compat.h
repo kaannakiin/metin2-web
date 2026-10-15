@@ -273,11 +273,28 @@ union LARGE_INTEGER {
 #define __forceinline inline
 #endif
 
+// MSVC's _vsnprintf/_snprintf return -1 on truncation; C99 returns the
+// untruncated length. The client writes `buf[len] = '\n'` with that result
+// (EterBase/Debug.cpp), so the C99 value put bytes past the stack buffer on
+// every log line longer than the buffer.
+inline int M2W_MsvcVsnprintf(char* pszBuf, size_t uSize, const char* c_szFormat, va_list args)
+{
+    const int iWritten = vsnprintf(pszBuf, uSize, c_szFormat, args);
+    return (iWritten < 0 || static_cast<size_t>(iWritten) >= uSize) ? -1 : iWritten;
+}
+inline int M2W_MsvcSnprintf(char* pszBuf, size_t uSize, const char* c_szFormat, ...)
+{
+    va_list args;
+    va_start(args, c_szFormat);
+    const int iWritten = M2W_MsvcVsnprintf(pszBuf, uSize, c_szFormat, args);
+    va_end(args);
+    return iWritten;
+}
 #ifndef _vsnprintf
-#define _vsnprintf vsnprintf
+#define _vsnprintf M2W_MsvcVsnprintf
 #endif
 #ifndef _snprintf
-#define _snprintf snprintf
+#define _snprintf M2W_MsvcSnprintf
 #endif
 
 /// Win32 defines `min`/`max` as MACROS. TMP4 code relies on them. I define

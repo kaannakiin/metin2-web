@@ -138,3 +138,14 @@ const char* M2W_StubsFullList()
 void Discord_Initialize(const char*, DiscordEventHandlers*, int, const char*) {}
 void Discord_Shutdown(void) {}
 void Discord_UpdatePresence(const DiscordRichPresence*) {}
+
+#if defined(__has_feature)
+#if __has_feature(address_sanitizer)
+// Options compiled in: the page's ENV is set after ASan has read its options.
+// No allocation stacks - collecting them on every malloc made startup take minutes.
+extern "C" __attribute__((used)) const char* __asan_default_options()
+{
+    return "halt_on_error=0:detect_leaks=0:malloc_context_size=0:fast_unwind_on_malloc=1:quarantine_size_mb=256";
+}
+#endif
+#endif

@@ -1199,6 +1199,124 @@ PATCHES.append((
     'the second delete walked freed memory (crash in ~CAniImageBox on entering the game)',
 ))
 
+PATCHES.append((
+    'EterBase/Debug.cpp',
+    '\tlen = _vsnprintf(szBuf + len, sizeof(szBuf) - (len + 1), c_szFormat, args) + len;\n',
+    '\t{\n\t\tconst int iWritten = _vsnprintf(szBuf + len, sizeof(szBuf) - (len + 1), c_szFormat, args);\n'
+    '\t\tlen = iWritten < 0 ? (int)sizeof(szBuf) - 2 : len + iWritten;\n\t}\n',
+    'TraceError: a message longer than the buffer wrote "\\n\\0" at szBuf[len] far past the '
+    'stack buffer (ASan: stack-buffer-overflow) - the heap corruption seen after login',
+))
+
+PATCHES.append((
+    'EterImageLib/DXTCImage.cpp',
+    '\tmemcpy(pbDest, m_pbCompBufferByLevels[miplevel], m_lPitch >> (miplevel * 2));\n',
+    '\t{\n'
+    '\t\tconst long lLevelW = max(1, m_nWidth >> miplevel);\n'
+    '\t\tconst long lLevelH = max(1, m_nHeight >> miplevel);\n'
+    '\t\tconst long lLevelBytes = ((lLevelW + 3) / 4) * ((lLevelH + 3) / 4) * (m_CompFormat == PF_DXT1 ? 8 : 16);\n'
+    '\t\tmemcpy(pbDest, m_pbCompBufferByLevels[miplevel], min(m_lPitch >> (miplevel * 2), lLevelBytes));\n'
+    '\t}\n',
+    'DDS files whose dwLinearSize is larger than the real block data overran the texture level '
+    '(ASan: heap-buffer-overflow in CDXTCImage::Copy); a D3D driver lock tolerated the excess',
+))
+
+PATCHES.append((
+    'GameLib/ActorInstanceMotion.cpp',
+    '\tDWORD dwMotionKey=rReservingMotionNode.dwMotionKey;\n',
+    '\tDWORD dwMotionKey=rReservingMotionNode.dwMotionKey;\n\tconst float fReservedStartTime=rReservingMotionNode.fStartTime;\n',
+    'ReservingMotionProcess read the front node after pop_front (ASan: container-overflow)',
+))
+PATCHES.append((
+    'eterLib/GrpImageTexture.cpp',
+    '    if (image.LoadHeaderFromMemory((const BYTE *) c_pvBuf))\n',
+    '    if (bufSize >= 128 && image.LoadHeaderFromMemory((const BYTE *) c_pvBuf))\n',
+    'the DDS magic check is commented out, so every image was parsed as a 128-byte DDS header - '
+    'past the end of smaller files (ASan: heap-buffer-overflow in LoadHeaderFromMemory)',
+))
+
+PATCHES.append((
+    'EterPythonLib/PythonWindow.h',
+    '\t\t\tstd::function<void(CGraphicExpandedImageInstance*)> m_SetRenderingRect, m_SetRenderingMode, m_SetDiffuseColor;\n',
+    '\t\t\tbool m_bRenderingRect = false, m_bRenderingMode = false, m_bDiffuseColor = false;\n'
+    '\t\t\tfloat m_afRenderingRect[4] = {}, m_afDiffuseColor[4] = {};\n'
+    '\t\t\tint m_iRenderingMode = 0;\n',
+    'CAniImageBox kept its settings in heap std::function objects; the in-game crash was '
+    '~CAniImageBox calling destroy_deallocate through a zeroed vtable - plain values instead',
+))
+PATCHES.append((
+    'EterPythonLib/PythonWindow.cpp',
+    '\t\tm_SetDiffuseColor = std::bind(&CGraphicExpandedImageInstance::SetDiffuseColor, std::placeholders::_1, r, g, b, a);\n'
+    '\t\tstd::for_each(m_ImageVector.begin(), m_ImageVector.end(), m_SetDiffuseColor);\n',
+    '\t\tm_bDiffuseColor = true;\n\t\tm_afDiffuseColor[0] = r; m_afDiffuseColor[1] = g; m_afDiffuseColor[2] = b; m_afDiffuseColor[3] = a;\n'
+    '\t\tfor (CGraphicExpandedImageInstance* pInstance : m_ImageVector)\n\t\t\tpInstance->SetDiffuseColor(r, g, b, a);\n',
+    'CAniImageBox::SetDiffuseColor without std::function',
+))
+PATCHES.append((
+    'EterPythonLib/PythonWindow.cpp',
+    '\t\tm_SetRenderingRect = std::bind(&CGraphicExpandedImageInstance::SetRenderingRect, std::placeholders::_1, fLeft, fTop, fRight, fBottom);\n'
+    '\t\tstd::for_each(m_ImageVector.begin(), m_ImageVector.end(), m_SetRenderingRect);\n',
+    '\t\tm_bRenderingRect = true;\n\t\tm_afRenderingRect[0] = fLeft; m_afRenderingRect[1] = fTop; m_afRenderingRect[2] = fRight; m_afRenderingRect[3] = fBottom;\n'
+    '\t\tfor (CGraphicExpandedImageInstance* pInstance : m_ImageVector)\n\t\t\tpInstance->SetRenderingRect(fLeft, fTop, fRight, fBottom);\n',
+    'CAniImageBox::SetRenderingRect without std::function',
+))
+PATCHES.append((
+    'EterPythonLib/PythonWindow.cpp',
+    '\t\tm_SetRenderingMode = std::bind(&CGraphicExpandedImageInstance::SetRenderingMode, std::placeholders::_1, iMode);\n'
+    '\t\tstd::for_each(m_ImageVector.begin(), m_ImageVector.end(), m_SetRenderingMode);\n',
+    '\t\tm_bRenderingMode = true;\n\t\tm_iRenderingMode = iMode;\n'
+    '\t\tfor (CGraphicExpandedImageInstance* pInstance : m_ImageVector)\n\t\t\tpInstance->SetRenderingMode(iMode);\n',
+    'CAniImageBox::SetRenderingMode without std::function',
+))
+PATCHES.append((
+    'EterPythonLib/PythonWindow.cpp',
+    '\t\t\t\t\tif (m_SetRenderingRect)\n\t\t\t\t\t\tm_SetRenderingRect(pImageInstance);\n\n'
+    '\t\t\t\t\tif (m_SetRenderingMode)\n\t\t\t\t\t\tm_SetRenderingMode(pImageInstance);\n\n'
+    '\t\t\t\t\tif (m_SetDiffuseColor)\n\t\t\t\t\t\tm_SetDiffuseColor(pImageInstance);\n',
+    '\t\t\t\t\tif (m_bRenderingRect)\n\t\t\t\t\t\tpImageInstance->SetRenderingRect(m_afRenderingRect[0], m_afRenderingRect[1], m_afRenderingRect[2], m_afRenderingRect[3]);\n\n'
+    '\t\t\t\t\tif (m_bRenderingMode)\n\t\t\t\t\t\tpImageInstance->SetRenderingMode(m_iRenderingMode);\n\n'
+    '\t\t\t\t\tif (m_bDiffuseColor)\n\t\t\t\t\t\tpImageInstance->SetDiffuseColor(m_afDiffuseColor[0], m_afDiffuseColor[1], m_afDiffuseColor[2], m_afDiffuseColor[3]);\n',
+    'CAniImageBox::OnUpdate applies the stored settings to a new frame',
+))
+
+PATCHES.append((
+    'EterPythonLib/PythonWindow.cpp',
+    'BOOL g_bOutlineBoxEnable = FALSE;\n',
+    'BOOL g_bOutlineBoxEnable = FALSE;\n\n#include <unordered_set>\nstd::unordered_set<const void*> g_m2wDeadWindows;\n',
+    'addresses of deleted windows, so a second wndMgr.Destroy of the same handle is caught',
+))
+PATCHES.append((
+    'EterPythonLib/PythonWindow.cpp',
+    '\t\tm_windowType = WINDOW_TYPE_WINDOW;\n\t}\n\n\tCWindow::~CWindow()\n\t{\n\t}\n',
+    '\t\tm_windowType = WINDOW_TYPE_WINDOW;\n\t\tg_m2wDeadWindows.erase(this);\n\t}\n\n'
+    '\tCWindow::~CWindow()\n\t{\n\t\tg_m2wDeadWindows.insert(this);\n\t}\n',
+    'a window marks its address dead when deleted and live again when the address is reused',
+))
+PATCHES.append((
+    'EterPythonLib/PythonWindowManager.cpp',
+    '\t\t\tTraceError("DestroyWindow: window %p destroyed twice in one frame - ignored", (void*)pWin);\n\t\t\treturn;\n\t\t}\n',
+    '\t\t\tTraceError("DestroyWindow: window %p destroyed twice in one frame - ignored", (void*)pWin);\n\t\t\treturn;\n\t\t}\n'
+    '\t\tif (g_m2wDeadWindows.count(pWin))\n\t\t{\n'
+    '\t\t\tTraceError("DestroyWindow: window %p was already deleted - ignored", (void*)pWin);\n'
+    '\t\t\tPyRun_SimpleString("import traceback, sys; traceback.print_stack(file=sys.stderr)");\n'
+    '\t\t\treturn;\n\t\t}\n',
+    'a handle destroyed again in a later frame deleted the window twice (ASan: ~CAniImageBox '
+    'called destroy_deallocate through a zeroed vtable) - the in-game crash',
+))
+PATCHES.append((
+    'EterPythonLib/PythonWindowManager.cpp',
+    'BOOL g_bShowOverInWindowName = FALSE;\n',
+    'BOOL g_bShowOverInWindowName = FALSE;\n\n#include <unordered_set>\nextern std::unordered_set<const void*> g_m2wDeadWindows;\n',
+    'the dead-window set lives in PythonWindow.cpp',
+))
+
+PATCHES.append((
+    'GameLib/ActorInstanceMotion.cpp',
+    '\tfloat fStartTime = rReservingMotionNode.fStartTime;\n',
+    '\tfloat fStartTime = fReservedStartTime;\n',
+    'ReservingMotionProcess: the start time saved before pop_front',
+))
+
 def apply_patches(stage):
     """Applies every entry of PATCHES to the staged tree: the pattern must occur
     exactly as many times as declared (default once) or the script stops, so a
