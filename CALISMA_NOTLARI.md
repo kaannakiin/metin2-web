@@ -43,6 +43,8 @@ Oyun portları internete açık DEĞİL; tarayıcı yalnızca bridge üzerinden 
 
 GM hesabı: login `kaannakiin`, karakter `numan` (IMPLEMENTOR), silme kodu `1234567`. Şifre kullanıcıda; sohbette geçti → **canlıya açmadan önce değiştir**.
 
+Arkadaşlar için 10 GM hesabı: `gm01`…`gm10`, yetki **GOD**. GM yetkisi hesap + karakter adına bağlı (`gm.cpp`), bu yüzden karakter tam olarak `GM01`…`GM10` adıyla açılmalı. Şifreler kullanıcıda (sohbette verildi). Silme kodu `1234567`.
+
 ---
 
 ## 3. Sunucu (VM) — ÇALIŞIYOR ✅
