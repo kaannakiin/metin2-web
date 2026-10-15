@@ -174,6 +174,10 @@ TImage ReadTga(const unsigned char* p, UINT uBytes)
     if (uType != 2 && uType != 3 && uType != 10 && uType != 11)
         return o;
 
+    // w * h * 4 must fit the 32-bit size_t of wasm32 - the DDS limit
+    if (iWidth <= 0 || iHeight <= 0 || iWidth > 8192 || iHeight > 8192)
+        return o;
+
     if (iWidth <= 0 || iHeight <= 0)
         return o;
 
@@ -251,7 +255,7 @@ TImage ReadBmp(const unsigned char* p, UINT uBytes)
         bTopDown = true;
     }
 
-    if (iWidth <= 0 || iHeight <= 0 || uDataOffset >= uBytes)
+    if (iWidth <= 0 || iHeight <= 0 || iWidth > 8192 || iHeight > 8192 || uDataOffset >= uBytes)
         return o;
 
     const unsigned int uBytesPerPixel = uBits / 8;
@@ -309,6 +313,11 @@ TImage ReadPng(const unsigned char* p, UINT uBytes)
     kPng.version = PNG_IMAGE_VERSION;
     if (!png_image_begin_read_from_memory(&kPng, p, uBytes))
         return o;
+    if (kPng.width > 8192 || kPng.height > 8192)
+    {
+        png_image_free(&kPng);
+        return o;
+    }
 
     kPng.format = PNG_FORMAT_BGRA;
     o.vecPixels.resize(PNG_IMAGE_SIZE(kPng));
