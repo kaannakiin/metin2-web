@@ -132,14 +132,25 @@ Kapatılmayıp yamalanan Windows'a özel kısımlar: görev çubuğu gruplama (k
 - `tools/build_python.py`: `DISABLED_MODULES`'e `_lzma`, `_uuid`, `_ctypes` eklendi (Debian host kütüphaneleri wasm build'ini bozuyordu). CPython **python.org kaynağından** derlendi (hazır binary kullanılmadı).
 - `webclient.toml`: kaynak/pack/font yolları, sunucu `192.168.122.10`, bridge hedefleri (30001/30003/30101/30103/30105).
 
+### Python script adımları (fork uyarlamaları, `Tools/web/kit/tools/`)
+
+- `unpack_packs.py`: `TO_UNPACK = ('root', 'locale')` (kit `locale_en`/`locale_pl` bekliyordu).
+- `rewrite_scripts.py`:
+  - **Kodlama satır satır seçiliyor.** Fork'ta Türkçe metinler cp1254, orijinal Korece yorumlar ve metinler CP949; bazı dosyalarda ikisi bir arada. Kitin "UTF-8 değilse CP949" kuralı Türkçeyi sessizce bozuyordu.
+  - Fork bazı modülleri iki yazımla import ediyor (`interfaceModule`/`interfacemodule`…). En çok kullanılan yazım kanonik; diğerleri `import uiToolTip as uitooltip` biçimine çevriliyor, böylece modül tek kalıyor.
+  - Dosyalar yeniden adlandırıldıktan sonra liste tazeleniyor.
+- `script_patches.py`: 16 TMP4 yamasının 6'sı fork yazımına göre `FORK_ANCHORS` ile yeniden bağlandı. Dosya adları büyük/küçük harf duyarsız eşleşiyor.
+- `uiscript_from_client.py`: aynı satır bazlı kodlama çözücüsünü kullanıyor.
+- Dil: `?deflang=tr` → `locale.cfg` = `10002 1254 tr`. Fork'ta Türkçe dışındaki diller UTF-8; o dillerde karakter bozulması olabilir.
+
 ### Build adımları durumu
 
-| Adım                                                | Durum                                                                                 |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| lzo, cryptopp, python, stage, eterbase, eterpack    | ✅                                                                                    |
-| **engine**                                          | ⏳ derleme hataları çözülüyor (GameLib aşamasında)                                    |
-| unpack/scripts/rewrite/uiscript, corpus, data, link | sırada                                                                                |
-| trees, gr2                                          | atlanacak (SpeedTree/Granny DLL'leri yok — ağaç yok, modellerin ~%1'i eksik olabilir) |
+| Adım                                             | Durum                                                                                 |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| lzo, cryptopp, python, stage, eterbase, eterpack | ✅                                                                                    |
+| engine, unpack, scripts, rewrite, uiscript       | ✅                                                                                    |
+| corpus, data, link                               | ⏳                                                                                    |
+| trees, gr2                                       | atlanacak (SpeedTree/Granny DLL'leri yok — ağaç yok, modellerin ~%1'i eksik olabilir) |
 
 Komutlar (container içinde): `cd /work/kit && source /work/emsdk/emsdk_env.sh && python3.13 webclient.py build --only <adım>` (`--only` tek adım alır). Log: `/work/step_<adım>.log`. Toplu script: `/work/build1.sh`.
 
