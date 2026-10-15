@@ -180,6 +180,24 @@ tarayıcı ─https─▶ Traefik (coolify-proxy, Let's Encrypt)
 - Kopyalar: `Tools/web/deploy/` (`deploy.sh`, `site-nginx.conf`, `metin2.yaml`). Yeniden yayın: container'da `webclient.py package` + `tools/bridge_config.py --site https://metin2.kaanakin.dev`, host'ta `deploy.sh`.
 - Container'lar `--restart unless-stopped`; VM autostart açık → host yeniden başlarsa her şey kalkar.
 
+### Canlı testte bulunan ve düzeltilen sorunlar (tarayıcıda, sırayla)
+
+1. `__builtin__` → `builtins` (fork aynı satırı `UserInterface.cpp`'de de kullanıyor).
+2. Fork `OpenLogFile` stderr'i `./syserr/` klasörüne yönlendiriyordu → klasör yok, stderr kapanıyordu, hiçbir hata görünmüyordu. Web'de stderr = konsol.
+3. `locale.cfg`: fork iki alan okuyor (`1254 tr`), kit üç alan yazıyordu (`10002 1254 tr`) → "cp10002" hatası.
+4. `introLogin.py` Windows kayıt defteri (`winreg`) kullanıyor → yoksa "kayıtlı hesap yok".
+5. PNG desteği (fork arayüzü PNG, kit sadece TGA/BMP/JPEG/DDS okuyordu) → libpng.
+6. **Kod sayfası 1254 tablosu yoktu** → bütün Türkçe metinler boş çiziliyordu.
+7. `serverInfo.py`: yazarın test sunucuları (192.168.1.156) çıkarıldı, tek kanal; `channel.inf` hatırlanan sunucu yoksa 1/1.
+8. Tam ekran: açılışta tarayıcı penceresi boyutu `metin2.cfg`'ye yazılıyor; 7 px başlık çubuğu kırpması kaldırıldı.
+9. **Fontlar:** Windows GDI yerine FreeType mono+hinting ile `TMP4FNT1` bin'leri (`tools/bake_fonts_ft.py`, OS/2 win metrikleri) → orijinal piksel font görünümü.
+10. Girişte `std::thread` çökmesi (`ENABLE_CLIENT_PERFORMANCE` ön yükleme) → ana döngüde senkron yükleme.
+11. Kanal "Offline": yukarıdaki 7 ile çözüldü.
+
+**Açık:** krallık seçiminden sonra `free()` içinde abort (bellek bozulması / çift serbest bırakma). ASan teşhis derlemesi `/asan/` adresinde (`EMCC_CFLAGS=-fsanitize=address`, 4 GB bellek; açılış ~10 dk).
+
+Yayın: `/home/m2web/publish.sh` (paket eksiksiz değilse canlıya dokunmaz), site `/home/m2web/www`'den sunuluyor.
+
 ## 7. Sıradaki adımlar
 
 1. **İlk giriş testi** (`kaannakiin` / `numan`) — tarayıcıda; hata olursa tarayıcı konsolu + `docker logs m2web-bridge` + VM'deki syslog'lar.
