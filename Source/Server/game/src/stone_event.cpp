@@ -177,6 +177,7 @@ short CStoneEvent::GetStoneEventPoint(LPCHARACTER pkChr)
 			}
 		}
 	}
+	return 0;
 }
 
 bool CStoneEvent::IsStoneEventSystemStatus()

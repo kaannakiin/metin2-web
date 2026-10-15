@@ -31,6 +31,8 @@ void CHARACTER::LoadGemSystem()
 
 	snprintf(file_name, sizeof(file_name), "%s/gem.txt", LocaleService_GetBasePath().c_str());
 	fp = fopen(file_name, "r");
+	if (!fp)
+		return;
 
 	while (fgets(one_line, 256, fp))
 	{
@@ -151,6 +153,7 @@ bool CHARACTER::CheckSlotGemMarket(int slot)
 		if (info_slots[0].value_6 == 0) return false;
 		else return true;
 	}
+	return false;
 }
 
 void CHARACTER::BuyItemsGemMarket(int slot)

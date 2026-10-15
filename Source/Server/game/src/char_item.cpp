@@ -1243,6 +1243,7 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) c
 #endif
 
 	}
+	return false;
 }
 
 int CHARACTER::GetEmptyInventory(BYTE size) const

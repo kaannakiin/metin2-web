@@ -1,0 +1,16 @@
+[inputs]
+source = "/work/websrc"
+client = "/work/anka2/Client"
+packs = "/work/packs"
+font = "/usr/share/wine/fonts/tahoma.ttf"
+
+[tools]
+emsdk = "/work/emsdk"
+python2to3 = "/usr/bin/python3"
+
+[server]
+address = "192.168.122.10"
+
+[bridge]
+targets = ["192.168.122.10:30001", "192.168.122.10:30003", "192.168.122.10:30101", "192.168.122.10:30103", "192.168.122.10:30105"]
+port_span = 0

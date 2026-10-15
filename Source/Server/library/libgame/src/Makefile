@@ -2,7 +2,7 @@ CXX	= clang++
 BIN_DIR = ../lib
 BIN = $(BIN_DIR)/libgame.a
 
-CFLAGS  = -m32 -Wall -w -O2 -pipe -fno-exceptions -I../include
+CFLAGS  = -m32 -D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_NONE -Wall -w -O2 -pipe -fno-exceptions -I../include
 CFLAGS += -std=c++14
 
 LIBS =

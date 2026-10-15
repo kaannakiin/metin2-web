@@ -727,6 +727,7 @@ int SECTREE_MANAGER::GetSungmaValueAffectByRegion(long lMapIndex, int iAffecType
 			if(rRegion.iAffecType == iAffecType)
 				return rRegion.iValue;
 	}
+	return 0;
 }
 #endif
 

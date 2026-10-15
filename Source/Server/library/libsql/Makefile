@@ -9,7 +9,7 @@ SVN_VERSION = $(shell svnversion -n -c . | cut -d':' -f2)
 BIN     = ./libsql.a
 
 IFLAGS = -I/usr/local/include -I/usr/local/include/mysql
-CFLAGS  = $(IFLAGS) -m32 -Wall -w -O2 -pipe -D_THREAD_SAFE -fno-exceptions
+CFLAGS  = $(IFLAGS) -m32 -D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_NONE -Wall -w -O2 -pipe -D_THREAD_SAFE -fno-exceptions
 CFLAGS += -std=c++14
 
 LIBS =

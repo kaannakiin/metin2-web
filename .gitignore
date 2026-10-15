@@ -121,3 +121,5 @@ Client/pack/**
 #############################################
 # Client büyük assetleri LFS ile kullanıyorsan burayı açma
 # Client/
+
+.playwright-mcp

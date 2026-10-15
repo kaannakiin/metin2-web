@@ -25,7 +25,7 @@ DEPFILE = Depend
 endif
 
 # >> DERLEYICI BAYRAKLARI <<
-CFLAGS = -m32 -g -w -Ofast -pipe -fno-rtti -fno-exceptions -std=c++14 -static-libstdc++ -Wno-long-long -pthread -D_THREAD_SAFE
+CFLAGS = -m32 -D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_NONE -g -w -Ofast -pipe -fno-rtti -fno-exceptions -std=c++14 -static-libstdc++ -Wno-long-long -pthread -D_THREAD_SAFE
 
 # >> VERSIYON VE SISTEM BILGISI <<
 CFLAGS += -D__USER__=\"$(USER)\" -D__HOSTNAME__=\"$(HOSTNAME)\" -D__PWD__=\"$(PWD)\" -D__DB_VERSION__=\"$(DB_VERSION)\"

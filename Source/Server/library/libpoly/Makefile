@@ -3,7 +3,7 @@ BIN = ./libpoly.a
 
 GCC_VERSION = $(shell $(CC) --version 2>&1 | grep "(GCC)" | cut -d' ' -f3  | cut -d'.' -f1)
 
-CFLAGS  = -m32 -Wall -w -O2 -pipe -fno-exceptions -fno-rtti
+CFLAGS  = -m32 -D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_NONE -Wall -w -O2 -pipe -fno-exceptions -fno-rtti
 CFLAGS += -std=c++14
 
 LIBS =

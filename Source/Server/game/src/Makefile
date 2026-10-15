@@ -28,7 +28,7 @@ endif
 LIBS = -lm -lmd
 
 # >> DERLEYICI BAYRAKLARI <<
-CFLAGS = -m32 -g -w -Ofast -pipe -fexceptions -Wno-enum-constexpr-conversion -std=c++2a -static-libstdc++ -pthread -D_THREAD_SAFE -DNDEBUG
+CFLAGS = -m32 -D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_NONE -g -w -Ofast -pipe -fexceptions -Wno-enum-constexpr-conversion -std=c++2a -static-libstdc++ -pthread -D_THREAD_SAFE -DNDEBUG
 
 # >> GUVENLIK OZELLIKLERI <<
 CFLAGS += -fstack-protector-all
