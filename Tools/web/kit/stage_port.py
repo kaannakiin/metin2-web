@@ -1078,6 +1078,36 @@ PATCHES.append((
     'minIni maps strnicmp to strncasecmp only on platforms it knows',
 ))
 
+PATCHES.append((
+    'UserInterface/PythonApplication.cpp',
+    '\tHICON exeIcon = bStatus ? LoadIcon(ms_hInstance, MAKEINTRESOURCE(IDI_METIN2)) : LoadIcon(ms_hInstance, MAKEINTRESOURCE(BLOCK_METIN2));\n\tSendMessage(GetWindowHandle(), WM_SETICON, ICON_BIG, (LPARAM)exeIcon);\n',
+    '',
+    'ENABLE_MULTI_FARM_BLOCK swaps the window icon to show the farm-block state - no window icon in the browser',
+))
+
+PATCHES.append((
+    'GameLib/PropertyManager.cpp',
+    '#ifdef ENABLE_FOXFS_ENCRYPT\nbool CPropertyManager::Put(',
+    'bool CPropertyManager::Put(',
+    'Put/Erase exist only under ENABLE_FOXFS_ENCRYPT although they use only m_pack, '
+    'which the non-FoxFS branch has as well; Property.cpp needs Put',
+))
+
+PATCHES.append((
+    'GameLib/PropertyManager.cpp',
+    '\treturn false;\n}\n#endif\n\nvoid CPropertyManager::Clear()',
+    '\treturn false;\n}\n\nvoid CPropertyManager::Clear()',
+    'the matching #endif of the patch above',
+))
+
+PATCHES.append((
+    'UserInterface/Locale.cpp',
+    'int StringCompareCI(LPCSTR szStringLeft',
+    'unsigned int LocaleService_GetCodePage()\n{\n\treturn GetCodePage();\n}\n\nint StringCompareCI(LPCSTR szStringLeft',
+    'the fork renamed LocaleService_GetCodePage to GetCodePage; compat (python2_bridge, ime_web) '
+    'calls it by the TMP4 name',
+))
+
 def apply_patches(stage):
     """Applies every entry of PATCHES to the staged tree: the pattern must occur
     exactly as many times as declared (default once) or the script stops, so a
