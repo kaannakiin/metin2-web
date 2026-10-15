@@ -231,6 +231,13 @@ ASan notları: seçenekler `compat/stubs.cpp` içinde `__asan_default_options` i
 
 `property_create.xml` eskiydi: `property/` klasöründeki 10081 dosyanın 5713'ü pakete girmiyordu (binalar `property/b`, `property/c`). Henüz hiçbir dosyanın sağlamadığı CRC'leri getiren 2007 dosya XML'e eklendi (mevcut 88 CRC çakışması değişmesin diye). Dizin 4366 → 6374 kayıt; haritanın istediği eksik 127 binanın hepsi geldi. Yeniden üretim: `make_eterpacks.py --only property`, ardından property paketini `client_files`'a açma (`/home/m2web/props2.py`), sonra `corpus` ve `data` adımları.
 
+Bu yetmedi: binaların **modelleri** de yoktu. Upstream'in `ced4250af` ("Full client update") commit'i `binary_unpack`'ten 3691 dosya silmiş (`zone/b` 754, `zone/n` 668, `property/n` 774…), XML'ler ise hâlâ bunları listeliyordu. Pyungmoo'daki 601 binanın 546'sının `.gr2`'si eksikti; bütün haritalarda 33427 binanın 16470'i.
+
+- `ced4250af^`'ten geri getirildi: `zone/b/obj` (758), eksik CRC'leri karşılayan 221 property dosyası (`property/n/obj`, `property/ghost/obj`, `shadow_devil_tower`) ve kullandıkları modeller (838). Property dosyaları XML'e eklendi (213).
+- Paketlerden açarken **`node build/port/obj/unpack_pack.js . <pack> client_files`** kullan: pack içindeki adlar `d:/ymir work/...`, kendi açıcım (`props2.py`) bunları `client_files/d:/` altına yazıyordu.
+- Geri gelen modellerin 635'i BitKnit2 → `gr2_unbitknit client_files repaired_gr2` (4032 → 4667), sonra `corpus` + `package`.
+- Sonuç: Pyungmoo 601/601 binanın modeli var; tüm haritalarda modelsiz bina 16470 → 141, CRC'si bulunamayan nesne 4972 → 391 (kalan 74 CRC ve 27 model eski commit'te de yok). Kontrol betiği: `/home/m2web/propcheck.py [harita]`.
+
 ### Dururken karakterin bozulması — düzeltildi
 
 Granny 2.11 (sürüm 7) dosyaları animasyon eğrilerini sıkıştırılmış `curve2` biçimlerinde tutuyor; kit yalnızca eski `Degree/Knots/Controls` biçimini okuyordu. Okunamayan eğri dinlenme pozuna düşüyordu (savaşçı `general/wait.gr2` sürüm 7, `run.gr2` sürüm 6). `compat/gr2_to_granny.cpp` `DecodeCurve2`: DaIdentity, sabitler, DaK32fC32f, DaKeyframes32f, DaK16u/8u, D3K16u/8u, D3I1K*, D9I1/I3K*, D4nK16uC15u/D4nK8uC7u (quaternion açma LSLib ile aynı). Keyframe eğrilerinin zaman birimi (`TimeStep` varsayıldı) oyunda doğrulanmadı.
@@ -256,7 +263,7 @@ Granny 2.11 (sürüm 7) dosyaları animasyon eğrilerini sıkıştırılmış `c
 
 ### Bilinen eksikler (sonra)
 
-- `zone` pack'inde 1888 dosya `binary_unpack`'te yok (ör. `plechi_env`); LFS'teki orijinal pack'lerde olabilir.
+- `zone` pack'inde hâlâ eksik dosyalar var (ör. `plechi_env`); bir kısmı `ced4250af`'te silinmiş, haritaların kullandıkları geri getirildi.
 - ~90 üst seviye refine seti yok (Zodyak, Kyanite, pendant vb.).
 - Pet auto skill'leri: sunucu/client enum sırası ile kitap ID'leri uyuşmuyor.
 - Sunucu: `roulette_items.txt` yok, `blend.txt`'te `ATTACK_SPEED` → `ATT_SPEED` olmalı, koleksiyon tabloları boş.
