@@ -164,23 +164,32 @@ bool CProperty::ReadFromMemory(const void * c_pvData, int iLen, const char *c_ps
 {
 	const char *pcData = (const char *) c_pvData;
 
+	if (!pcData || iLen < (int) sizeof(DWORD) + 1)
+		return false;
+
+	const char *pcEnd = pcData + iLen;
+
 	if (*(DWORD *) pcData != MAKEFOURCC('Y', 'P', 'R', 'T'))
 		return false;
 
 	pcData += sizeof(DWORD);
 
-	if (*pcData != '\r' || *(pcData + 1) != '\n')
+	// The repository stores text with LF endings (.gitattributes text=auto), so packs built from a
+	// non-Windows checkout carry "YPRT\n" instead of "YPRT\r\n".
+	if (*pcData == '\r' && pcData + 1 < pcEnd && *(pcData + 1) == '\n')
+		pcData += 2;
+	else if (*pcData == '\n')
+		pcData += 1;
+	else
 	{
 		TraceError("CProperty::ReadFromMemory: File format error after FourCC: %s\n", c_pszFileName);
 		return false;
 	}
 
-	pcData += 2;
-
 	CTokenVector stTokenVector;
 
 	CMemoryTextFileLoader textFileLoader;
-	textFileLoader.Bind(iLen - (sizeof(DWORD) + 2), pcData);
+	textFileLoader.Bind((int) (pcEnd - pcData), pcData);
 
 	m_stCRC = textFileLoader.GetLineString(0);
 	m_dwCRC = atoi(m_stCRC.c_str());

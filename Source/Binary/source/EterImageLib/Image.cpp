@@ -85,7 +85,7 @@ void CImage::Create(int width, int height)
 
 	m_width = width;
 	m_height = height;
-	m_pdwColors = new DWORD[m_width*m_height];
+	m_pdwColors = new DWORD[(size_t) m_width * m_height];
 }
 
 void CImage::Destroy()

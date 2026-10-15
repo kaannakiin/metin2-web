@@ -216,9 +216,9 @@ class CubeRenewalCategoriaItem(CubeRenewalItem):
 		return self.index
 
 	def FindVnumSubCategoria(self, key):
-		list = filter(lambda argMember, argKey=key: argMember.IsSameVnum(argKey), self.SubCategorias)
-		if list:
-			return list[0]
+		matches = filter(lambda argMember, argKey=key: argMember.IsSameVnum(argKey), self.SubCategorias)
+		if matches:
+			return matches[0]
 
 		return None
 

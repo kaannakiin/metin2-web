@@ -256,9 +256,9 @@ class MessengerGroupItem(MessengerItem):
 		self.memberList = []
 
 	def FindMember(self, key):
-		list = filter(lambda argMember, argKey=key: argMember.IsSameKey(argKey), self.memberList)
-		if list:
-			return list[0]
+		matches = filter(lambda argMember, argKey=key: argMember.IsSameKey(argKey), self.memberList)
+		if matches:
+			return matches[0]
 
 		return None
 

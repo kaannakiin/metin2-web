@@ -40,13 +40,19 @@ void CTGAImage::Create(int width, int height)
 
 bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 {
+	if (!c_pbMem || iSize < 18)
+		return false;
+
 	memcpy(&m_Header, c_pbMem, 18);
 	c_pbMem += 18;
 	iSize -= 18;
 
+	const BYTE * c_pbEnd = c_pbMem + iSize;
+	auto HasBytes = [&](unsigned long long uBytes) { return uBytes <= (unsigned long long) (c_pbEnd - c_pbMem); };
+
 	CImage::Create(m_Header.width, m_Header.height);
 
-	UINT hxw = m_Header.width * m_Header.height;
+	const UINT hxw = (UINT) m_Header.width * m_Header.height;
 	BYTE r, g, b, a;
 	DWORD i;
 
@@ -56,6 +62,9 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 	{
 		case 3:
 			{
+				if (!HasBytes(hxw))
+					return false;
+
 				for (i = 0; i < hxw; ++i)
 				{
 					a = (char) *(c_pbMem++);
@@ -68,6 +77,9 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 			{
 				if (m_Header.colorBits == 16)	// 16bit
 				{
+					if (!HasBytes((unsigned long long) hxw * 2))
+						return false;
+
 					for (i = 0; i < hxw; ++i)
 					{
 						WORD w;
@@ -90,6 +102,9 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 				}
 				else if (m_Header.colorBits == 24)	// 24bit
 				{
+					if (!HasBytes((unsigned long long) hxw * 3))
+						return false;
+
 					for (i = 0; i < hxw; ++i)
 					{
 						r = (BYTE) *(c_pbMem++); --iSize;
@@ -102,8 +117,10 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 				}
 				else if (m_Header.colorBits == 32)	// 32bit
 				{
-					int size = GetWidth();
-					size *= GetHeight() * 4;
+					if (!HasBytes((unsigned long long) hxw * sizeof(DWORD)))
+						return false;
+
+					const size_t size = (size_t) hxw * sizeof(DWORD);
 
 					memcpy(pdwDest, c_pbMem, size);
 					c_pbMem += size;
@@ -121,11 +138,17 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 					i = 0;
 					while (i < hxw)
 					{
+						if (!HasBytes(1))
+							return false;
+
 						rle = (BYTE) *(c_pbMem++); --iSize;
 
 						if (rle < 0x80)
 						{
 							rle++;
+
+							if (rle > hxw - i || !HasBytes((unsigned long long) rle * 3))
+								return false;
 
 							while (rle)
 							{
@@ -134,19 +157,15 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 								r = (BYTE) *(c_pbMem++); --iSize;
 								a = 0xff;
 								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
-
-								if (i > hxw)
-								{
-									assert(!"RLE overflow");
-									printf("RLE overflow");
-									return false;
-								}
 								--rle;
 							}
 						}
 						else
 						{
 							rle -= 127;
+
+							if (rle > hxw - i || !HasBytes(3))
+								return false;
 
 							b = (BYTE) *(c_pbMem++); --iSize;
 							g = (BYTE) *(c_pbMem++); --iSize;
@@ -156,13 +175,6 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 							while (rle)
 							{
 								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
-
-								if (i > hxw)
-								{
-									assert(!"RLE overflow");
-									printf("RLE overflow");
-									return false;
-								}
 								--rle;
 							}
 						}
@@ -173,11 +185,17 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 					i = 0;
 					while (i < hxw)
 					{
+						if (!HasBytes(1))
+							return false;
+
 						rle = (BYTE) *(c_pbMem++); --iSize;
 
 						if (rle < 0x80)
 						{
 							rle++;
+
+							if (rle > hxw - i || !HasBytes((unsigned long long) rle * 4))
+								return false;
 
 							while (rle)
 							{
@@ -186,19 +204,15 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 								r = (BYTE) *(c_pbMem++); --iSize;
 								a = (BYTE) *(c_pbMem++); --iSize;
 								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
-
-								if (i > hxw)
-								{
-									assert(!"RLE overflow");
-									printf("RLE overflow");
-									return false;
-								}
 								--rle;
 							}
 						}
 						else
 						{
 							rle -= 127;
+
+							if (rle > hxw - i || !HasBytes(4))
+								return false;
 
 							b = (BYTE) *(c_pbMem++); --iSize;
 							g = (BYTE) *(c_pbMem++); --iSize;
@@ -208,14 +222,6 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 							while (rle)
 							{
 								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
-
-								if (i > hxw)
-								{
-									assert(!"RLE overflow");
-									printf("RLE overflow");
-									return false;
-								}
-
 								--rle;
 							}
 						}

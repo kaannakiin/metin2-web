@@ -297,7 +297,7 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void * c_pvB
         return true;
     }
 #else
-    if (bufSize >= 128 && image.LoadHeaderFromMemory((const BYTE *) c_pvBuf))
+    if (image.LoadHeaderFromMemory((const BYTE *) c_pvBuf, bufSize))
     {
         return (CreateDDSTexture(image, (const BYTE *) c_pvBuf));
     }

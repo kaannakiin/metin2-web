@@ -238,6 +238,8 @@ Bu yetmedi: binaların **modelleri** de yoktu. Upstream'in `ced4250af` ("Full cl
 - Geri gelen modellerin 635'i BitKnit2 → `gr2_unbitknit client_files repaired_gr2` (4032 → 4667), sonra `corpus` + `package`.
 - Sonuç: Pyungmoo 601/601 binanın modeli var; tüm haritalarda modelsiz bina 16470 → 141, CRC'si bulunamayan nesne 4972 → 391 (kalan 74 CRC ve 27 model eski commit'te de yok). Kontrol betiği: `/home/m2web/propcheck.py [harita]`.
 
+**Asıl kök neden (binalar ve ağaçlar):** `CProperty::ReadFromMemory` `YPRT`'den sonra `\r\n` şart koşuyordu. Repo `.gitattributes` `* text=auto` ile metni LF saklıyor, paketler Linux'ta üretildiği için bütün `.prb`/`.prt` dosyaları `YPRT\n` ile başlıyor → hepsi "File format error after FourCC" ile reddediliyordu (oyunda 871 `CArea::LoadObject Property(N) Load ERROR`). `GameLib/Property.cpp` artık LF ve CRLF'i kabul ediyor.
+
 ### Dururken karakterin bozulması — düzeltildi
 
 Granny 2.11 (sürüm 7) dosyaları animasyon eğrilerini sıkıştırılmış `curve2` biçimlerinde tutuyor; kit yalnızca eski `Degree/Knots/Controls` biçimini okuyordu. Okunamayan eğri dinlenme pozuna düşüyordu (savaşçı `general/wait.gr2` sürüm 7, `run.gr2` sürüm 6). `compat/gr2_to_granny.cpp` `DecodeCurve2`: DaIdentity, sabitler, DaK32fC32f, DaKeyframes32f, DaK16u/8u, D3K16u/8u, D3I1K*, D9I1/I3K*, D4nK16uC15u/D4nK8uC7u (quaternion açma LSLib ile aynı). Keyframe eğrilerinin zaman birimi (`TimeStep` varsayıldı) oyunda doğrulanmadı.

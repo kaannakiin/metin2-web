@@ -95,6 +95,7 @@ class CDXTCImage
 
 	public:
 		const BYTE *		m_pbCompBufferByLevels[MAX_MIPLEVELS];
+		DWORD				m_adwLevelBytes[MAX_MIPLEVELS];
 		std::vector<BYTE>	m_bCompVector[MAX_MIPLEVELS];
 
 		int					m_nCompSize;
@@ -114,8 +115,8 @@ class CDXTCImage
 		XDDPIXELFORMAT		m_xddPixelFormat;
 
 		bool LoadFromFile(const char * filename);		// true if success
-		bool LoadFromMemory(const BYTE * c_pbMap);
-		bool LoadHeaderFromMemory(const BYTE * c_pbMap);
+		bool LoadFromMemory(const BYTE * c_pbMap, size_t uSize);
+		bool LoadHeaderFromMemory(const BYTE * c_pbMap, size_t uSize);
 		bool Copy(int miplevel, BYTE * pbDest, long lDestPitch);
 
 		void Decompress(int miplevel, DWORD * pdwDest);

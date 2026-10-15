@@ -70,9 +70,21 @@ void CDXTCImage::Initialize()
 {
 	m_nWidth = 0;
 	m_nHeight = 0;
+	m_nCompSize = 0;
+	m_nCompLineSz = 0;
+	m_strFormat[0] = '\0';
+	m_CompFormat = PF_UNKNOWN;
+	m_lPitch = 0;
+	m_dwMipMapCount = 0;
+	m_bMipTexture = false;
+	m_dwFlags = 0;
+	memset(&m_xddPixelFormat, 0, sizeof(m_xddPixelFormat));
 
 	for (int i = 0; i < MAX_MIPLEVELS; ++i)
+	{
 		m_pbCompBufferByLevels[i] = nullptr;
+		m_adwLevelBytes[i] = 0;
+	}
 }
 
 void CDXTCImage::Clear()
@@ -124,11 +136,16 @@ bool CDXTCImage::LoadFromFile(const char * filename)
 		return false;
 	}
 
-	return LoadFromMemory((const BYTE*) pvMap);
+	return LoadFromMemory((const BYTE*) pvMap, mappedFile.Size());
 }
 
-bool CDXTCImage::LoadHeaderFromMemory(const BYTE * c_pbMap)
+bool CDXTCImage::LoadHeaderFromMemory(const BYTE * c_pbMap, size_t uSize)
 {
+	if (!c_pbMap || uSize < sizeof(DWORD) + sizeof(DDSURFACEDESC2))
+		return false;
+
+	const BYTE * c_pbEnd = c_pbMap + uSize;
+
 	//////////////////////////////////////
 	// start reading the file
 	// from Microsoft's mssdk D3DIM example "Compress"
@@ -176,116 +193,75 @@ bool CDXTCImage::LoadHeaderFromMemory(const BYTE * c_pbMap)
 		return false;
 	}
 
+	const DWORD c_dwMaxDimension = 16384;
+	if (ddsd.dwWidth == 0 || ddsd.dwHeight == 0 || ddsd.dwWidth > c_dwMaxDimension || ddsd.dwHeight > c_dwMaxDimension)
+		return false;
+
 	if (ddsd.dwMipMapCount > MAX_MIPLEVELS)
 		ddsd.dwMipMapCount = MAX_MIPLEVELS;
 
 	m_nWidth		= ddsd.dwWidth;
 	m_nHeight		= ddsd.dwHeight;
 	//!@#
-	m_dwMipMapCount = max(1, ddsd.dwMipMapCount);
+	m_dwMipMapCount = (ddsd.dwFlags & DDSD_MIPMAPCOUNT) ? max(1, ddsd.dwMipMapCount) : 1;
 	m_dwFlags		= ddsd.dwFlags;
+	m_lPitch		= (ddsd.dwFlags & DDSD_PITCH) ? ddsd.lPitch : ddsd.dwLinearSize;
 
-	if (ddsd.dwFlags & DDSD_PITCH)
+	const DWORD c_dwBlockBytes = (m_CompFormat == PF_DXT1) ? 8 : 16;
+
+	for (int i = 0; i < MAX_MIPLEVELS; ++i)
 	{
-		m_lPitch = ddsd.lPitch;
-		m_pbCompBufferByLevels[0] = c_pbMap;
+		m_pbCompBufferByLevels[i] = nullptr;
+		m_adwLevelBytes[i] = 0;
 	}
-	else
-	{
-		m_lPitch = ddsd.dwLinearSize;
 
-		if (ddsd.dwFlags & DDSD_MIPMAPCOUNT)
+	for (DWORD i = 0; i < m_dwMipMapCount; ++i)
+	{
+		const DWORD c_dwLevelW = max(1, ddsd.dwWidth >> i);
+		const DWORD c_dwLevelH = max(1, ddsd.dwHeight >> i);
+		const DWORD c_dwLevelBytes = ((c_dwLevelW + 3) / 4) * ((c_dwLevelH + 3) / 4) * c_dwBlockBytes;
+
+		if (c_dwLevelBytes > (size_t) (c_pbEnd - c_pbMap))
 		{
-			for (DWORD dwLinearSize = ddsd.dwLinearSize, i = 0; i < m_dwMipMapCount; ++i, dwLinearSize >>= 2)
-			{
-				m_pbCompBufferByLevels[i] = c_pbMap;
-				c_pbMap += dwLinearSize;
-			}
+			if (i == 0)
+				return false;
+
+			m_dwMipMapCount = i;
+			break;
 		}
-		else
-		{
-			m_pbCompBufferByLevels[0] = c_pbMap;
-		}
+
+		m_pbCompBufferByLevels[i] = c_pbMap;
+		m_adwLevelBytes[i] = c_dwLevelBytes;
+		c_pbMap += c_dwLevelBytes;
 	}
 
 	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
-bool CDXTCImage::LoadFromMemory(const BYTE * c_pbMap)
+bool CDXTCImage::LoadFromMemory(const BYTE * c_pbMap, size_t uSize)
 {
-	if (!LoadHeaderFromMemory(c_pbMap))
+	if (!LoadHeaderFromMemory(c_pbMap, uSize))
 		return false;
 
-	if (m_dwFlags & DDSD_PITCH)
+	for (DWORD i = 0; i < m_dwMipMapCount; ++i)
 	{
-		DWORD dwBytesPerRow = m_nWidth * m_xddPixelFormat.dwRGBBitCount / 8;
-
-		m_nCompSize = m_lPitch * m_nHeight;
-		m_nCompLineSz = dwBytesPerRow;
-
-		m_bCompVector[0].resize(m_nCompSize);
-		BYTE * pDest = &m_bCompVector[0][0];
-
-		c_pbMap = m_pbCompBufferByLevels[0];
-
-		for (int yp = 0; yp < m_nHeight; ++yp)
-		{
-			memcpy(pDest, c_pbMap, dwBytesPerRow);
-			pDest += m_lPitch;
-			c_pbMap += m_lPitch;
-		}
+		m_bCompVector[i].resize(m_adwLevelBytes[i]);
+		Copy(i, &m_bCompVector[i][0], 0);
 	}
-	else
-	{
-		if (m_dwFlags & DDSD_MIPMAPCOUNT)
-		{
-			for (DWORD dwLinearSize = m_lPitch, i = 0; i < m_dwMipMapCount; ++i, dwLinearSize >>= 2)
-			{
-				m_bCompVector[i].resize(dwLinearSize);
-				Copy(i, &m_bCompVector[i][0], dwLinearSize);
-			}
-		}
-		else
-		{
-			m_bCompVector[0].resize(m_lPitch);
-			Copy(0, &m_bCompVector[0][0], m_lPitch);
-		}
-	}
+
+	m_nCompSize = m_adwLevelBytes[0];
 
 	// done reading file
 	return true;
 }
 
-bool CDXTCImage::Copy(int miplevel, BYTE * pbDest, long lDestPitch)
+bool CDXTCImage::Copy(int miplevel, BYTE * pbDest, long /*lDestPitch*/)
 {
-	if (!(m_dwFlags & DDSD_MIPMAPCOUNT))
-		if (miplevel)
-			return false;
+	if (miplevel < 0 || miplevel >= (int) m_dwMipMapCount || miplevel >= MAX_MIPLEVELS || !m_pbCompBufferByLevels[miplevel])
+		return false;
 
-	/*
-	DXTColBlock * pBlock;
-	WORD * pPos = (WORD *) &m_pbCompBufferByLevels[miplevel][0];
-	int xblocks = (m_nWidth >> miplevel) / 4;
-	int yblocks = (m_nHeight >> miplevel) / 4;
-
-	for (int y = 0; y < yblocks; ++y)
-	{
-		// 8 bytes per block
-		pBlock = (DXTColBlock*) ((DWORD) pPos + y * xblocks * 8);
-
-		memcpy(pbDest, pBlock, xblocks * 8);
-		pbDest += lDestPitch;
-	}
-	*/
-
-	{
-		const long lLevelW = max(1, m_nWidth >> miplevel);
-		const long lLevelH = max(1, m_nHeight >> miplevel);
-		const long lLevelBytes = ((lLevelW + 3) / 4) * ((lLevelH + 3) / 4) * (m_CompFormat == PF_DXT1 ? 8 : 16);
-		memcpy(pbDest, m_pbCompBufferByLevels[miplevel], min(m_lPitch >> (miplevel * 2), lLevelBytes));
-	}
-	pbDest += lDestPitch;
+	memcpy(pbDest, m_pbCompBufferByLevels[miplevel], m_adwLevelBytes[miplevel]);
 	return true;
 }
 
