@@ -67,7 +67,8 @@ namespace
 	{
 		for (auto it = s_mapLoginFailures.begin(); it != s_mapLoginFailures.end();)
 		{
-			if (it->second.tWindowEnd <= tNow && it->second.tLockedUntil + LOGIN_FAILURE_BACKOFF_RESET <= tNow)
+			if (it->second.tWindowEnd <= tNow && it->second.tLockedUntil + LOGIN_FAILURE_BACKOFF_RESET <= tNow
+				&& it->second.tLastFailure + LOGIN_FAILURE_WINDOW <= tNow)
 				it = s_mapLoginFailures.erase(it);
 			else
 				++it;
