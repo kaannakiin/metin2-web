@@ -169,22 +169,22 @@ template<typename T> std::string MoneyString(T val)
 void CSoulRoulette::TurnWheel()
 {
 	if (GetGiftVnum()) {
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("LÃ¼tfen bekleyin, <Kan RitÃ¼eli> ÅŸu anda aktif."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Lütfen bekleyin, <Kan Ritüeli> þu anda aktif."));
 		return;
 	}
 
 	if (ch->GetGold() < RoulettePrice) {
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Kan RitÃ¼eli> iÃ§in yeterli yangÄ±n yok."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Kan Ritüeli> için yeterli yangýn yok."));
 		return;
 	}
 	if (ch->GetSoulPoint() < RouletteSoul) {
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Kan RitÃ¼eli> iÃ§in ruh gerekiyor."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Kan Ritüeli> için ruh gerekiyor."));
 		return;
 	}
 
 	int Rand = PickAGift();
 	if (Rand == -1) {
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Kan RitÃ¼eli> ÅŸu anda devre dÄ±ÅŸÄ±. LÃ¼tfen daha sonra tekrar deneyin."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Kan Ritüeli> þu anda devre dýþý. Lütfen daha sonra tekrar deneyin."));
 		return;
 	}
 
@@ -269,7 +269,7 @@ void CSoulRoulette::StateError(BYTE option, LPCHARACTER ch)
 			// we don't need iterate all data
 			if (it != v_Err.end()) {
 				const CSoulRoulette::ErrorData* p_Error = (*it);
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Kan RitÃ¼eli> EndiÅŸelenme, Ã¶dÃ¼lÃ¼nÃ¼ aldÄ±n!"));
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Kan Ritüeli> Endiþelenme, ödülünü aldýn!"));
 				ch->AutoGiveItem(p_Error->vnum, p_Error->count);
 				v_Err.erase(it);
 				delete p_Error;

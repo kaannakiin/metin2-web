@@ -12,6 +12,7 @@ chown -R 1000:1000 /home/m2web/bridge && chmod 640 /home/m2web/bridge/bridge-sit
 # host network: containers on the coolify network cannot reach the libvirt VM
 docker rm -f m2web-bridge >/dev/null 2>&1 || true
 docker run -d --name m2web-bridge --restart unless-stopped --network host --user 1000:1000 --read-only \
+    --memory 512m --pids-limit 200 --cap-drop ALL --security-opt no-new-privileges \
     -v /home/m2web/bridge:/app:ro -w /app node:20-alpine node src/index.js bridge-site.json
 
 # the site serves /home/m2web/www, filled only by publish.sh (checks the package first)

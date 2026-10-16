@@ -204,12 +204,19 @@ bool SpamBlockCheck(LPCHARACTER ch, const char* const buf, const size_t buflen)
 
 	if (ch->GetLevel() < g_iSpamBlockMaxLevel)
 	{
-		spam_score_of_ip_t::iterator it = spam_score_of_ip.find(ch->GetDesc()->GetHostName());
+		const char* c_szHost = ch->GetDesc()->GetHostName();
+		char szSpamKey[MAX_HOST_LENGTH + 1];
+		if (IsTrustedProxyIP(c_szHost))
+			snprintf(szSpamKey, sizeof(szSpamKey), "#%u", ch->GetPlayerID());
+		else
+			strlcpy(szSpamKey, c_szHost, sizeof(szSpamKey));
+
+		spam_score_of_ip_t::iterator it = spam_score_of_ip.find(szSpamKey);
 
 		if (it == spam_score_of_ip.end())
 		{
-			spam_score_of_ip.insert(std::make_pair(ch->GetDesc()->GetHostName(), std::make_pair(0, (LPEVENT) NULL)));
-			it = spam_score_of_ip.find(ch->GetDesc()->GetHostName());
+			spam_score_of_ip.insert(std::make_pair(szSpamKey, std::make_pair(0, (LPEVENT) NULL)));
+			it = spam_score_of_ip.find(szSpamKey);
 		}
 
 		if (it->second.second)
@@ -232,7 +239,7 @@ bool SpamBlockCheck(LPCHARACTER ch, const char* const buf, const size_t buflen)
 		if (it->second.first >= g_uiSpamBlockScore)
 		{
 			spam_event_info* info = AllocEventInfo<spam_event_info>();
-			strlcpy(info->host, ch->GetDesc()->GetHostName(), sizeof(info->host));
+			strlcpy(info->host, szSpamKey, sizeof(info->host));
 
 			it->second.second = event_create(block_chat_by_ip_event, info, PASSES_PER_SEC(g_uiSpamBlockDuration));
 			sys_log(0, "SPAM_IP: %s for %u seconds", info->host, g_uiSpamBlockDuration);
@@ -2229,6 +2236,9 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 
 		ch->SetRotation(pinfo->bRot * 5);
 		ch->ResetStopTime();
+
+		if (OXEVENT_MAP_INDEX != ch->GetMapIndex())
+			ch->RecordInstantMove(fDist);
 
 		ch->Move(pinfo->lX, pinfo->lY);
 		ch->Stop();
@@ -5413,6 +5423,9 @@ int CInputMain::ReciveHuntingAction(LPCHARACTER ch, const char* c_pData)
 			{
 
 				if (ch->GetLevel() < ch->GetQuestFlag("hunting_system.level"))
+					return 0;
+
+				if (p->dValue > 1)
 					return 0;
 
 				ch->SetQuestFlag("hunting_system.is_active", 1);

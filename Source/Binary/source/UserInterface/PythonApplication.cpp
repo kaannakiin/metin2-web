@@ -655,7 +655,7 @@ bool CPythonApplication::Process()
 				m_dwFaceAccCount += dwCurFaceCount;
 				m_dwFaceAccTime += m_dwCurRenderTime;
 
-				m_fFaceSpd = (m_dwFaceAccCount / m_dwFaceAccTime);
+				m_fFaceSpd = m_dwFaceAccTime ? (m_dwFaceAccCount / m_dwFaceAccTime) : 0;
 
 				if (-1 == m_iForceSightRange)
 				{
@@ -951,7 +951,7 @@ bool CPythonApplication::Process()
 					m_dwFaceAccCount += dwCurFaceCount;
 					m_dwFaceAccTime += m_dwCurRenderTime;
 
-					m_fFaceSpd = (m_dwFaceAccCount / m_dwFaceAccTime);
+					m_fFaceSpd = m_dwFaceAccTime ? (m_dwFaceAccCount / m_dwFaceAccTime) : 0;
 
 					if (-1 == m_iForceSightRange)
 					{

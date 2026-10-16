@@ -1729,6 +1729,9 @@ bool CPythonNetworkStream::RecvChatPacket()
 	if (!Recv(sizeof(kChat), &kChat))
 		return false;
 
+	if (kChat.size < sizeof(kChat) || kChat.size - sizeof(kChat) >= sizeof(buf))
+		return false;
+
 	UINT uChatSize=kChat.size - sizeof(kChat);
 
 	if (!Recv(uChatSize, buf))
@@ -1934,7 +1937,8 @@ bool CPythonNetworkStream::RecvWhisperPacket()
 	if (!Recv(sizeof(whisperPacket), &whisperPacket))
 		return false;
 
-	assert(whisperPacket.wSize - sizeof(whisperPacket) < 512);
+	if (whisperPacket.wSize < sizeof(whisperPacket) || whisperPacket.wSize - sizeof(whisperPacket) >= sizeof(buf))
+		return false;
 
 	if (!Recv(whisperPacket.wSize - sizeof(whisperPacket), &buf))
 		return false;
@@ -2730,11 +2734,17 @@ bool CPythonNetworkStream::RecvPartyPositionInfo()
 		return false;
 	}
 
-	for (auto iPacketSize = Packet.wSize - sizeof(Packet); iPacketSize > 0; iPacketSize -= sizeof(TPartyPosition))
+	int iPacketSize = Packet.wSize - (int) sizeof(Packet);
+	if (iPacketSize < 0 || iPacketSize % sizeof(TPartyPosition))
+		return false;
+
+	for (; iPacketSize > 0; iPacketSize -= sizeof(TPartyPosition))
 	{
 		TPartyPosition PositionInfo;
-		if (Recv(sizeof(PositionInfo), &PositionInfo))
-			CPythonMiniMap::Instance().AddPartyPositionInfo(PositionInfo);
+		if (!Recv(sizeof(PositionInfo), &PositionInfo))
+			return false;
+
+		CPythonMiniMap::Instance().AddPartyPositionInfo(PositionInfo);
 	}
 	
 	return true;
@@ -3657,7 +3667,7 @@ bool CPythonNetworkStream::RecvMessenger()
 				if (!Recv(sizeof(TPacketGCMessengerListOffline),&on))
 					return false;
 
-				if (!Recv(on.length, char_name))
+				if (on.length >= sizeof(char_name) || !Recv(on.length, char_name))
 					return false;
 
 				char_name[on.length] = 0;
@@ -3678,7 +3688,7 @@ bool CPythonNetworkStream::RecvMessenger()
 			TPacketGCMessengerLogin p;
 			if (!Recv(sizeof(p),&p))
 				return false;
-			if (!Recv(p.length, char_name))
+			if (p.length >= sizeof(char_name) || !Recv(p.length, char_name))
 				return false;
 			char_name[p.length] = 0;
 			CPythonMessenger::Instance().OnFriendLogin(char_name);
@@ -3691,7 +3701,7 @@ bool CPythonNetworkStream::RecvMessenger()
 			TPacketGCMessengerLogout logout;
 			if (!Recv(sizeof(logout),&logout))
 				return false;
-			if (!Recv(logout.length, char_name))
+			if (logout.length >= sizeof(char_name) || !Recv(logout.length, char_name))
 				return false;
 			char_name[logout.length] = 0;
 			CPythonMessenger::Instance().OnFriendLogout(char_name);
@@ -3704,7 +3714,7 @@ bool CPythonNetworkStream::RecvMessenger()
 			if (!Recv(sizeof(bLength), &bLength))
 				return false;
 
-			if (!Recv(bLength, char_name))
+			if (bLength >= sizeof(char_name) || !Recv(bLength, char_name))
 				return false;
 
 			char_name[bLength] = 0;
@@ -3721,7 +3731,7 @@ bool CPythonNetworkStream::RecvMessenger()
 				if (!Recv(sizeof(TPacketGCMessengerTeamListOffline),&on))
 					return false;
 
-				if (!Recv(on.length, char_name))
+				if (on.length >= sizeof(char_name) || !Recv(on.length, char_name))
 					return false;
 
 				char_name[on.length] = 0;
@@ -3749,7 +3759,7 @@ bool CPythonNetworkStream::RecvMessenger()
 			TPacketGCMessengerLogin p;
 			if (!Recv(sizeof(p),&p))
 				return false;
-			if (!Recv(p.length, char_name))
+			if (p.length >= sizeof(char_name) || !Recv(p.length, char_name))
 				return false;
 			char_name[p.length] = 0;
 			CPythonMessenger::Instance().OnTeamLogin(char_name);
@@ -3762,7 +3772,7 @@ bool CPythonNetworkStream::RecvMessenger()
 			TPacketGCMessengerLogout logout;
 			if (!Recv(sizeof(logout),&logout))
 				return false;
-			if (!Recv(logout.length, char_name))
+			if (logout.length >= sizeof(char_name) || !Recv(logout.length, char_name))
 				return false;
 			char_name[logout.length] = 0;
 			CPythonMessenger::Instance().OnTeamLogout(char_name);
@@ -3779,7 +3789,7 @@ bool CPythonNetworkStream::RecvMessenger()
 				if (!Recv(sizeof(TPacketGCMessengerBlockListOffline), &block_on))
 					return false;
 
-				if (!Recv(block_on.length, char_name))
+				if (block_on.length >= sizeof(char_name) || !Recv(block_on.length, char_name))
 					return false;
 
 				char_name[block_on.length] = 0;
@@ -3800,7 +3810,7 @@ bool CPythonNetworkStream::RecvMessenger()
 			TPacketGCMessengerLogin block_p;
 			if (!Recv(sizeof(block_p), &block_p))
 				return false;
-			if (!Recv(block_p.length, char_name))
+			if (block_p.length >= sizeof(char_name) || !Recv(block_p.length, char_name))
 				return false;
 			char_name[block_p.length] = 0;
 			CPythonMessenger::Instance().OnBlockLogin(char_name);
@@ -3813,7 +3823,7 @@ bool CPythonNetworkStream::RecvMessenger()
 			TPacketGCMessengerLogout block_logout;
 			if (!Recv(sizeof(block_logout), &block_logout))
 				return false;
-			if (!Recv(block_logout.length, char_name))
+			if (block_logout.length >= sizeof(char_name) || !Recv(block_logout.length, char_name))
 				return false;
 			char_name[block_logout.length] = 0;
 			CPythonMessenger::Instance().OnBlockLogout(char_name);
@@ -6807,6 +6817,9 @@ bool CPythonNetworkStream::RecvLocaleChatPacket()
 	WORD size = kLocaleChatPacket.size - sizeof(kLocaleChatPacket);
 	char buf[256];
 
+	if (kLocaleChatPacket.size < sizeof(kLocaleChatPacket) || size >= sizeof(buf))
+		return false;
+
 	if (size > 0)
 	{
 		if (!Recv(size, buf))
@@ -6886,6 +6899,9 @@ bool CPythonNetworkStream::RecvLocaleWhishperPacket()
 
 	WORD size = kLocaleWhisperPacket.size - sizeof(kLocaleWhisperPacket);
 	char buf[256];
+
+	if (kLocaleWhisperPacket.size < sizeof(kLocaleWhisperPacket) || size >= sizeof(buf))
+		return false;
 
 	if (size > 0)
 	{

@@ -89,6 +89,8 @@ class DESC
 		void			LargePacket(const void * c_pvData, int iSize);
 
 		int			ProcessInput();		// returns -1 if error
+		int			ConsumeProxyHeader();
+		bool			CountInputPacket(BYTE bHeader);
 		int			ProcessOutput();	// returns -1 if error
 
 		CInputProcessor	*	GetInputProcessor()	{ return m_pInputProcessor; }
@@ -178,6 +180,9 @@ class DESC
 		DWORD			m_dwHandle;
 
 		std::string		m_stHost;
+		bool			m_bProxyHeaderPending;
+		DWORD			m_dwPacketWindowStart;
+		int				m_iPacketCount;
 		WORD			m_wPort;
 		time_t			m_LastTryToConnectTime;
 

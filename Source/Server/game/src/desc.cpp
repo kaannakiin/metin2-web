@@ -19,6 +19,9 @@
 #include "TrafficProfiler.h"
 #include "locale_service.h"
 #include "log.h"
+#include "ip_ban.h"
+
+static const int PROXY_HEADER_MAX_LEN = 107;
 
 #define DEFAULT_PACKET_BUFFER_SIZE 95536 // Fix 65536
 
@@ -46,6 +49,9 @@ void DESC::Initialize()
 	m_iPhase = PHASE_CLOSE;
 	m_dwHandle = 0;
 
+	m_bProxyHeaderPending = false;
+	m_dwPacketWindowStart = 0;
+	m_iPacketCount = 0;
 	m_wPort = 0;
 	m_LastTryToConnectTime = 0;
 
@@ -223,6 +229,7 @@ bool DESC::Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSoc
 	m_sock		= _fd;
 
 	m_stHost		= inet_ntoa(c_rSockAddr.sin_addr);
+	m_bProxyHeaderPending = IsTrustedProxyIP(m_stHost.c_str());
 	m_wPort			= c_rSockAddr.sin_port;
 	m_dwHandle		= _handle;
 
@@ -265,6 +272,76 @@ bool DESC::Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSoc
 	return true;
 }
 
+bool DESC::CountInputPacket(BYTE bHeader)
+{
+	if (g_iPacketFloodLimit <= 0 || IsPhase(PHASE_P2P))
+		return true;
+
+	const DWORD dwNow = get_dword_time();
+	if (dwNow - m_dwPacketWindowStart >= 1000)
+	{
+		m_dwPacketWindowStart = dwNow;
+		m_iPacketCount = 0;
+	}
+
+	if (++m_iPacketCount <= g_iPacketFloodLimit)
+		return true;
+
+	if (m_iPacketCount == g_iPacketFloodLimit + 1)
+		sys_err("PACKET_FLOOD: host %s login %s header %u limit %d/s", GetHostName(), GetLogin().c_str(), bHeader, g_iPacketFloodLimit);
+
+	return false;
+}
+
+int DESC::ConsumeProxyHeader()
+{
+	const int iSize = buffer_size(m_lpInputBuffer);
+	const char* c_pData = (const char*) buffer_read_peek(m_lpInputBuffer);
+	const char* c_pEnd = (const char*) memchr(c_pData, '\n', MIN(iSize, PROXY_HEADER_MAX_LEN));
+
+	if (!c_pEnd)
+		return iSize < PROXY_HEADER_MAX_LEN ? 0 : -1;
+
+	char szLine[PROXY_HEADER_MAX_LEN + 1];
+	const int iLineLen = c_pEnd - c_pData + 1;
+	thecore_memcpy(szLine, c_pData, iLineLen);
+	szLine[iLineLen] = '\0';
+	buffer_read_proceed(m_lpInputBuffer, iLineLen);
+	m_bProxyHeaderPending = false;
+
+	if (strncmp(szLine, "PROXY ", 6) != 0)
+	{
+		sys_err("bad proxy header from %s", GetHostName());
+		return -1;
+	}
+
+	char szProto[8] = {};
+	char szSource[64] = {};
+	struct in_addr kAddr;
+
+	if (sscanf(szLine, "PROXY %7s %63s", szProto, szSource) != 2 || strcmp(szProto, "TCP4") != 0 || inet_pton(AF_INET, szSource, &kAddr) != 1)
+		return 1;
+
+	const DWORD dwSource = ntohl(kAddr.s_addr);
+	const BYTE bFirst = dwSource >> 24;
+	const BYTE bSecond = (dwSource >> 16) & 0xFF;
+	if (bFirst == 0 || bFirst == 10 || bFirst == 127 || (bFirst == 169 && bSecond == 254) || (bFirst == 172 && bSecond >= 16 && bSecond <= 31) || (bFirst == 192 && bSecond == 168) || IsTrustedProxyIP(szSource))
+	{
+		sys_err("proxy header names a non-public source %s (peer %s)", szSource, GetHostName());
+		return -1;
+	}
+
+	if (g_bAuthServer && IsBanIP(kAddr))
+	{
+		sys_log(0, "connection from %s was banned.", szSource);
+		return -1;
+	}
+
+	m_stHost = szSource;
+	m_SockAddr.sin_addr = kAddr;
+	return 1;
+}
+
 int DESC::ProcessInput()
 {
 	std::size_t bytes_read;
@@ -284,6 +361,15 @@ int DESC::ProcessInput()
 		return 0;
 
 	buffer_write_proceed(m_lpInputBuffer, bytes_read);
+
+	if (m_bProxyHeaderPending)
+	{
+		const int iProxyHeader = ConsumeProxyHeader();
+		if (iProxyHeader < 0)
+			return -1;
+		if (iProxyHeader == 0)
+			return bytes_read;
+	}
 
 	if (!m_pInputProcessor)
 		sys_err("no input processor");
@@ -954,6 +1040,11 @@ void DESC::ChatPacket(BYTE type, const char * format, ...)
 	int len = vsnprintf(chatbuf, sizeof(chatbuf), format, args);
 	va_end(args);
 
+	if (len < 0)
+		len = 0;
+	else if (len >= (int) sizeof(chatbuf))
+		len = sizeof(chatbuf) - 1;
+
 	struct packet_chat pack_chat;
 
 	pack_chat.header    = HEADER_GC_CHAT;
@@ -988,6 +1079,11 @@ void DESC::LocaleChatPacket(BYTE type, DWORD id, const char* format, ...)
 	int len = vsnprintf(chatbuf, sizeof(chatbuf), format, args);
 	va_end(args);
 
+	if (len < 0)
+		len = 0;
+	else if (len >= (int) sizeof(chatbuf))
+		len = sizeof(chatbuf) - 1;
+
 	TPacketGCLocaleChat packet;
 	packet.header = HEADER_GC_LOCALE_CHAT;
 	packet.type = type;
@@ -1013,6 +1109,11 @@ void DESC::LocaleWhisperPacket(BYTE type, DWORD id, const char* namefrom, const 
 	va_start(args, format);
 	int len = vsnprintf(chatbuf, sizeof(chatbuf), format, args);
 	va_end(args);
+
+	if (len < 0)
+		len = 0;
+	else if (len >= (int) sizeof(chatbuf))
+		len = sizeof(chatbuf) - 1;
 
 	TPacketGCLocaleWhisper packet;
 	packet.header = HEADER_GC_LOCALE_WHISPER;

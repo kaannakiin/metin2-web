@@ -9,7 +9,7 @@ ENV=/root/.cloudflare/metin2-cdn.env
 WRANGLER=wrangler@4.146.0
 
 [ -s "$ENV" ] || { echo "no $ENV - not deploying"; exit 1; }
-[ -s "$S/manifest.bin" ] && [ -s "$S/order.txt" ] || { echo "no corpus in $S - not deploying"; exit 1; }
+[ -s "$S/manifest.bin" ] && [ -s "$S/groups.txt" ] || { echo "no corpus in $S - not deploying"; exit 1; }
 n=$(ls "$S" | grep -cE '^[0-9a-f]{32}\.bin$')
 [ "$n" -gt 1000 ] || { echo "corpus has $n chunks - not deploying"; exit 1; }
 

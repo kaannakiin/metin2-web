@@ -51,7 +51,7 @@ namespace WhiteDragon
 		{ 130, 100 },
 	};
 
-	// WHITEDRAGON_SHELTER - ScharmÃ¼tzler d.Horts [6785]
+	// WHITEDRAGON_SHELTER - Scharmützler d.Horts [6785]
 	int WhiteDragonShelter[15][2] =
 	{
 		{ 160, 150 },
@@ -429,10 +429,10 @@ namespace WhiteDragon
 			GetMapSectree()->for_each(f);
 
 			char szNotice[512];
-			snprintf(szNotice, sizeof(szNotice), "TÃ¼m katÄ±lÄ±mcÄ±lar 30 saniye iÃ§inde Ä±ÅŸÄ±nlanacak.");
+			snprintf(szNotice, sizeof(szNotice), "Tüm katýlýmcýlar 30 saniye içinde ýþýnlanacak.");
 			SendNoticeMap(szNotice, GetMapIndex(), true);
 
-			pKiller->ChatPacket(CHAT_TYPE_INFO, "Ã–dÃ¼lÃ¼nÃ¼ giriÅŸten alabilirsin!");
+			pKiller->ChatPacket(CHAT_TYPE_INFO, "Ödülünü giriþten alabilirsin!");
 			if (GetDungeonLevel() == true)
 				pKiller->SetQuestFlag("white_dragon.loot_hard", 1);
 			else
@@ -605,7 +605,7 @@ namespace WhiteDragon
 
 		if (!lMapIndex)
 		{
-			pChar->ChatPacket(CHAT_TYPE_INFO, "Harita oluÅŸturulurken bir hata oluÅŸtu.");
+			pChar->ChatPacket(CHAT_TYPE_INFO, "Harita oluþturulurken bir hata oluþtu.");
 			return false;
 		}
 
@@ -623,7 +623,7 @@ namespace WhiteDragon
 			PIXEL_POSITION mPos;
 			if (!SECTREE_MANAGER::instance().GetRecallPositionByEmpire((int)(MAP_WHITEDRAGONCAVE_BOSS), 0, mPos))
 			{
-				pChar->ChatPacket(CHAT_TYPE_INFO, "Sectree hatasÄ±: geri Ã§aÄŸÄ±rma konumu alÄ±namadÄ±.");
+				pChar->ChatPacket(CHAT_TYPE_INFO, "Sectree hatasý: geri çaðýrma konumu alýnamadý.");
 				return true;
 			}
 

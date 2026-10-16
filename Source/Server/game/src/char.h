@@ -1964,6 +1964,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void MountVnum(DWORD vnum);
 		DWORD GetMountVnum() const { return m_dwMountVnum; }
 		DWORD GetLastMountTime() const { return m_dwMountTime; }
+		void RecordInstantMove(float fDistMeters);
 
 		bool CanUseHorseSkill();
 
@@ -2102,6 +2103,8 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		DWORD m_dwMountVnum;
 		DWORD m_dwMountTime;
+		DWORD m_dwInstantMoveWindowStart;
+		float m_fInstantMoveWindowDist;
 
 		BYTE m_bSendHorseLevel;
 		BYTE m_bSendHorseHealthGrade;

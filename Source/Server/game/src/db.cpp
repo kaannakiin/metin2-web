@@ -294,6 +294,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 				{
 					{
 						sys_log(0, " NOID");
+						OnLoginFailed(d, pinfo->login);
 						LoginFailure(d, "NOID");
 						M2_DELETE(pinfo);
 					}
@@ -399,6 +400,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 					if (nPasswordDiff)
 					{
+						OnLoginFailed(d, pinfo->login);
 						LoginFailure(d, "WRONGPWD");
 						sys_log(0, " WRONGPWD");
 						M2_DELETE(pinfo);
@@ -465,9 +467,9 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 						DESC_MANAGER::instance().ConnectAccount(r.login, d);
 
 						LoginPrepare(d, pinfo->adwClientKey, aiPremiumTimes);
-						M2_DELETE(pinfo);
-
+						OnLoginSucceeded(pinfo->login);
 						sys_log(0, "QID_AUTH_LOGIN: SUCCESS %s", pinfo->login);
+						M2_DELETE(pinfo);
 					}
 				}
 			}

@@ -96,6 +96,12 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int iBytes, 
 
 		if (bHeader)
 		{
+			if (!lpDesc->CountInputPacket(bHeader) && g_bPacketFloodKick)
+			{
+				lpDesc->SetPhase(PHASE_CLOSE);
+				return true;
+			}
+
 			if (test_server && bHeader != HEADER_CG_MOVE)
 				sys_log(0, "Packet Analyze [Header %d][bufferLeft %d] ", bHeader, m_iBufferLeft);
 

@@ -304,6 +304,9 @@ bool CPythonNetworkStream::__RecvPlayerDestroySuccessPacket()
 		return false;
 	}
 
+	if (packet.account_index >= PLAYER_PER_ACCOUNT4)
+		return false;
+
 	memset (&m_akSimplePlayerInfo[packet.account_index], 0, sizeof (m_akSimplePlayerInfo[packet.account_index]));
 	m_adwGuildID[packet.account_index] = 0;
 	m_astrGuildName[packet.account_index] = "";

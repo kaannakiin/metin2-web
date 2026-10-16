@@ -77,6 +77,9 @@ string g_stDefaultQuestObjectDir	= "./quest/object";
 std::set<string> g_setQuestObjectDir;
 
 std::vector<std::string>	g_stAdminPageIP;
+std::vector<std::string>	g_stTrustedProxyIP;
+int g_iPacketFloodLimit = 300;
+bool g_bPacketFloodKick = false;
 std::string	g_stAdminPagePassword = "SHOWMETHEMONEY";
 
 string g_stBlockDate				= "30000705";
@@ -198,6 +201,24 @@ static void FN_add_adminpageIP(char *line)
 		g_stAdminPageIP.push_back(v);
 		v = strtok_r(NULL, delim, &last);
 	}
+}
+
+static void FN_add_trustedProxyIP(char *line)
+{
+	char	*last;
+	const char *delim = " \t\r\n";
+	char *v = strtok_r(line, delim, &last);
+
+	while (v)
+	{
+		g_stTrustedProxyIP.push_back(v);
+		v = strtok_r(NULL, delim, &last);
+	}
+}
+
+bool IsTrustedProxyIP(const char* c_szHost)
+{
+	return std::find(g_stTrustedProxyIP.begin(), g_stTrustedProxyIP.end(), c_szHost) != g_stTrustedProxyIP.end();
 }
 
 static void FN_log_adminpage()
@@ -361,6 +382,23 @@ void config_init (const string& st_localeServiceName)
 		{
 			FN_add_adminpageIP(value_string);
 			//g_stAdminPageIP[2] = value_string;
+		}
+
+		TOKEN("packet_flood_limit")
+		{
+			str_to_number(g_iPacketFloodLimit, value_string);
+		}
+
+		TOKEN("packet_flood_kick")
+		{
+			int iKick = 0;
+			str_to_number(iKick, value_string);
+			g_bPacketFloodKick = iKick != 0;
+		}
+
+		TOKEN("trusted_proxy_ip")
+		{
+			FN_add_trustedProxyIP(value_string);
 		}
 
 		TOKEN("adminpage_password")

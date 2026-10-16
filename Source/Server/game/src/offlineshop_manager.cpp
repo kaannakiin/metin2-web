@@ -306,7 +306,7 @@ void COfflineShopManager::AddItemReal(OFFLINE_SHOP_ITEM* item)
 
 void COfflineShopManager::AddItem(LPCHARACTER ch, BYTE bDisplayPos, TItemPos bPos, long long iPrice)
 {
-	if (!ch || bDisplayPos >= OFFLINE_SHOP_HOST_ITEM_MAX_NUM)
+	if (!ch || bDisplayPos >= OFFLINE_SHOP_HOST_ITEM_MAX_NUM || iPrice <= 0 || iPrice > GOLD_MAX)
 		return;
 
 	if (bDisplayPos >= 40)
@@ -540,7 +540,7 @@ void COfflineShopManager::BuyItemReal(TOfflineShopBuy* item)
 
 void COfflineShopManager::Buy(LPCHARACTER ch, DWORD vid, BYTE pos)
 {
-	if(!ch)
+	if(!ch || pos >= OFFLINE_SHOP_HOST_ITEM_MAX_NUM)
 		return;
 
 	if (ch->CanBuyItemOfflineShop())
@@ -921,6 +921,7 @@ void COfflineShopManager::OpenMyOfflineShop(LPCHARACTER ch, const char* c_pszSig
 	}
 
 	std::set<TItemPos> cont;
+	bool usedDisplayPos[OFFLINE_SHOP_HOST_ITEM_MAX_NUM] = {};
 	for (BYTE i = 0; i < bItemCount; ++i)
 	{
 		if (cont.find((pTable+i)->pos) != cont.end())
@@ -928,6 +929,16 @@ void COfflineShopManager::OpenMyOfflineShop(LPCHARACTER ch, const char* c_pszSig
 			sys_err("MY_OFFLINE_SHOP: duplicate shop item detected! (name: %s)", ch->GetName());
 			return;
 		}
+		cont.insert((pTable + i)->pos);
+
+		const BYTE bDisplayPos = (pTable + i)->display_pos;
+		if (bDisplayPos >= OFFLINE_SHOP_HOST_ITEM_MAX_NUM || usedDisplayPos[bDisplayPos])
+			return;
+		usedDisplayPos[bDisplayPos] = true;
+
+		if ((pTable + i)->price <= 0 || (pTable + i)->price > GOLD_MAX)
+			return;
+
 		LPITEM pkItem = ch->GetItem((pTable + i)->pos);
 
 		if ((pTable + i)->display_pos >= 40)
@@ -981,7 +992,8 @@ void COfflineShopManager::OpenMyOfflineShop(LPCHARACTER ch, const char* c_pszSig
 	memset(&m_data.items, 0, sizeof(OFFLINE_SHOP_ITEM) * OFFLINE_SHOP_HOST_ITEM_MAX_NUM);
 	for (int i = 0; i < bItemCount; ++i)
 	{
-		LPITEM pkItem = ch->GetItem(pTable->pos);
+		const TOfflineShopItemTable* pEntry = pTable + i;
+		LPITEM pkItem = ch->GetItem(pEntry->pos);
 		if (!pkItem)
 			continue;
 
@@ -995,13 +1007,13 @@ void COfflineShopManager::OpenMyOfflineShop(LPCHARACTER ch, const char* c_pszSig
 			continue;
 		}
 
-		OFFLINE_SHOP_ITEM& item = m_data.items[pTable->display_pos];
+		OFFLINE_SHOP_ITEM& item = m_data.items[pEntry->display_pos];
 		item.vnum = pkItem->GetVnum();
 		item.id = pkItem->GetID();
 		item.owner_id = ch->GetPlayerID();
-		item.pos = pTable->display_pos;
+		item.pos = pEntry->display_pos;
 		item.count = pkItem->GetCount();
-		item.price = pTable->price;
+		item.price = pEntry->price;
 		item.status = 0;
 		thecore_memcpy(item.alSockets, pkItem->GetSockets(), sizeof(item.alSockets));
 		thecore_memcpy(item.aAttr, pkItem->GetAttributes(), sizeof(item.aAttr));
@@ -1012,7 +1024,6 @@ void COfflineShopManager::OpenMyOfflineShop(LPCHARACTER ch, const char* c_pszSig
 		strlcpy(item.szBuyerName, "NONAME", sizeof(item.szBuyerName));
 		pkItem->RemoveFromCharacter();
 		ITEM_MANAGER::instance().SaveSingleItem(pkItem);
-		++pTable;
 	}
 
 	shop_create n;
@@ -1036,7 +1047,7 @@ void COfflineShopManager::OpenSlotReal(TOfflineShopOpenSlot* ch)
 
 void COfflineShopManager::OpenSlot(LPCHARACTER ch, BYTE bPos)
 {
-	if (!ch)
+	if (!ch || bPos >= OFFLINE_SHOP_HOST_ITEM_MAX_NUM - 40)
 		return;
 
 	unsigned long long myFlag = ch->GetOfflineShopFlag();

@@ -17,6 +17,9 @@ enum
 };
 
 void LoginFailure(LPDESC d, const char * c_pszStatus);
+bool IsLoginThrottled(LPDESC d, const char* c_szLogin);
+void OnLoginFailed(LPDESC d, const char* c_szLogin);
+void OnLoginSucceeded(const char* c_szLogin);
 
 
 class CInputProcessor

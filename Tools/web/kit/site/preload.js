@@ -47,7 +47,7 @@
     function startProgress(w) {
         if (!w.groups) return null;
         var done = 0, total = 0;
-        ['meta', 'motion', 'boot'].forEach(function (name) {
+        ['boot', 'meta', 'motion'].forEach(function (name) {
             var g = w.groups[name];
             if (!g) return;
             total += g.names.length;

@@ -13,6 +13,83 @@
 
 extern time_t get_global_time();
 
+namespace
+{
+	struct SLoginFailures
+	{
+		int		iCount;
+		time_t	tWindowEnd;
+		time_t	tLockedUntil;
+	};
+
+	const int LOGIN_FAILURE_LIMIT_PER_ACCOUNT = 5;
+	const int LOGIN_FAILURE_LIMIT_PER_HOST = 20;
+	const time_t LOGIN_FAILURE_WINDOW = 300;
+	const size_t LOGIN_FAILURE_MAX_ENTRIES = 10000;
+
+	std::unordered_map<std::string, SLoginFailures> s_mapLoginFailures;
+
+	std::string AccountKey(const char* c_szLogin)
+	{
+		char szLogin[LOGIN_MAX_LEN + 1];
+		trim_and_lower(c_szLogin, szLogin, sizeof(szLogin));
+		return std::string("a:") + szLogin;
+	}
+
+	bool IsLocked(const std::string& stKey)
+	{
+		auto it = s_mapLoginFailures.find(stKey);
+		return it != s_mapLoginFailures.end() && it->second.tLockedUntil > get_global_time();
+	}
+
+	void AddFailure(const std::string& stKey, int iLimit)
+	{
+		const time_t tNow = get_global_time();
+
+		if (s_mapLoginFailures.size() >= LOGIN_FAILURE_MAX_ENTRIES)
+		{
+			for (auto it = s_mapLoginFailures.begin(); it != s_mapLoginFailures.end();)
+			{
+				if (it->second.tWindowEnd <= tNow && it->second.tLockedUntil <= tNow)
+					it = s_mapLoginFailures.erase(it);
+				else
+					++it;
+			}
+		}
+
+		SLoginFailures& r = s_mapLoginFailures[stKey];
+		if (r.tWindowEnd <= tNow)
+		{
+			r.iCount = 0;
+			r.tWindowEnd = tNow + LOGIN_FAILURE_WINDOW;
+		}
+
+		if (++r.iCount >= iLimit)
+			r.tLockedUntil = tNow + LOGIN_FAILURE_WINDOW;
+	}
+}
+
+bool IsLoginThrottled(LPDESC d, const char* c_szLogin)
+{
+	if (IsLocked(AccountKey(c_szLogin)))
+		return true;
+
+	return !IsTrustedProxyIP(d->GetHostName()) && IsLocked(std::string("h:") + d->GetHostName());
+}
+
+void OnLoginFailed(LPDESC d, const char* c_szLogin)
+{
+	AddFailure(AccountKey(c_szLogin), LOGIN_FAILURE_LIMIT_PER_ACCOUNT);
+
+	if (!IsTrustedProxyIP(d->GetHostName()))
+		AddFailure(std::string("h:") + d->GetHostName(), LOGIN_FAILURE_LIMIT_PER_HOST);
+}
+
+void OnLoginSucceeded(const char* c_szLogin)
+{
+	s_mapLoginFailures.erase(AccountKey(c_szLogin));
+}
+
 bool FN_IS_VALID_LOGIN_STRING(const char *str)
 {
 	const char*	tmp;
@@ -74,6 +151,13 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 		sys_log(0, "InputAuth::Login : IS_NOT_VALID_LOGIN_STRING(%s) desc %p",
 				login, get_pointer(d));
 		LoginFailure(d, "NOID");
+		return;
+	}
+
+	if (IsLoginThrottled(d, login))
+	{
+		sys_log(0, "InputAuth::Login : throttled %s from %s", login, d->GetHostName());
+		LoginFailure(d, "BLKLOGIN");
 		return;
 	}
 

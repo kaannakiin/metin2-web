@@ -237,11 +237,14 @@ m2w.safeUrl = function (u) {
 /// try to close the tab, and when the browser refuses (only a tab opened by
 /// script may close itself) go back where the player came from - `?return=`,
 /// `m2w.config.returnUrl` set by the page, or `document.referrer` on the
-/// same origin - and with none of these, show a message. The client carries
+/// same origin (`?return=` too must be on this origin) - and with none of these, show a message. The client carries
 /// NO page address of its own; that is a deployment setting.
 m2w.quit = function () {
     try {
-        var target = m2w.options.get('return') || '';
+        // `?return=` comes from whoever wrote the link, so only this site's own
+        // pages; another site needs `m2w.config.returnUrl`, which the operator sets.
+        var target = m2w.safeUrl(m2w.options.get('return') || '');
+        try { if (target && new URL(target).origin !== location.origin) target = ''; } catch (e) { target = ''; }
         if (!target && m2w.config.returnUrl) target = String(m2w.config.returnUrl);
         if (!target && document.referrer) {
             try {
@@ -1283,6 +1286,7 @@ m2w.chunkCachePut = function (name, bytes) {
     state.bytes += bytes.length;
     state.used.add(name);
     state.evict(name);
+    if (m2w.prefetch && m2w.prefetch.fetched) m2w.prefetch.fetched.add(name);
 };
 
 /// Fetches a chunk IN THE BACKGROUND - Cache Storage first, then the
@@ -1519,7 +1523,7 @@ m2w.prefetchStart = function (base) {
         p.groups = groups;
         var pending = p.pending;
         p.pending = [];
-        ['meta', 'motion', 'boot'].forEach(function (g) { m2w.want(g, false); });
+        ['boot', 'meta', 'motion'].forEach(function (g) { m2w.want(g, false); });
         pending.forEach(function (w) { m2w.want(w[0], w[1]); });
         state.storage.then(prune);
     });

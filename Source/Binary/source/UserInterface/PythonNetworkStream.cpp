@@ -86,7 +86,7 @@ class CMainPacketHeaderMap : public CNetworkPacketHeaderMap
 			Set(HEADER_GC_QUICKSLOT_ADD, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCQuickSlotAdd), STATIC_SIZE_PACKET));
 			Set(HEADER_GC_QUICKSLOT_DEL, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCQuickSlotDel), STATIC_SIZE_PACKET));
 			Set(HEADER_GC_QUICKSLOT_SWAP, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCQuickSlotSwap), STATIC_SIZE_PACKET));
-			Set(HEADER_GC_WHISPER, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCWhisper), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_WHISPER, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCWhisper), DYNAMIC_SIZE_PACKET));
 			Set(HEADER_GC_CHARACTER_POSITION, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCPosition), STATIC_SIZE_PACKET));
 			Set(HEADER_GC_MOTION, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCMotion), STATIC_SIZE_PACKET));
 			Set(HEADER_GC_PARTS, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCCharacterUpdate), STATIC_SIZE_PACKET));
@@ -210,8 +210,8 @@ class CMainPacketHeaderMap : public CNetworkPacketHeaderMap
 			Set(HEADER_GC_SHOPSEARCH_SET, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCShopSearchItemSet), DYNAMIC_SIZE_PACKET));
 #endif
 #ifdef ENABLE_CLIENT_LOCALE_STRING
-			Set(HEADER_GC_LOCALE_CHAT, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCLocaleChat), STATIC_SIZE_PACKET));
-			Set(HEADER_GC_LOCALE_WHISPER, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCLocaleWhisper), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_LOCALE_CHAT, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCLocaleChat), DYNAMIC_SIZE_PACKET));
+			Set(HEADER_GC_LOCALE_WHISPER, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCLocaleWhisper), DYNAMIC_SIZE_PACKET));
 #endif
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 			Set(HEADER_GC_AURA, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCAura), DYNAMIC_SIZE_PACKET));
@@ -688,8 +688,8 @@ bool CPythonNetworkStream::CheckPacket (TPacketHeader* pRetHeader)
 	{
 		TraceError ("Unknown packet header: %d, last: %d %d", header, g_iLastPacket[0], g_iLastPacket[1]);
 		ClearRecvBuffer();
-
-		PostQuitMessage (0);
+		OnRemoteDisconnect();
+		Disconnect();
 		return false;
 	}
 
@@ -704,6 +704,15 @@ bool CPythonNetworkStream::CheckPacket (TPacketHeader* pRetHeader)
 
 		if (!Peek(sizeof(TDynamicSizePacketHeader), &DynamicSizePacketHeader))
 			return false;
+
+		if (DynamicSizePacketHeader.size < sizeof(TDynamicSizePacketHeader) || DynamicSizePacketHeader.size > GetRecvBufferCapacity())
+		{
+			TraceError("Bad dynamic packet size: header %d size %d, last: %d %d", DynamicSizePacketHeader.header, DynamicSizePacketHeader.size, g_iLastPacket[0], g_iLastPacket[1]);
+			ClearRecvBuffer();
+			OnRemoteDisconnect();
+			Disconnect();
+			return false;
+		}
 
 		if (!Peek(DynamicSizePacketHeader.size))
 		{
@@ -761,6 +770,8 @@ bool CPythonNetworkStream::RecvErrorPacket (int header)
 				m_strPhase.c_str(), header, g_iLastPacket[0], g_iLastPacket[1]);
 
 	ClearRecvBuffer();
+	OnRemoteDisconnect();
+	Disconnect();
 	return true;
 }
 

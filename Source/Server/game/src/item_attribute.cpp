@@ -177,7 +177,7 @@ void CItem::PutAttributeWithLevel(BYTE bLevel)
 		}
 	}
 
-	// total==0 veya liste boÅŸ ise number(1,total) crash olur.
+	// total==0 veya liste boþ ise number(1,total) crash olur.
 	if (avail.empty() || total <= 0)
 	{
 		sys_err("Cannot put item attribute %d %d %s item_id(%u)", iAttributeSet, bLevel, GetName(), GetID());

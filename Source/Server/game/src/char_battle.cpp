@@ -4156,11 +4156,11 @@ class CFuncShoot
 			if (!battle_is_attackable(m_me, pkVictim))
 				return;
 
-			if (m_me->IsNPC())
-			{
-				if (DISTANCE_APPROX(m_me->GetX() - pkVictim->GetX(), m_me->GetY() - pkVictim->GetY()) > 5000)
-					return;
-			}
+			if (m_me->GetMapIndex() != pkVictim->GetMapIndex())
+				return;
+
+			if (DISTANCE_APPROX(m_me->GetX() - pkVictim->GetX(), m_me->GetY() - pkVictim->GetY()) > 5000)
+				return;
 
 			LPITEM pkBow, pkArrow;
 
@@ -4523,7 +4523,7 @@ void CHARACTER::FlyTarget(DWORD dwTargetVID, long x, long y, BYTE bHeader)
 
 		if (bHeader == HEADER_CG_FLY_TARGETING)
 			m_dwFlyTargetID = dwTargetVID;
-		else
+		else if (m_vec_dwFlyTargets.size() < 32 && std::find(m_vec_dwFlyTargets.begin(), m_vec_dwFlyTargets.end(), dwTargetVID) == m_vec_dwFlyTargets.end())
 			m_vec_dwFlyTargets.push_back(dwTargetVID);
 	}
 	else

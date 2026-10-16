@@ -17,6 +17,7 @@ class CNetworkStream
 		bool IsSecurityMode();
 
 		int	GetRecvBufferSize();
+		int	GetRecvBufferCapacity();
 
 		void Clear();
 		void ClearRecvBuffer();

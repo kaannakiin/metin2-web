@@ -72,6 +72,9 @@ void DESC_MANAGER::AcceptHandshake(const char* c_szHost, DWORD dwHandshakeTime)
 
 bool DESC_MANAGER::IsIntrusiveHandshake(const char* c_szHost)
 {
+	if (IsTrustedProxyIP(c_szHost))
+		return false;
+
 	if (!m_vecAcceptHostHandshake.empty())
 	{
 		AcceptHostHandshakeVector::iterator it = std::find_if(m_vecAcceptHostHandshake.begin(), m_vecAcceptHostHandshake.end(),
@@ -134,6 +137,9 @@ void DESC_MANAGER::SetIntruder(const char* c_szHost, DWORD dwDelayHandshakeTime)
 
 bool DESC_MANAGER::IsIntruder(const char* c_szHost)
 {
+	if (IsTrustedProxyIP(c_szHost))
+		return false;
+
 	if (!m_vecIntruderHost.empty())
 	{
 		IntruderHostVector::iterator it = std::find_if(m_vecIntruderHost.begin(), m_vecIntruderHost.end(),
@@ -148,6 +154,9 @@ bool DESC_MANAGER::IsIntruder(const char* c_szHost)
 
 void DESC_MANAGER::AllowHandshake(const char* c_szHost)
 {
+	if (IsTrustedProxyIP(c_szHost))
+		return;
+
 	if (!m_vecIntrusiveHostCount.empty())
 	{
 		IntrusiveHostCountVector::iterator it = std::find_if(m_vecIntrusiveHostCount.begin(), m_vecIntrusiveHostCount.end(),

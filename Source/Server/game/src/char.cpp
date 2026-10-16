@@ -485,6 +485,8 @@ void CHARACTER::Initialize()
 	m_iComboHackCount = 0;
 	m_dwSkipComboAttackByTime = 0;
 	m_dwMountTime = 0;
+	m_dwInstantMoveWindowStart = 0;
+	m_fInstantMoveWindowDist = 0.0f;
 	m_dwLastGoldDropTime = 0;
 
 	m_bIsLoadedAffect = false;
@@ -5703,6 +5705,11 @@ void CHARACTER::ChatPacket (BYTE type, const char* format, ...)
 	int len = vsnprintf(chatbuf, sizeof(chatbuf), format, args);
 	va_end(args);
 
+	if (len < 0)
+		len = 0;
+	else if (len >= (int) sizeof(chatbuf))
+		len = sizeof(chatbuf) - 1;
+
 	struct packet_chat pack_chat;
 
 	pack_chat.header    = HEADER_GC_CHAT;
@@ -5743,6 +5750,11 @@ void CHARACTER::LocaleChatPacket(BYTE type, DWORD index, const char* format, ...
 	int len = vsnprintf(chatbuf, sizeof(chatbuf), format, args);
 	va_end(args);
 
+	if (len < 0)
+		len = 0;
+	else if (len >= (int) sizeof(chatbuf))
+		len = sizeof(chatbuf) - 1;
+
 	TPacketGCLocaleChat packet;
 	packet.header = HEADER_GC_LOCALE_CHAT;
 	packet.size = sizeof(packet) + len;
@@ -5771,6 +5783,11 @@ void CHARACTER::LocaleWhisperPacket(BYTE type, DWORD index, const char* namefrom
 	va_start(args, format);
 	int len = vsnprintf(chatbuf, sizeof(chatbuf), format, args);
 	va_end(args);
+
+	if (len < 0)
+		len = 0;
+	else if (len >= (int) sizeof(chatbuf))
+		len = sizeof(chatbuf) - 1;
 
 	TPacketGCLocaleWhisper packet;
 	packet.header = HEADER_GC_LOCALE_WHISPER;
@@ -8709,6 +8726,22 @@ bool CHARACTER::CanSummon(int iLeaderShip)
 	return ((iLeaderShip >= 20) || ((iLeaderShip >= 12) && ((m_dwLastDeadTime + 180) > get_dword_time())));
 }
 
+
+void CHARACTER::RecordInstantMove(float fDistMeters)
+{
+	const DWORD dwNow = get_dword_time();
+	if (dwNow - m_dwInstantMoveWindowStart >= 1000)
+	{
+		m_dwInstantMoveWindowStart = dwNow;
+		m_fInstantMoveWindowDist = 0.0f;
+	}
+
+	const float fBefore = m_fInstantMoveWindowDist;
+	m_fInstantMoveWindowDist += fDistMeters;
+
+	if (fBefore <= 30.0f && m_fInstantMoveWindowDist > 30.0f)
+		sys_log(0, "MOVE_RATE: %s moved %.1fm instantly within 1s map %ld riding %d", GetName(), m_fInstantMoveWindowDist, GetMapIndex(), IsRiding());
+}
 
 void CHARACTER::MountVnum(DWORD vnum)
 {
@@ -11669,6 +11702,9 @@ int teleportMap[][5] = {
 
 void CHARACTER::StartWarpOn(BYTE map_index)
 {
+	if (map_index >= sizeof(teleportMap) / sizeof(teleportMap[0]) || IsDead() || !CanWarp())
+		return;
+
 	if (teleportMap[map_index][2] != 0)
 	{
 		if (GetLevel() < teleportMap[map_index][2])

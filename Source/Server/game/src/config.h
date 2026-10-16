@@ -92,6 +92,10 @@ extern std::set<std::string> g_setQuestObjectDir;
 
 
 extern std::vector<std::string>	g_stAdminPageIP;
+extern std::vector<std::string>	g_stTrustedProxyIP;
+bool IsTrustedProxyIP(const char* c_szHost);
+extern int g_iPacketFloodLimit;
+extern bool g_bPacketFloodKick;
 extern std::string	g_stAdminPagePassword;
 
 extern int	SPEEDHACK_LIMIT_COUNT;

@@ -943,7 +943,7 @@ namespace SnakeLair
 		}
 
 		char szNotice[512];
-		snprintf(szNotice, sizeof(szNotice), "Bu artÄ±k %d dakika boyunca kullanÄ±labilir.", uint32_t(TIME_LIMIT_DUNGEON) / 60);
+		snprintf(szNotice, sizeof(szNotice), "Bu artýk %d dakika boyunca kullanýlabilir.", uint32_t(TIME_LIMIT_DUNGEON) / 60);
 		SendNoticeMap(szNotice, pkChar->GetMapIndex(), true);
 
 		pkChar->SetQuestNPCID(0);
@@ -1550,7 +1550,7 @@ namespace SnakeLair
 			PIXEL_POSITION pos = CSnk::Instance().GetXYZ();
 			if (!pos.x)
 			{
-				pkChar->ChatPacket(CHAT_TYPE_INFO, "Hata! Koordinatlar oluÅŸturulurken bir sorun oluÅŸtu, yetkililere bildiriniz.");
+				pkChar->ChatPacket(CHAT_TYPE_INFO, "Hata! Koordinatlar oluþturulurken bir sorun oluþtu, yetkililere bildiriniz.");
 				return;
 			}
 
@@ -1919,7 +1919,7 @@ namespace SnakeLair
 
 		if (pParty->GetLeaderPID() != pkChar->GetPlayerID())
 		{
-			pkChar->ChatPacket(CHAT_TYPE_INFO, "Parti lideri deÄŸilsin.");
+			pkChar->ChatPacket(CHAT_TYPE_INFO, "Parti lideri deðilsin.");
 			return;
 		}
 
@@ -1936,7 +1936,7 @@ namespace SnakeLair
 		{
 			if (pMap->GetParty()->GetLeaderPID() != pkChar->GetPlayerID())
 			{
-				pkChar->ChatPacket(CHAT_TYPE_INFO, "HATA! - BaÅŸka bir grup zaten kayÄ±tlÄ±.");
+				pkChar->ChatPacket(CHAT_TYPE_INFO, "HATA! - Baþka bir grup zaten kayýtlý.");
 				return;
 			}
 
@@ -2049,7 +2049,7 @@ namespace SnakeLair
 
 			if (!pParty)
 			{
-				pChar->ChatPacket(CHAT_TYPE_INFO, "Herhangi bir gruba dahil deÄŸilsin.");
+				pChar->ChatPacket(CHAT_TYPE_INFO, "Herhangi bir gruba dahil deðilsin.");
 				return false;
 			}
 
@@ -2071,14 +2071,14 @@ namespace SnakeLair
 
 			if (pParty->GetLeaderPID() != pChar->GetPlayerID())
 			{
-				pChar->ChatPacket(CHAT_TYPE_INFO, "Yeni bir zindan yalnÄ±zca parti lideri tarafÄ±ndan oluÅŸturulabilir.");
+				pChar->ChatPacket(CHAT_TYPE_INFO, "Yeni bir zindan yalnýzca parti lideri tarafýndan oluþturulabilir.");
 				return false;
 			}
 
 			long lMapIndex = SECTREE_MANAGER::Instance().CreatePrivateMap(lNormalMapIndex);
 			if (!lMapIndex)
 			{
-				pChar->ChatPacket(CHAT_TYPE_INFO, "Harita oluÅŸturulurken bir hata oluÅŸtu.");
+				pChar->ChatPacket(CHAT_TYPE_INFO, "Harita oluþturulurken bir hata oluþtu.");
 				return false;
 			}
 
@@ -2090,7 +2090,7 @@ namespace SnakeLair
 				PIXEL_POSITION mPos;
 				if (!SECTREE_MANAGER::Instance().GetRecallPositionByEmpire(static_cast<int>(MAP_SNAKE_TEMPLE_02), 0, mPos))
 				{
-					pChar->ChatPacket(CHAT_TYPE_INFO, "Sectree hatasÄ±: geri Ã§aÄŸÄ±rma konumu alÄ±namadÄ±.");
+					pChar->ChatPacket(CHAT_TYPE_INFO, "Sectree hatasý: geri çaðýrma konumu alýnamadý.");
 					return true;
 				}
 
@@ -2124,7 +2124,7 @@ namespace SnakeLair
 		const LPPARTY& pParty = pkChar->GetParty();
 		if (!pParty)
 		{
-			pkChar->ChatPacket(CHAT_TYPE_INFO, "Grubun daÄŸÄ±ldÄ±. Burada ne yapÄ±yorsun?");
+			pkChar->ChatPacket(CHAT_TYPE_INFO, "Grubun daðýldý. Burada ne yapýyorsun?");
 			return;
 		}
 

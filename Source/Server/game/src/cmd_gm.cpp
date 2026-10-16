@@ -1377,6 +1377,11 @@ void BroadcastLocaleNotice(BYTE type, BYTE empire, long mapidx, DWORD id, const 
 	int len = vsnprintf(chatbuf, sizeof(chatbuf), format, args);
 	va_end(args);
 
+	if (len < 0)
+		len = 0;
+	else if (len >= (int) sizeof(chatbuf))
+		len = sizeof(chatbuf) - 1;
+
 	TPacketGGLocaleChatNotice packet;
 	packet.header = HEADER_GG_LOCALE_CHAT_NOTICE;
 	packet.type = type;

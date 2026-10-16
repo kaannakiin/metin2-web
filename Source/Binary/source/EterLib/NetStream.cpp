@@ -74,7 +74,7 @@ bool CNetworkStream::__RecvInternalBuffer()
 
 	if (IsSecurityMode())
 	{		
-		int restSize = min(m_recvTEABufSize - m_recvTEABufInputPos, m_recvBufSize - m_recvBufInputPos);
+		int restSize = min(m_recvTEABufSize - m_recvTEABufInputPos, m_recvBufSize - m_recvBufInputPos - m_recvTEABufInputPos);
  
 		if (restSize > 0)
 		{
@@ -88,6 +88,8 @@ bool CNetworkStream::__RecvInternalBuffer()
 				{
 					return false;
 				}
+
+				return true;
 			}
 			else if (recvSize == 0)
 			{
@@ -132,6 +134,8 @@ bool CNetworkStream::__RecvInternalBuffer()
 				{
 					return false;
 				}
+
+				return true;
 			}
 			else if (recvSize == 0)
 			{
@@ -407,9 +411,14 @@ int CNetworkStream::GetRecvBufferSize()
 	return m_recvBufInputPos - m_recvBufOutputPos;
 }
 
+int CNetworkStream::GetRecvBufferCapacity()
+{
+	return m_recvBufSize;
+}
+
 bool CNetworkStream::Peek (int size)
 {
-	if (GetRecvBufferSize() < size)
+	if (size < 0 || GetRecvBufferSize() < size)
 	{
 		return false;
 	}
@@ -419,7 +428,7 @@ bool CNetworkStream::Peek (int size)
 
 bool CNetworkStream::Peek (int size, char* pDestBuf)
 {
-	if (GetRecvBufferSize() < size)
+	if (size < 0 || GetRecvBufferSize() < size)
 	{
 		return false;
 	}

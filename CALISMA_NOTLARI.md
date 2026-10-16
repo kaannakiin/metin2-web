@@ -350,3 +350,19 @@ Granny 2.11 (sürüm 7) dosyaları animasyon eğrilerini sıkıştırılmış `c
 - **Font:** Wine Tahoma'nın `İ`'si 1 px'lik çıplak bir çizgi ama `I` kadar yer kaplıyordu ("İ stemci"). `bake_fonts_ft.py` `İ`'yi `I` + kendi noktasından oluşturuyor.
 - Kaydedilecek: `boot_files.txt` (Playwright ile ilk oturum: `m2w.corpus.files`), ardından corpus yeniden kurulup yayınlanacak.
 - Açık: in-game dil bayrakları Windows'taki gibi `locale.cfg` yazıp `app.Exit()` yapıyor; web'de sayfanın `?lang=` ile yenilenmesi gerek.
+- `boot` kaydedildi (`tools/data/boot_files.txt`, ilk oturumdan 7386 dosya; meta/motion/harita dosyaları çıkınca 1516 dosya, 99.8 MB / 25 parça, 40 MB'ı girişte önbelleğe alınan `effect/sword`). Sıra: boot → meta → motion.
+- Ölçüm (Playwright, önbellek temiz, `webtest03`):
+  - Seçim ekranına kadar 150 MB (önce ~360) ve 30 senkron indirme (önce 112).
+  - Oyuna giriş ~4 s, senkron indirme 0. Önce ~50 s sürüyordu, iki uzun donmayla.
+  - İkinci ziyarette ağdan 6 MB.
+  - Kalan: açılışta motor başlangıcı + giriş tanımları ~14 s donma.
+- Dil paketleri Cloudflare cache kuralına ve nginx'in 1 yıllık `Cache-Control`'una eklendi (`/client.locale_*`).
+- `?return=` artık sadece aynı origin'e yönlendiriyor (açık yönlendirme bulgusu); başka site için `m2w.config.returnUrl`.
+- Türkçe yazma: gerçek `keydown` olaylarıyla sohbet doğru (`hadı şşş ççç ğüö İı ŞĞÜÖÇ`). Playwright'ın `keyboard.type`'ı ABD klavyesinde olmayan harflere `keydown` göndermediği için yanıltıcı.
+- Sunucuda UTF-8 Türkçe metinler (`SnakeLair.cpp`, `soulroulette.cpp`, `WhiteDragon.cpp`, `item_attribute.cpp`) cp1254'e çevrildi: istemci cp1254 çiziyor, bu mesajlar `Ä±`/`ÅŸ` görünüyordu. Sunucu derlemesi gerekiyor.
+- Açık: `[WİKİ] mesaj gönderdi` hâlâ `WÄ°KÄ°` görünüyor (Python tarafında metin doğru, kaynak bulunamadı); `/b` duyurusundaki bozulma GM olmadan yeniden üretilemedi.
+
+### Güvenlik ve kararlılık düzeltmeleri (2026-10-16)
+
+- Plan ve durum tablosu (fazlar F0–F4, açık ayrıntılar orada, repoda değil): <https://claude.ai/code/artifact/d1cd7bf2-4024-462d-8172-403fad8de3e5>
+- F0 (client) yerelde hazır, henüz yayında değil: `LOCALE_CHAT`/`LOCALE_WHISPER`/`WHISPER` dinamik paket olarak kayıtlı (metin keserken `memory access out of bounds` çökmesinin muhtemel kök nedeni), `recv` -1'de okuma pozisyonu geri sarılmıyor, bozuk akışta client çökmek yerine giriş ekranına dönüyor, FPS sayacında sıfıra bölme düzeltildi.

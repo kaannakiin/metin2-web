@@ -1344,6 +1344,17 @@ int CHARACTER_MANAGER::GetMultiFarmCount(const char* playerIP, std::map<DWORD, s
 
 void CHARACTER_MANAGER::CheckMultiFarmAccount(const char* szIP, const DWORD playerID, const char* playerName, const bool bStatus, BYTE affectType, int affectDuration, bool isP2P)
 {
+	if (IsTrustedProxyIP(szIP))
+	{
+		LPCHARACTER pkChr = FindByPID(playerID);
+		if (pkChr)
+		{
+			pkChr->SetRewardStatus(bStatus);
+			pkChr->ChatPacket(CHAT_TYPE_COMMAND, "UpdateMultiFarmAffect %d %d", bStatus, true);
+		}
+		return;
+	}
+
 	CheckMultiFarmAccounts(szIP);
 
 	LPCHARACTER ch = FindByPID(playerID);
