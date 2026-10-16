@@ -134,6 +134,32 @@ def compile_entry(empp):
     return result
 
 
+LOCALE_PACKS = os.path.join(PORT, 'data_locale')
+
+
+def package_languages():
+    """`client.locale_<lang>.data` + `.js` for every language directory that
+    build_client_data.py moved out of client.data; client.html loads only the
+    player's. Returns the language codes."""
+    for old in os.listdir(PORT):
+        if old.startswith('client.locale_'):
+            os.remove(os.path.join(PORT, old))
+    if not os.path.isdir(LOCALE_PACKS):
+        return []
+    packager = os.path.join(os.path.dirname(os.path.realpath(tool_name('emcc'))), 'tools', 'file_packager.py')
+    languages = sorted(d for d in os.listdir(LOCALE_PACKS) if os.path.isdir(os.path.join(LOCALE_PACKS, d)))
+    for lang in languages:
+        name = 'client.locale_' + lang
+        r = subprocess.run([sys.executable, packager, name + '.data',
+                            '--preload', os.path.join(LOCALE_PACKS, lang) + '@/',
+                            '--js-output=' + name + '.js', '--no-node'],
+                           cwd=PORT, capture_output=True, text=True)
+        if r.returncode != 0:
+            raise SystemExit('file_packager failed for %s:\n%s' % (lang, r.stderr[-800:]))
+        print('language: %s (%d kB)' % (name, os.path.getsize(os.path.join(PORT, name + '.data')) // 1024))
+    return languages
+
+
 def copy_site_scripts():
     """Copies sw.js and preload.js from site/ next to the page."""
     for name in ('sw.js', 'preload.js'):
@@ -224,7 +250,8 @@ def main():
         # `FS` in the JS glue. Without it one cannot look into syserr.txt, i.e.
         # into the client's OWN log - the only place where the game
         # says what went wrong. Without it only guessing remains.
-        '-sEXPORTED_RUNTIME_METHODS=FS,callMain',
+        # the language packages (file_packager, package_languages) call these on Module
+        '-sEXPORTED_RUNTIME_METHODS=FS,callMain,FS_createPath,FS_createDataFile,addRunDependency,removeRunDependency',
         # libjpeg is a ready emscripten port, so there is no reason
         # to write it. The versions agree: the client has the libjpeg-9a header
         # (JPEG_LIB_VERSION 90), the port has jpeg-9f - the same major version,
@@ -390,6 +417,7 @@ def main():
     # M2W_BRIDGE, [server] bridge in webclient.toml or private/bridge.txt
     sBridge = workspace.bridge_address()
     kPage = kPage.replace('__BRIDGE__', sBridge.replace('"', ''))
+    kPage = kPage.replace('__LANGUAGES__', ','.join(package_languages()))
     print('bridge in the page: ' + (sBridge or '(the same server as the page)'))
     with open(PAGE, 'w', encoding='utf-8', newline='\n') as f:
         f.write(kPage)

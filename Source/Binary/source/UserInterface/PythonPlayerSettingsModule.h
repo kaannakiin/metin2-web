@@ -1,6 +1,9 @@
 #pragma once
 
 #include <thread>
+#ifdef __EMSCRIPTEN__
+#include <deque>
+#endif
 
 #include "PythonItem.h"
 #include "PythonSkill.h"
@@ -116,6 +119,15 @@ class CPythonPlayerSettingsModule : public CSingleton<CPythonPlayerSettingsModul
 			}
 		}
 
+#ifdef __EMSCRIPTEN__
+		void ProcessDeferredCache();
+
+	private:
+		std::deque<std::string> m_kDeferredCache;
+		DWORD m_dwDeferredWaitSince = 0;
+
+	public:
+#endif
 		void joinLoadThread()
 		{
 			if (m_loadThread.joinable())

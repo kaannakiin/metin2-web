@@ -328,3 +328,25 @@ Granny 2.11 (sürüm 7) dosyaları animasyon eğrilerini sıkıştırılmış `c
 - Kurallar `10.0.1.6` (`coolify-proxy`'nin coolify ağındaki IP'si) ile değiştirildi, `/24` kuralları silindi.
 - Doğrulandı: Cloudflare üzerinden portal 200, oyun 200, bridge 426 (WebSocket bekliyor); doğrudan origin 403; Traefik container'ından portal 200 / bridge 426; `m2web-site` container'ından portal zaman aşımı; diğer Coolify siteleri yanıt veriyor (502/504 yok), Traefik logunda hata yok.
 - Risk: Coolify proxy'yi yeniden oluşturursa IP değişebilir ve site kapanır. `deploy_portal.sh` her deploy'da bunu kontrol edip uyarıyor; o durumda iki UFW kuralını yeni IP'ye taşı.
+
+### Akıcı yükleme: gruplu corpus, harita ön-yüklemesi, dil paketleri (2026-10-16)
+
+Ölçülen sorun: girişte ~360 MB iniyordu. Fork'un `ENABLE_CLIENT_PERFORMANCE` ön-yüklemesi (`net.LoadResourcesInCache`) 8 ırkın bütün hareketlerini girişte zorla yüklüyor. Corpus alfabetik olduğu için 500 baytlık `.msa` dosyaları megabaytlık zırh `.dds`'leriyle aynı 4 MB parçalarda duruyordu. Kayıtlı 90 parçanın ~55'i `pc`/`pc2` klasörlerindendi. Karakter seçince harita, `MAIN_CHARACTER` paketi işlenirken senkron yükleniyor ve ekran donuyordu.
+
+- **Corpus düzeni** (`tools/build_corpus.py`, `tools/corpus_groups.py`):
+  - Her biri kendi parçalarında olmak üzere `meta` (küçük tanım dosyaları, 66.6 MB / 17 parça), `motion` (bütün ırkların hareket `.gr2`'leri, 73 MB / 19 parça) ve `boot` (`tools/data/boot_files.txt`, kayıtlı ilk oturum; henüz boş).
+  - Sonra her haritanın dosyaları bir arada (önce köyler), en sonda kalanlar alfabetik.
+  - `corpus/groups.txt` (`order.txt`'nin yerine, `no-cache`) her grubun ve her `map:<klasör>`'ün parçalarını listeliyor.
+  - Harita grubu statik çıkarılıyor: klasör, textureset, ortam ve alanlardaki nesneler (CRC → property → model → `gr2.py` ile doku).
+  - Simülasyonda köylerin parça ihtiyacı alfabetik düzene göre 88/124/88 MB'tan 36/76/48 MB'a indi. Gerçek build'de: a1 48 MB, b1 96 MB, c1 72 MB.
+- **Ön-yükleme** (`compat/runtime.js` `m2w.prefetchStart`):
+  - `meta`/`motion`/`boot` sayfa açılınca arka planda iner.
+  - Seçim ekranında hesabın karakterlerinin bulunduğu haritalar sıraya girer (`PythonNetworkStreamPhaseSelect.cpp`, x/y → `AtlasInfo`).
+  - Yüklemede girilen harita öne alınır. `MAIN_CHARACTER` paketi, harita bellekte olana kadar ya da en fazla 1 dk bekletilir (`__WebMapPrefetched`, `m2w.mapReady`). Ekran donmaz, köşede "Harita indiriliyor" çubuğu görünür.
+  - Bellek bütçesi 512 MB (8 GB+ cihazda 768).
+  - Cache Storage'daki eski build parçaları siliniyor.
+- **Girişteki zorla yükleme** (sadece web): hareketler kaydediliyor ama yüklenmiyor. `CPythonPlayerSettingsModule::ProcessDeferredCache` her karede 4 ms, parçası bellekte olanları önbelleğe alıyor (5 s bekleyen dosya yine yüklenir).
+- **Dil paketleri:** `locale/<dil>/` artık `client.data`'da değil (133 MB → 59 MB). Her dil `client.locale_<dil>.data/.js` (tr 17.6 MB, diğerleri ~5.6 MB). `client.html` dili seçer (`?lang` → localStorage → `?deflang` → tarayıcı → en), sadece o paketi yükler ve motora `m2w.config.lang` ile iletir.
+- **Font:** Wine Tahoma'nın `İ`'si 1 px'lik çıplak bir çizgi ama `I` kadar yer kaplıyordu ("İ stemci"). `bake_fonts_ft.py` `İ`'yi `I` + kendi noktasından oluşturuyor.
+- Kaydedilecek: `boot_files.txt` (Playwright ile ilk oturum: `m2w.corpus.files`), ardından corpus yeniden kurulup yayınlanacak.
+- Açık: in-game dil bayrakları Windows'taki gibi `locale.cfg` yazıp `app.Exit()` yapıyor; web'de sayfanın `?lang=` ile yenilenmesi gerek.

@@ -735,6 +735,9 @@ bool CPythonApplication::Process()
 
 	m_kGuildMarkDownloader.Process();
 	m_kAccountConnector.Process();
+#if defined(__EMSCRIPTEN__) && defined(ENABLE_CLIENT_PERFORMANCE)
+	CPythonPlayerSettingsModule::Instance().ProcessDeferredCache();
+#endif
 
 	//////////////////////
 	// Input Process

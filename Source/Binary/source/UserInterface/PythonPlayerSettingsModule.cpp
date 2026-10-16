@@ -109,8 +109,39 @@ void CPythonPlayerSettingsModule::__RegisterCacheMotionData(CRaceData *pRaceData
 	const CGraphicThing *pkMotionThing = pRaceData->RegisterMotionData(wMotionMode, wMotionIndex, c_szFullFileName, byPercentage);
 
 	if (pkMotionThing)
+#ifdef __EMSCRIPTEN__
+		// Every race's motions loaded here froze the login screen for the
+		// whole download; ProcessDeferredCache takes them once in memory.
+		m_kDeferredCache.push_back(pkMotionThing->GetFileName());
+#else
 		CResourceManager::Instance().LoadStaticCache(pkMotionThing->GetFileName());
+#endif
 }
+
+#ifdef __EMSCRIPTEN__
+bool M2W_CorpusFileReady(const char* c_szPath);
+
+void CPythonPlayerSettingsModule::ProcessDeferredCache()
+{
+	const DWORD c_dwBudgetMSec = 4;
+	const DWORD c_dwMaxWaitMSec = 5000;
+	const DWORD dwStart = ELTimer_GetMSec();
+	while (!m_kDeferredCache.empty() && ELTimer_GetMSec() - dwStart < c_dwBudgetMSec)
+	{
+		const std::string& c_rstrFileName = m_kDeferredCache.front();
+		if (!M2W_CorpusFileReady(c_rstrFileName.c_str()))
+		{
+			if (!m_dwDeferredWaitSince)
+				m_dwDeferredWaitSince = ELTimer_GetMSec();
+			if (ELTimer_GetMSec() - m_dwDeferredWaitSince < c_dwMaxWaitMSec)
+				return;
+		}
+		m_dwDeferredWaitSince = 0;
+		CResourceManager::Instance().LoadStaticCache(c_rstrFileName.c_str());
+		m_kDeferredCache.pop_front();
+	}
+}
+#endif
 
 void CPythonPlayerSettingsModule::__SetIntroMotions(CRaceData *pRaceData, const std::string &c_rstrFolderName)
 {

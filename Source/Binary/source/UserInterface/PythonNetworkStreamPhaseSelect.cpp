@@ -2,6 +2,12 @@
 #include "PythonNetworkStream.h"
 #include "Packet.h"
 
+#ifdef __EMSCRIPTEN__
+#include "PythonBackground.h"
+
+void M2W_CorpusWantMap(const char* c_szMap);
+#endif
+
 extern DWORD g_adwEncryptKey[4];
 extern DWORD g_adwDecryptKey[4];
 
@@ -44,6 +50,19 @@ void CPythonNetworkStream::SetSelectPhase()
 		{
 			PyCallClassMemberFunc (m_poHandler, "SetSelectEmpirePhase", Py_BuildValue ("()"));
 		}
+
+#ifdef __EMSCRIPTEN__
+		// While the player picks a character the page fetches the maps the
+		// characters stand on, so entering one rarely waits.
+		for (const TSimplePlayerInformation& c_rkSlot : m_akSimplePlayerInfo)
+		{
+			if (!c_rkSlot.dwID)
+				continue;
+			CPythonBackground::TMapInfo* pkMapInfo = CPythonBackground::Instance().GlobalPositionToMapInfo(c_rkSlot.x, c_rkSlot.y);
+			if (pkMapInfo)
+				M2W_CorpusWantMap(pkMapInfo->m_strName.c_str());
+		}
+#endif
 	}
 }
 

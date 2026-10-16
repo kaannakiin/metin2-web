@@ -1,10 +1,9 @@
-// preload.js - a download bar in the corner for the essential game data.
+// preload.js - a download bar in the corner while the game data comes.
 // Loaded by site/client.html.
 //
-// `corpus/order.txt` (the recorded order of use: login + village) is fetched by
-// `m2w_prefetch_start` in compat/webfs_web.cpp (a window in memory + Cache
-// Storage); here we only show its progress. Everything else is fetched on
-// demand when the game needs it - nothing downloads the whole corpus.
+// The prefetch itself is compat/runtime.js (m2w.prefetchStart, groups.txt):
+// the start-up groups from page load, then the map being entered. Here we
+// only show `m2w.prefetch`; everything else is fetched on demand.
 (function () {
     // --- Service Worker -----------------------------------------------------
     if ('serviceWorker' in navigator) {
@@ -40,26 +39,39 @@
     }
 
     // --- prefetch progress from compat --------------------------------------
-    var lastDone = -1, lastChange = 0;
-    /// Polls `m2w.prefetch` every 500 ms until it is done, has stalled for
-    /// 10 s, or turns out not to exist (no order.txt).
+    var TEXT = {
+        tr: { start: 'Oyun verileri', map: 'Harita indiriliyor', ready: 'hazır', disk: 'diskten' },
+        en: { start: 'Game data', map: 'Downloading the map', ready: 'ready', disk: 'from disk' }
+    };
+    /// Start-up groups done/total chunks, or null before groups.txt arrives.
+    function startProgress(w) {
+        if (!w.groups) return null;
+        var done = 0, total = 0;
+        ['meta', 'motion', 'boot'].forEach(function (name) {
+            var g = w.groups[name];
+            if (!g) return;
+            total += g.names.length;
+            g.names.forEach(function (n) { if (w.fetched.has(n) || (m2w.chunks && m2w.chunks.map.has(n))) ++done; });
+        });
+        return { done: done, total: total };
+    }
+    var hideAt = 0;
+    /// Polls `m2w.prefetch` twice a second for the rest of the session.
     function watch() {
+        var t = TEXT[(m2w.config && m2w.config.lang) === 'tr' ? 'tr' : 'en'];
         var w = m2w.prefetch;
-        if (w && w.total > 0) {
-            if (w.done !== lastDone) { lastDone = w.done; lastChange = performance.now(); }
-            // The prefetch waits for room in memory (a sliding window) and stalls
-            // when the game leaves the recorded path; the game then fetches on demand.
-            var bStalled = performance.now() - lastChange > 10000;
-            if (w.done < w.total && !bStalled) {
-                show('Essential data: ' + w.done + ' / ' + w.total, w.done / w.total,
-                     (w.fromStorage ? w.fromStorage + ' from disk' : ''));
-            } else {
-                show('Essential data: ready', 1, '');
-                setTimeout(function () { bar.style.display = 'none'; }, 1500);
-                return;
+        if (w && w.urgent && w.urgent.total) {
+            show(t.map, w.urgent.done / w.urgent.total, w.urgent.done + ' / ' + w.urgent.total);
+            hideAt = performance.now() + 1500;
+        } else if (w && !w.disabled) {
+            var s = startProgress(w);
+            if (s && s.total && s.done < s.total) {
+                show(t.start, s.done / s.total, s.done + ' / ' + s.total +
+                     (w.fromStorage ? ' (' + w.fromStorage + ' ' + t.disk + ')' : ''));
+                hideAt = performance.now() + 1500;
+            } else if (bar.style.display !== 'none' && performance.now() > hideAt) {
+                bar.style.display = 'none';
             }
-        } else if (!w && performance.now() > 20000) {
-            return;
         }
         setTimeout(watch, 500);
     }

@@ -95,7 +95,53 @@ def bake_one(face, height, italic, bold):
             else:
                 a, b, c, x0 = 0.0, float(advance), 0.0, 0
             glyphs.append((code, a, b, c, advance, x0, width, cy, bytes(data)))
-    return cy, glyphs
+    return cy, dotted_capital_i(glyphs)
+
+
+def glyph_pixels(glyph):
+    """Set of lit (x, y) cell positions of a baked glyph."""
+    x0, width, cy, data = glyph[5], glyph[6], glyph[7], glyph[8]
+    byte_count = (width + 7) // 8
+    return {(x0 + x, y) for y in range(cy) for x in range(width)
+            if data[y * byte_count + (x >> 3)] & (0x80 >> (x & 7))}
+
+
+def glyph_from_pixels(code, advance, cy, pixels):
+    """A baked glyph tuple holding `pixels`."""
+    x0 = min(x for x, _ in pixels)
+    width = max(x for x, _ in pixels) - x0 + 1
+    byte_count = (width + 7) // 8
+    data = bytearray(byte_count * cy)
+    for x, y in pixels:
+        data[y * byte_count + ((x - x0) >> 3)] |= 0x80 >> ((x - x0) & 7)
+    return (code, float(x0), float(width), float(advance - x0 - width), advance, x0, width, cy, bytes(data))
+
+
+def dotted_capital_i(glyphs):
+    """Wine's Tahoma draws U+0130 as a bare 1 px stem inside the advance of the
+    serifed I, which reads as "İ stemci"; Windows Tahoma draws I with a dot."""
+    by_code = {g[0]: i for i, g in enumerate(glyphs)}
+    if 0x49 not in by_code or 0x130 not in by_code:
+        return glyphs
+    plain, dotted = glyphs[by_code[0x49]], glyphs[by_code[0x130]]
+    plain_pixels, dotted_pixels = glyph_pixels(plain), glyph_pixels(dotted)
+    if not plain_pixels or not dotted_pixels:
+        return glyphs
+    cap_top = min(y for _, y in plain_pixels)
+    dot = {(x, y) for x, y in dotted_pixels if y < cap_top}
+    stem = dotted_pixels - dot
+    if not dot or not stem:
+        return glyphs
+
+    def centre(pixels):
+        xs = [x for x, _ in pixels]
+        return (min(xs) + max(xs)) / 2.0
+
+    shift = int(round(centre(plain_pixels) - centre(stem)))
+    pixels = plain_pixels | {(x + shift, y) for x, y in dot}
+    glyphs = list(glyphs)
+    glyphs[by_code[0x130]] = glyph_from_pixels(0x130, plain[4], plain[7], pixels)
+    return glyphs
 
 
 def build(target):

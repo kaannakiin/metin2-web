@@ -8,6 +8,10 @@
 
 #include "../eterPack/EterPackManager.h"
 
+#ifdef __EMSCRIPTEN__
+bool M2W_CorpusMapReady(const char* c_szMap);
+#endif
+
 void CPythonNetworkStream::EnableChatInsultFilter(bool isEnable)
 {
 	m_isEnableChatInsultFilter=isEnable;
@@ -221,6 +225,40 @@ bool CPythonNetworkStream::LoadConvertTable(DWORD dwEmpireID, const char *c_szFi
 }
 
 // Loading ---------------------------------------------------------------------------
+#ifdef __EMSCRIPTEN__
+// The map loads inside the main character packet handler, file by file over
+// blocking fetches, and the screen freezes meanwhile. The packet stays in the
+// buffer until the page has prefetched that map, so the loading screen keeps
+// drawing; the page gives up waiting after a minute.
+bool CPythonNetworkStream::__WebMapPrefetched(TPacketHeader header)
+{
+	LONG lX = 0, lY = 0;
+	auto peek = [this, &lX, &lY](auto kPacket)
+	{
+		if (!Peek(sizeof(kPacket), &kPacket))
+			return false;
+		lX = kPacket.lX;
+		lY = kPacket.lY;
+		return true;
+	};
+
+	bool bPeeked;
+	switch (header)
+	{
+		case HEADER_GC_MAIN_CHARACTER: bPeeked = peek(TPacketGCMainCharacter()); break;
+		case HEADER_GC_MAIN_CHARACTER2_EMPIRE: bPeeked = peek(TPacketGCMainCharacter2_EMPIRE()); break;
+		case HEADER_GC_MAIN_CHARACTER3_BGM: bPeeked = peek(TPacketGCMainCharacter3_BGM()); break;
+		case HEADER_GC_MAIN_CHARACTER4_BGM_VOL: bPeeked = peek(TPacketGCMainCharacter4_BGM_VOL()); break;
+		default: return true;
+	}
+	if (!bPeeked)
+		return true;
+
+	CPythonBackground::TMapInfo* pkMapInfo = CPythonBackground::Instance().GlobalPositionToMapInfo(lX, lY);
+	return !pkMapInfo || M2W_CorpusMapReady(pkMapInfo->m_strName.c_str());
+}
+#endif
+
 void CPythonNetworkStream::LoadingPhase()
 {
 	TPacketHeader header;
@@ -229,6 +267,11 @@ void CPythonNetworkStream::LoadingPhase()
 	{
 		return;
 	}
+
+#ifdef __EMSCRIPTEN__
+	if (!__WebMapPrefetched(header))
+		return;
+#endif
 
 	switch (header)
 	{

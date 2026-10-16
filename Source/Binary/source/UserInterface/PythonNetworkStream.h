@@ -513,6 +513,9 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		void LoginPhase();
 		void SelectPhase();
 		void LoadingPhase();
+#ifdef __EMSCRIPTEN__
+		bool __WebMapPrefetched(TPacketHeader header);
+#endif
 		void GamePhase();
 
 		bool __IsNotPing();
