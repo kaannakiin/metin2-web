@@ -1,0 +1,17 @@
+import type { ReactNode } from "react";
+
+// A Metin stone: the gold rim is the outer shape showing 1.5px around the
+// inner one; the aura sits on a wrapper because drop-shadow follows clip-path.
+export function MetinStone({ children }: { children: ReactNode }) {
+  return (
+    <div className="animate-stone-land">
+      <div className="animate-aura">
+        <div className="stone-shape bg-linear-to-b from-gold/80 via-gold/30 to-gold/60 p-[1.5px]">
+          <div className="stone-shape bg-[radial-gradient(120%_80%_at_30%_0%,#232d63_0%,#121a3d_45%,#0a1028_100%)] px-8 pt-14 pb-9 sm:px-12">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

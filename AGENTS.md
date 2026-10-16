@@ -16,6 +16,7 @@ A Metin2 server + client fork, self-hosted for ~10 players. The main goal is pla
 - `Tools/web/kit/` — **repo copies** of our changes to the kit (`stage_port.py`, `compat/`, `tools/`, `site/`, `gr2_bitknit/`, `webclient.toml`). The live kit is on the host at `/home/m2web/kit` (= `/work/kit` in the container). A change must land in both places (`scp`).
 - `Tools/web/deploy/` — Traefik route (`metin2.yaml`), nginx site config, `deploy.sh`, `publish.sh`, `publish_cdn.sh`.
 - `Tools/web/cdn/` — the `metin2-corpus` Worker (assets only: `wrangler.jsonc`, `_headers`); host copy in `/home/m2web/cdn/`.
+- `web/portal/` — the site in front of the game: TanStack Start (React 19, SSR) + Tailwind 4 + react-hook-form/zod. Register and login are server functions (`src/lib/auth.ts`) that talk to the `account` DB directly; zod schemas in `src/server/validation.ts` are shared by forms and server. Production runs `node server.ts` (Hono static `/assets/*` + the Start fetch handler). Not deployed yet.
 - `home/` — server runtime tree (configs, `share/locale`, `share/data`, protos) mirrored onto the VM under `/usr/home`.
 - `sql/` — schema reconstructed from the C++ queries (no original dump), all `utf8mb4`.
 
@@ -70,6 +71,16 @@ python3 -I Tools/web/kit/patchcheck.py <kit_dir> Source/Binary/source   # every 
 Run container scripts as files: write to `/home/m2web/x.sh`, then `ssh -o BatchMode=yes root@88.99.1.151 'docker exec m2web-build bash /work/x.sh'` (this form is allowlisted). Long jobs: `nohup` + `publish.sh`.
 
 Publish: `webclient.py package` and `tools/bridge_config.py --site https://metin2.kaanakin.dev` in the container, then `/home/m2web/publish.sh` on the host (refuses to sync an incomplete package). It runs `publish_cdn.sh` first (wrangler in a `node:22-alpine` container, token in `/root/.cloudflare/metin2-cdn.env`; only changed chunks upload, the first full upload took ~10 min) and then syncs the site. `deploy.sh` recreates the site and bridge containers.
+
+Portal (`web/portal`, Node ≥ 22.18, no build step for `server.ts`):
+
+```sh
+npm install
+npm run dev         # vite dev on :3000; register/login need DB_* env vars, see src/server/config.ts
+npm run build       # dist/client + dist/server
+npm run typecheck
+npm start           # node server.ts, HOST/PORT env
+```
 
 ASan build: `build_asan.sh` / `publish_asan.sh` on the host, served under `/asan/`. Keep `MAXIMUM_MEMORY` at 2 GB and `malloc_context_size=0` (see notes).
 
