@@ -25,8 +25,12 @@ app.use(
   }),
 );
 
+app.use("/favicon.svg", serveStatic({ root: "./dist/client" }));
+
 app.all("*", (c) => start.fetch(c.req.raw));
 
 const hostname = process.env.HOST ?? "127.0.0.1";
 const port = Number(process.env.PORT ?? 3000);
-serve({ fetch: app.fetch, hostname, port }, () => console.log(`portal listening on ${hostname}:${port}`));
+serve({ fetch: app.fetch, hostname, port }, () =>
+  console.log(`portal listening on ${hostname}:${port}`),
+);

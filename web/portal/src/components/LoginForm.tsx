@@ -45,7 +45,11 @@ export function LoginForm({ defaultLogin }: { defaultLogin?: string }) {
         {...form.register("password")}
       />
       <FormAlert message={alert} />
-      <SubmitButton pending={isSubmitting} idle="Giriş yap ve oyna" busy="Giriş yapılıyor…" />
+      <SubmitButton
+        pending={isSubmitting}
+        idle="Giriş yap ve oyna"
+        busy="Giriş yapılıyor…"
+      />
     </form>
   );
 }

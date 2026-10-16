@@ -1,6 +1,9 @@
 import type { AuthError } from "./auth";
 
-export function authErrorMessage(error: AuthError, retryAfterSec?: number): string {
+export function authErrorMessage(
+  error: AuthError,
+  retryAfterSec?: number,
+): string {
   switch (error) {
     case "wrong_credentials":
       return "Kullanıcı adı ya da şifre yanlış.";

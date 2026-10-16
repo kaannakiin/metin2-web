@@ -16,3 +16,9 @@ export type Config = z.infer<typeof Env>;
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   return Env.parse(env);
 }
+
+const PublicEnv = z.object({ TURNSTILE_SITE_KEY: z.string().min(1) });
+
+export function loadPublicConfig(env: NodeJS.ProcessEnv = process.env) {
+  return PublicEnv.parse(env);
+}

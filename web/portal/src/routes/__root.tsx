@@ -1,5 +1,11 @@
 import type { ReactNode } from "react";
-import { HeadContent, Link, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
+import {
+  HeadContent,
+  Link,
+  Outlet,
+  Scripts,
+  createRootRoute,
+} from "@tanstack/react-router";
 import appCss from "../styles.css?url";
 import { SITE } from "../site";
 
@@ -15,8 +21,13 @@ export const Route = createRootRoute({
       { title: SITE.name },
     ],
     links: [
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
       { rel: "stylesheet", href: FONTS },
       { rel: "stylesheet", href: appCss },
     ],
@@ -32,9 +43,14 @@ export const Route = createRootRoute({
 function NotFound() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4 text-center">
-      <h1 className="font-display text-4xl font-extrabold text-gold">Bu sayfa yok</h1>
+      <h1 className="font-display text-4xl font-extrabold text-gold">
+        Bu sayfa yok
+      </h1>
       <p className="text-mist">Adres yanlış ya da sayfa kaldırıldı.</p>
-      <Link to="/" className="text-rice underline decoration-gold underline-offset-4">
+      <Link
+        to="/"
+        className="text-rice underline decoration-gold underline-offset-4"
+      >
         Ana sayfaya dön
       </Link>
     </main>

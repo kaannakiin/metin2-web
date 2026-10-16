@@ -76,11 +76,15 @@ Portal (`web/portal`, Node ≥ 22.18, no build step for `server.ts`):
 
 ```sh
 npm install
-npm run dev         # vite dev on :3000; register/login need DB_* env vars, see src/server/config.ts
+npm run dev         # vite dev on :3000 with .env.development (Turnstile test keys); register/login also need DB_* vars
 npm run build       # dist/client + dist/server
 npm run typecheck
-npm start           # node server.ts, HOST/PORT env
+npm test            # node --test over test/**/*.test.ts (no DB needed); one file: node --test test/server.test.ts
+npm run format      # Prettier + Tailwind class sorting; run after every change (format:check to verify)
+npm start           # node server.ts; HOST/PORT plus every var in src/server/config.ts, read at runtime
 ```
+
+All env vars, including `TURNSTILE_SITE_KEY`, are read at runtime by the server (the site key reaches the page through a route loader), so one build serves every environment.
 
 ASan build: `build_asan.sh` / `publish_asan.sh` on the host, served under `/asan/`. Keep `MAXIMUM_MEMORY` at 2 GB and `malloc_context_size=0` (see notes).
 

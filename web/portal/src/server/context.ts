@@ -9,6 +9,7 @@ export interface ServerContext {
   accounts: Accounts;
   verifyTurnstile: VerifyTurnstile;
   loginLimiter: Limiter;
+  loginFailureLimiter: Limiter;
   registerLimiter: Limiter;
 }
 
@@ -29,8 +30,12 @@ export function serverContext(): ServerContext {
   context = {
     config,
     accounts: mysqlAccounts(pool),
-    verifyTurnstile: turnstileVerifier(config.TURNSTILE_SECRET, new URL(config.SITE_ORIGIN).hostname),
+    verifyTurnstile: turnstileVerifier(
+      config.TURNSTILE_SECRET,
+      new URL(config.SITE_ORIGIN).hostname,
+    ),
     loginLimiter: createLimiter(10, 10 * 60_000),
+    loginFailureLimiter: createLimiter(5, 15 * 60_000),
     registerLimiter: createLimiter(5, 60 * 60_000),
   };
   return context;

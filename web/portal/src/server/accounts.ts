@@ -4,7 +4,11 @@ export type CreateResult = "created" | "taken";
 export type CheckResult = "ok" | "wrong" | "blocked";
 
 export interface Accounts {
-  create(login: string, password: string, deleteCode: string): Promise<CreateResult>;
+  create(
+    login: string,
+    password: string,
+    deleteCode: string,
+  ): Promise<CreateResult>;
   check(login: string, password: string): Promise<CheckResult>;
 }
 
@@ -18,7 +22,8 @@ export function mysqlAccounts(pool: Pool): Accounts {
         );
         return "created";
       } catch (error) {
-        if ((error as { code?: string }).code === "ER_DUP_ENTRY") return "taken";
+        if ((error as { code?: string }).code === "ER_DUP_ENTRY")
+          return "taken";
         throw error;
       }
     },

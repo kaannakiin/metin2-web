@@ -6,7 +6,10 @@ const HANDOFF_KEY = "m2w.autologin";
 
 export function launchGame(login: string, password: string) {
   try {
-    sessionStorage.setItem(HANDOFF_KEY, JSON.stringify({ login, password, expires: Date.now() + 60_000 }));
+    sessionStorage.setItem(
+      HANDOFF_KEY,
+      JSON.stringify({ login, password, expires: Date.now() + 60_000 }),
+    );
   } catch {
     // Storage blocked: the game still opens on its own login screen.
   }

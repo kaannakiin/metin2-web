@@ -56,7 +56,16 @@
 }
 
 @utility stone-shape {
-  clip-path: polygon(14% 0, 86% 3%, 100% 20%, 97% 100%, 3% 100%, 0 16%);
+  clip-path: polygon(
+    22% 0,
+    70% 1.5%,
+    100% 11%,
+    96.5% 58%,
+    100% 100%,
+    5% 97.5%,
+    0 41%,
+    4% 8%
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {
