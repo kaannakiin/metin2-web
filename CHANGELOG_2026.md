@@ -26,7 +26,7 @@ Aşağıdaki madde listesi, depodaki güncel sürümle uyumlu özet değişiklik
 12. **Dünya patronu** (2504 M591) **notice** sorunları düzeltildi.
 13. **Vuruş / kaçırma** sorunu düzeltildi.
 14. Bazı **zindanlarda core** hatası ve **Şeytan Kulesi** demirci **+ basma** sorunu düzeltildi.
-15. Tüm **binekler** ve **kaykaylarda **sağ/sol rotasyon** ayarlandı.
+15. Tüm **binekler** ve **kaykaylarda **sağ/sol rotasyon\*\* ayarlandı.
 16. **Şaman**, sörf tahtası üzerindeki **çift yelpaze** animasyonu düzeltildi.
 17. **6, 7, 8, 9** yeni **skill**’ler etkinleştirildi; resmi davranışa uygun çalışır.
 18. **Şaman** becerileri düzeltildi: **Kükreme**, **Ejderha Atışı**.
@@ -48,13 +48,13 @@ Aşağıdaki madde listesi, depodaki güncel sürümle uyumlu özet değişiklik
 
 ## Özet tablo
 
-| # | Konu | Tür |
-|---|------|-----|
-| 1–3 | FreeBSD, MariaDB 10.6, yardımcı script | Altyapı |
-| 4–8 | Biyolog, seçenekler, çevrimdışı pazar, depo, otomatik av | Sistem |
-| 9–18 | Client, zindan, patron, savaş, binek, şaman, skill | Düzeltme / oynanış |
-| 19–23 | Battle Pass, sıralama, kalıntı, ünvan, şampiyon seviye | Özellik |
-| 24–25 | DumpProto, binary sunucu bilgisi | Araç / client |
+| #     | Konu                                                     | Tür                |
+| ----- | -------------------------------------------------------- | ------------------ |
+| 1–3   | FreeBSD, MariaDB 10.6, yardımcı script                   | Altyapı            |
+| 4–8   | Biyolog, seçenekler, çevrimdışı pazar, depo, otomatik av | Sistem             |
+| 9–18  | Client, zindan, patron, savaş, binek, şaman, skill       | Düzeltme / oynanış |
+| 19–23 | Battle Pass, sıralama, kalıntı, ünvan, şampiyon seviye   | Özellik            |
+| 24–25 | DumpProto, binary sunucu bilgisi                         | Araç / client      |
 
 ---
 
