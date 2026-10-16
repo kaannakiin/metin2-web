@@ -102,8 +102,13 @@ rollback() {
         service metin2 start
         echo "restored $game $db"'
     sed -i 's/"proxyProtocol": true/"proxyProtocol": false/' /home/m2web/bridge/bridge-site.json
+    sed -i 's/^proxy_protocol = true$/proxy_protocol = false/' "$KIT/webclient.toml"
+    grep -q '"proxyProtocol": false' /home/m2web/bridge/bridge-site.json &&
+        grep -q '^proxy_protocol = false$' "$KIT/webclient.toml" ||
+        { echo "could not turn the PROXY line off in bridge-site.json or webclient.toml" >&2; exit 1; }
     docker restart m2web-bridge
-    echo "Bridge restarted without the PROXY line. TRUSTED_PROXY_IP stays in the CONFIGs; the old binaries ignore it."
+    echo "Bridge restarted without the PROXY line; webclient.toml now says proxy_protocol = false, so a later bridge_config.py keeps it off."
+    echo "TRUSTED_PROXY_IP stays in the CONFIGs; the old binaries ignore it."
 }
 
 case "${1:-}" in
