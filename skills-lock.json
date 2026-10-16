@@ -7,11 +7,35 @@
       "skillPath": "plugins/c-review/skills/c-review/SKILL.md",
       "computedHash": "c6d168c0b0bc90d67eb9861ce29315709cc06fe163fe672eb630ad1093d8dbba"
     },
+    "cloudflare": {
+      "source": "cloudflare/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cloudflare/SKILL.md",
+      "computedHash": "f08c8c1be96dfad7f9d5418b1345477dd2e55af58c8da01326c9a2616c7ed721"
+    },
     "find-skills": {
       "source": "vercel-labs/skills",
       "sourceType": "github",
       "skillPath": "skills/find-skills/SKILL.md",
       "computedHash": "b146008599c31057cef1c145774cea5d5afb30e8f43fa802e47a4b461419aaaf"
+    },
+    "turnstile-spin": {
+      "source": "cloudflare/skills",
+      "sourceType": "github",
+      "skillPath": "skills/turnstile-spin/SKILL.md",
+      "computedHash": "3a27698abc37d9e6be50af36dc28986e6b29ab3bc10831d988158667fd1d27ac"
+    },
+    "web-perf": {
+      "source": "cloudflare/skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-perf/SKILL.md",
+      "computedHash": "72d0dd9706147e19bf3c1a36fdc02570f77685541d89d901a3a2f570824ba3cb"
+    },
+    "wrangler": {
+      "source": "cloudflare/skills",
+      "sourceType": "github",
+      "skillPath": "skills/wrangler/SKILL.md",
+      "computedHash": "9b410cfe14c41d3d4ace5d42e2e19f4eb96104c659b5ed45abf341db28d81029"
     }
   }
 }
