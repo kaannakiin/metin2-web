@@ -191,7 +191,17 @@ Zone `kaanakin.dev`, **Free plan**; sadece ücretsiz özellikler (fatura riski y
 - **Always Use HTTPS kapalı kalmalı**: Traefik Let's Encrypt'i HTTP-01 ile (port 80) yeniliyor, yönlendirmeyi Traefik yapıyor.
 - Doğrulandı: html/manifest/order/sw → `DYNAMIC`; wasm/data/chunk → `MISS` sonra `HIT`; WebSocket site origin'i `101`, yabancı origin `401`.
 - Yayında purge gerekmez: değişen motor dosyaları yeni `?v=` alır, chunk adları içerik hash'i.
-- Risk: Cloudflare CDN şartları büyük non-HTML dosya sunumunu kısıtlayabiliyor (corpus 5.5 GB). ~10 oyuncuda sorun beklenmiyor; büyürse corpus R2'ye (egress ücretsiz, ama ücretsiz kotanın üstü faturalı) taşınabilir.
+
+### Corpus Cloudflare Workers'ta (2026-10-16)
+
+- `/corpus/*` → Worker `metin2-corpus` (sadece static assets, script yok). Ücretsiz ve sınırsız; ölçüldü: 150+ corpus isteğinde Worker invocation sayısı 0, yani günlük 100k limitine sayılmıyor. Kart yok → fatura mümkün değil.
+- Neden R2 değil: kart istiyor ve harcama üst sınırı yok. Workers assets Free planda: sürüm başına 20.000 dosya, dosya başına 25 MiB (bizde 1371 dosya, en büyüğü 6.5 MB `manifest.bin`).
+- İstemci değişmedi: aynı origin'in `corpus/` yolu. Rota silinirse istekler anında Hetzner'deki kopyaya döner.
+- Dosyalar: repo `Tools/web/cdn/` (`wrangler.jsonc`, `_headers`), host `/home/m2web/cdn/`. Token: host `/root/.cloudflare/metin2-cdn.env` (Workers Scripts Edit, Workers Routes Edit, Zone Read; sadece kaanakin.dev).
+- Yayın: `publish.sh` önce `publish_cdn.sh` (wrangler@4.146.0, `node:22-alpine`), sonra site rsync. Sadece güncel build yayında; eski sayfayla oyunda olan yenilemeli (2 kişiyiz, bilinçli tercih).
+- Test (curl + Playwright): parçalar origin ile bayt bayt aynı (adlar `sha256[:32]`, md5 değil), parça `immutable`, `manifest.bin`/`order.txt` `no-cache`, olmayan parça 404, giriş ekranı açılıyor, konsolda hata yok, deploy sonrası origin'e corpus isteği düşmüyor. Cache'siz ilk indirme ~9 MB/s (20 parça, 80 MB).
+- `?fetch=1` (tüm corpus'u arka planda indirme) kaldırıldı: `site/preload.js` artık sadece `order.txt` prefetch ilerlemesini gösteriyor. `compat/runtime.js` seçenek tablosundaki `nofetch` satırı sadece açıklama; bir sonraki motor derlemesinde silinecek.
+- Risk: Cloudflare CDN şartları büyük non-HTML dosya sunumunu kısıtlayabiliyor; Workers assets Developer Platform ürünü olduğu için önerilen yol bu. Cloudflare yine de itiraz ederse çözüm: corpus'u gri bulutlu bir subdomain'den Hetzner'den sunmak (Cloudflare'in kendi önerisi).
 
 ### Canlı testte bulunan ve düzeltilen sorunlar (tarayıcıda, sırayla)
 

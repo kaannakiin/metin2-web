@@ -14,17 +14,19 @@ A Metin2 server + client fork, self-hosted for ~10 players. The main goal is pla
 - `Source/Binary` — client (C++, Python 2.7 UI, D3D8). Built for Windows with `client.sln`; for the web it is copied to the build container and compiled by the kit.
 - `Client/` + `Tools/binary_unpack/` — client data (`root`, `locale`, `property`, `zone`…) that becomes EIX/EPK packs via `Tools/web/make_eterpacks.py`.
 - `Tools/web/kit/` — **repo copies** of our changes to the kit (`stage_port.py`, `compat/`, `tools/`, `site/`, `gr2_bitknit/`, `webclient.toml`). The live kit is on the host at `/home/m2web/kit` (= `/work/kit` in the container). A change must land in both places (`scp`).
-- `Tools/web/deploy/` — Traefik route (`metin2.yaml`), nginx site config, `deploy.sh`, `publish.sh`.
+- `Tools/web/deploy/` — Traefik route (`metin2.yaml`), nginx site config, `deploy.sh`, `publish.sh`, `publish_cdn.sh`.
+- `Tools/web/cdn/` — the `metin2-corpus` Worker (assets only: `wrangler.jsonc`, `_headers`); host copy in `/home/m2web/cdn/`.
 - `home/` — server runtime tree (configs, `share/locale`, `share/data`, protos) mirrored onto the VM under `/usr/home`.
 - `sql/` — schema reconstructed from the C++ queries (no original dump), all `utf8mb4`.
 
 ## Runtime topology (one Hetzner host, 88.99.1.151)
 
 ```text
-browser ─https─▶ Traefik (coolify-proxy) ─┬─ /      ─▶ m2web-site   (nginx, serves /home/m2web/www)
-                                           └─ /to/… ─▶ m2web-bridge (node, host network, 10.0.1.1:11496)
-                                                          └─ TCP ─▶ KVM VM 192.168.122.10 (FreeBSD 14.5 i386)
-                                                                    MariaDB, db 15000, auth 30001, ch99 30003, ch1 30101/30103/30105
+browser ─https─▶ Cloudflare ─┬─ /corpus/* ─▶ Worker metin2-corpus (static assets, never reaches the host)
+                              └─ the rest ──▶ Traefik (coolify-proxy) ─┬─ /      ─▶ m2web-site   (nginx, serves /home/m2web/www)
+                                                                       └─ /to/… ─▶ m2web-bridge (node, host network, 10.0.1.1:11496)
+                                                                                      └─ TCP ─▶ KVM VM 192.168.122.10 (FreeBSD 14.5 i386)
+                                                                                                MariaDB, db 15000, auth 30001, ch99 30003, ch1 30101/30103/30105
 ```
 
 - `metin2.kaanakin.dev` is **proxied by Cloudflare** (Free plan, zone `kaanakin.dev`), managed through the Cloudflare MCP server (`.mcp.json`). Settings and why: `CALISMA_NOTLARI.md` §6.
@@ -36,10 +38,12 @@ browser ─https─▶ Traefik (coolify-proxy) ─┬─ /      ─▶ m2web-sit
 
 Understand this before changing nginx, the service worker or adding a CDN:
 
-- Cloudflare cache rules mirror the origin headers: hashed chunks and `?v=` engine files are cached at the edge; everything else on the host is never cached. Nothing needs purging on publish. A new unhashed file that should be cached needs a rule change.
 - `client.html` is `no-cache` and stamps `client.js/.wasm/.data` and `preload.js` with `?v=<build time>`; those are cached for a year. A new build is picked up because the HTML changes.
-- Game files are packed into a content-addressed **corpus**: `corpus/<md5>.bin` 4 MB chunks (`immutable`), plus `corpus/manifest.bin` and `corpus/order.txt` (not hashed, so `no-cache`). ~5.5 GB, ~1370 files.
-- The engine reads chunks with **synchronous XHR** (`compat/webfs_web.cpp`), which bypasses the service worker. `sw.js` + `preload.js` only serve the async prefetch/background downloads from Cache Storage (`m2w-corpus`). What actually limits blocking downloads is the chunk memory budget (`runtime.js`, `?corpusMB`).
+- Game files are packed into a content-addressed **corpus**: `corpus/<sha256[:32]>.bin` 4 MB chunks (`immutable`), plus `corpus/manifest.bin` (the engine adds `?t=`) and `corpus/order.txt` (not hashed, so `no-cache`). ~5.4 GB, ~1370 files.
+- `/corpus/*` is served by the `metin2-corpus` Worker (assets only, no script, so requests are free and do not count toward the Workers daily limit; headers from `Tools/web/cdn/_headers`). The client is unaware: it reads the same-origin `corpus/` path (`?corpus=` is ignored on the real site by design). The origin still has a copy; deleting the Worker route falls back to it instantly.
+- Cloudflare cache rules for the origin: `?v=` engine files cached at the edge, everything else never cached. Nothing needs purging on publish.
+- Only the current build's corpus is deployed (no previous chunks kept): after a publish, players with the game open must reload.
+- The engine reads chunks with **synchronous XHR** (`compat/webfs_web.cpp`), which bypasses the service worker. `sw.js` + `preload.js` only serve the async prefetch of `order.txt` (login + village) from Cache Storage (`m2w-corpus`); everything else is fetched on demand. There is no whole-corpus background download. The browser HTTP cache (`immutable`) is what spares re-downloads.
 
 ## Commands
 
@@ -65,7 +69,7 @@ python3 -I Tools/web/kit/patchcheck.py <kit_dir> Source/Binary/source   # every 
 
 Run container scripts as files: write to `/home/m2web/x.sh`, then `ssh -o BatchMode=yes root@88.99.1.151 'docker exec m2web-build bash /work/x.sh'` (this form is allowlisted). Long jobs: `nohup` + `publish.sh`.
 
-Publish: `webclient.py package` and `tools/bridge_config.py --site https://metin2.kaanakin.dev` in the container, then `/home/m2web/publish.sh` on the host (refuses to sync an incomplete package). `deploy.sh` recreates the site and bridge containers.
+Publish: `webclient.py package` and `tools/bridge_config.py --site https://metin2.kaanakin.dev` in the container, then `/home/m2web/publish.sh` on the host (refuses to sync an incomplete package). It runs `publish_cdn.sh` first (wrangler in a `node:22-alpine` container, token in `/root/.cloudflare/metin2-cdn.env`; only changed chunks upload, the first full upload took ~10 min) and then syncs the site. `deploy.sh` recreates the site and bridge containers.
 
 ASan build: `build_asan.sh` / `publish_asan.sh` on the host, served under `/asan/`. Keep `MAXIMUM_MEMORY` at 2 GB and `malloc_context_size=0` (see notes).
 

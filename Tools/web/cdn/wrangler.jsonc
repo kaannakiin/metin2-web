@@ -1,0 +1,14 @@
+{
+  "name": "metin2-corpus",
+  "compatibility_date": "2026-10-13",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "metin2.kaanakin.dev/corpus/*", "zone_name": "kaanakin.dev" }
+  ],
+  // Assets only, no script: requests never invoke Worker code, so they stay free and unlimited.
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "none"
+  }
+}
