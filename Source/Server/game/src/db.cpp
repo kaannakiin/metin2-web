@@ -467,7 +467,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 						DESC_MANAGER::instance().ConnectAccount(r.login, d);
 
 						LoginPrepare(d, pinfo->adwClientKey, aiPremiumTimes);
-						OnLoginSucceeded(pinfo->login);
+						OnLoginSucceeded(d, pinfo->login);
 						sys_log(0, "QID_AUTH_LOGIN: SUCCESS %s", pinfo->login);
 						M2_DELETE(pinfo);
 					}

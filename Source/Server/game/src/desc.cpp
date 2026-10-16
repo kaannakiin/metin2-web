@@ -320,7 +320,10 @@ int DESC::ConsumeProxyHeader()
 	struct in_addr kAddr;
 
 	if (sscanf(szLine, "PROXY %7s %63s", szProto, szSource) != 2 || strcmp(szProto, "TCP4") != 0 || inet_pton(AF_INET, szSource, &kAddr) != 1)
-		return 1;
+	{
+		sys_err("unusable proxy header from %s", GetHostName());
+		return -1;
+	}
 
 	const DWORD dwSource = ntohl(kAddr.s_addr);
 	const BYTE bFirst = dwSource >> 24;

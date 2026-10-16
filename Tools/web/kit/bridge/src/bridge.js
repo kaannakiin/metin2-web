@@ -1,5 +1,6 @@
 'use strict';
 
+const crypto = require('node:crypto');
 const net = require('node:net');
 const { CLOSE_CODES } = require('./close-codes.js');
 
@@ -17,13 +18,26 @@ function toBuffer(data) {
   throw new Error('unexpected websocket message type: ' + typeof data);
 }
 
+/// The first four groups of an IPv6 address: one household or phone usually
+/// owns a whole /64, so this is what identifies a player.
+function ipv6Prefix64(address) {
+  const [head, tail = ''] = address.split('::');
+  const front = head ? head.split(':') : [];
+  const back = tail ? tail.split(':') : [];
+  const groups = [...front, ...Array(Math.max(0, 8 - front.length - back.length)).fill('0'), ...back];
+  return groups.slice(0, 4).map((g) => parseInt(g, 16) || 0).join(':');
+}
+
 /// A PROXY protocol v1 line naming the player. The game server keeps 15-character
-/// host fields, so an IPv6 player is sent as UNKNOWN and stays on the bridge address.
+/// IPv4 host fields, so an IPv6 player is named by a stable 240.x.y.z address
+/// derived from its /64 (240/4 is reserved, never a real player).
 function proxyHeader(clientAddress, target) {
-  if (net.isIPv4(clientAddress)) {
-    return `PROXY TCP4 ${clientAddress} ${target.host} 0 ${target.port}\r\n`;
+  let source = clientAddress;
+  if (net.isIPv6(clientAddress)) {
+    const digest = crypto.createHash('sha256').update(ipv6Prefix64(clientAddress)).digest();
+    source = `240.${digest[0]}.${digest[1]}.${digest[2]}`;
   }
-  return 'PROXY UNKNOWN\r\n';
+  return `PROXY TCP4 ${source} ${target.host} 0 ${target.port}\r\n`;
 }
 
 /// Joins one browser WebSocket to one TCP connection to `target`, byte for byte, with backpressure both ways; returns { socket, close }.

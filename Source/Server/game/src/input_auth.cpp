@@ -22,7 +22,8 @@ namespace
 		time_t	tLockedUntil;
 	};
 
-	const int LOGIN_FAILURE_LIMIT_PER_ACCOUNT = 5;
+	const int LOGIN_FAILURE_LIMIT_PER_ACCOUNT_SOURCE = 5;
+	const int LOGIN_FAILURE_LIMIT_PER_ACCOUNT = 50;
 	const int LOGIN_FAILURE_LIMIT_PER_HOST = 20;
 	const time_t LOGIN_FAILURE_WINDOW = 300;
 	const size_t LOGIN_FAILURE_MAX_ENTRIES = 10000;
@@ -34,6 +35,11 @@ namespace
 		char szLogin[LOGIN_MAX_LEN + 1];
 		trim_and_lower(c_szLogin, szLogin, sizeof(szLogin));
 		return std::string("a:") + szLogin;
+	}
+
+	std::string AccountSourceKey(LPDESC d, const char* c_szLogin)
+	{
+		return AccountKey(c_szLogin) + "@" + d->GetHostName();
 	}
 
 	bool IsLocked(const std::string& stKey)
@@ -71,7 +77,7 @@ namespace
 
 bool IsLoginThrottled(LPDESC d, const char* c_szLogin)
 {
-	if (IsLocked(AccountKey(c_szLogin)))
+	if (IsLocked(AccountSourceKey(d, c_szLogin)) || IsLocked(AccountKey(c_szLogin)))
 		return true;
 
 	return !IsTrustedProxyIP(d->GetHostName()) && IsLocked(std::string("h:") + d->GetHostName());
@@ -79,14 +85,16 @@ bool IsLoginThrottled(LPDESC d, const char* c_szLogin)
 
 void OnLoginFailed(LPDESC d, const char* c_szLogin)
 {
+	AddFailure(AccountSourceKey(d, c_szLogin), LOGIN_FAILURE_LIMIT_PER_ACCOUNT_SOURCE);
 	AddFailure(AccountKey(c_szLogin), LOGIN_FAILURE_LIMIT_PER_ACCOUNT);
 
 	if (!IsTrustedProxyIP(d->GetHostName()))
 		AddFailure(std::string("h:") + d->GetHostName(), LOGIN_FAILURE_LIMIT_PER_HOST);
 }
 
-void OnLoginSucceeded(const char* c_szLogin)
+void OnLoginSucceeded(LPDESC d, const char* c_szLogin)
 {
+	s_mapLoginFailures.erase(AccountSourceKey(d, c_szLogin));
 	s_mapLoginFailures.erase(AccountKey(c_szLogin));
 }
 
