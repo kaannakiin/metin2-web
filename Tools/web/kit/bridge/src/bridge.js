@@ -33,9 +33,12 @@ function ipv6Prefix64(address) {
 /// derived from its /64 (240/4 is reserved, never a real player).
 function proxyHeader(clientAddress, target) {
   let source = clientAddress;
-  if (net.isIPv6(clientAddress)) {
+  const mapped = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/i.exec(clientAddress);
+  if (mapped && net.isIPv4(mapped[1])) {
+    source = mapped[1];
+  } else if (net.isIPv6(clientAddress)) {
     const digest = crypto.createHash('sha256').update(ipv6Prefix64(clientAddress)).digest();
-    source = `240.${digest[0]}.${digest[1]}.${digest[2]}`;
+    source = `${240 + (digest[0] & 15)}.${digest[1]}.${digest[2]}.${digest[3]}`;
   }
   return `PROXY TCP4 ${source} ${target.host} 0 ${target.port}\r\n`;
 }

@@ -20,12 +20,15 @@ namespace
 		int		iCount;
 		time_t	tWindowEnd;
 		time_t	tLockedUntil;
+		int		iLocks;
 	};
 
 	const int LOGIN_FAILURE_LIMIT_PER_ACCOUNT_SOURCE = 5;
-	const int LOGIN_FAILURE_LIMIT_PER_ACCOUNT = 50;
+	const int LOGIN_FAILURE_LIMIT_PER_ACCOUNT = 30;
 	const int LOGIN_FAILURE_LIMIT_PER_HOST = 20;
 	const time_t LOGIN_FAILURE_WINDOW = 300;
+	const time_t LOGIN_FAILURE_BACKOFF_RESET = 3600;
+	const int LOGIN_FAILURE_MAX_BACKOFF_STEPS = 4;
 	const size_t LOGIN_FAILURE_MAX_ENTRIES = 10000;
 
 	std::unordered_map<std::string, SLoginFailures> s_mapLoginFailures;
@@ -70,8 +73,15 @@ namespace
 			r.tWindowEnd = tNow + LOGIN_FAILURE_WINDOW;
 		}
 
+		if (r.tLockedUntil + LOGIN_FAILURE_BACKOFF_RESET <= tNow)
+			r.iLocks = 0;
+
 		if (++r.iCount >= iLimit)
-			r.tLockedUntil = tNow + LOGIN_FAILURE_WINDOW;
+		{
+			r.iLocks = MIN(r.iLocks + 1, LOGIN_FAILURE_MAX_BACKOFF_STEPS);
+			r.tLockedUntil = tNow + LOGIN_FAILURE_WINDOW * (1 << (r.iLocks - 1));
+			r.iCount = 0;
+		}
 	}
 }
 
