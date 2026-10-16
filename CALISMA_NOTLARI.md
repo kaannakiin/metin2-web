@@ -203,6 +203,14 @@ Zone `kaanakin.dev`, **Free plan**; sadece ücretsiz özellikler (fatura riski y
 - `?fetch=1` (tüm corpus'u arka planda indirme) kaldırıldı: `site/preload.js` artık sadece `order.txt` prefetch ilerlemesini gösteriyor. `compat/runtime.js` seçenek tablosundaki `nofetch` satırı sadece açıklama; bir sonraki motor derlemesinde silinecek.
 - Risk: Cloudflare CDN şartları büyük non-HTML dosya sunumunu kısıtlayabiliyor; Workers assets Developer Platform ürünü olduğu için önerilen yol bu. Cloudflare yine de itiraz ederse çözüm: corpus'u gri bulutlu bir subdomain'den Hetzner'den sunmak (Cloudflare'in kendi önerisi).
 
+### Portal ve otomatik giriş (2026-10-16)
+
+- Portal: `web/portal` (TanStack Start + Tailwind + react-hook-form/zod), kayıt/giriş sunucu fonksiyonları `account` DB'sine doğrudan bağlanır. **Henüz yayında değil** (Traefik rotası, MariaDB `portal` kullanıcısı, Cloudflare IP allowlist, Turnstile anahtarları yapılacak).
+- Otomatik giriş akışı: portal girişten sonra `sessionStorage["m2w.autologin"]` = `{login, password, expires: +60 s}` → `client.html` okur ve hemen siler, `Module.preRun`'da motorun bellek dosya sistemine `/m2w_autologin` (iki satır) yazar → `intrologin.py` `Open()` sonunda dosyayı okur ve siler, ilk `OnUpdate`'te alanları doldurup giriş butonunu çağırır (F1–F4 hızlı girişiyle aynı yol, hata pencereleri aynen çalışır). Windows'ta dosya hiç olmaz.
+- Motor derlenmedi: sadece root pack + `scripts rewrite uiscript data link` + `package` (host `/home/m2web/autologin.sh`). `link` şart: yeni `?v=` ile tarayıcılar yeni `client.data`'yı alır.
+- Şablon: `kit/site/client.html` (repo kopyası `Tools/web/kit/site/client.html`; `__BRIDGE__`/`__VERSION__` link adımında doluyor).
+- Test (canlı, Playwright, geçici `webtest01` hesabı, sonra silindi): giriş ekranı atlandı, krallık seçimine geçti; `sessionStorage`, sayfa değişkeni ve `/m2w_autologin` boş kaldı; konsolda hata yok. Kayıt yokken normal giriş ekranı açılıyor; `client.data` ikinci açılışta cache'ten (transfer 0).
+
 ### Canlı testte bulunan ve düzeltilen sorunlar (tarayıcıda, sırayla)
 
 1. `__builtin__` → `builtins` (fork aynı satırı `UserInterface.cpp`'de de kullanıyor).

@@ -276,6 +276,7 @@ class LoginWindow(ui.ScriptWindow):
 		self.inputDialog = None
 		self.connectingDialog = None
 		self.stream = stream
+		self.webAutoLogin = None
 
 		self.isOnSelectServer = FALSE
 
@@ -347,6 +348,7 @@ class LoginWindow(ui.ScriptWindow):
 
 		self.__OpenServerBoard()
 		self.__OnSelectServer()
+		self.webAutoLogin = self.__TakeWebAutoLogin()
 
 		app.ShowCursor()
 
@@ -783,6 +785,13 @@ class LoginWindow(ui.ScriptWindow):
 	def OnUpdate(self):
 		ServerStateChecker.Update()
 
+		if self.webAutoLogin:
+			id, pwd = self.webAutoLogin
+			self.webAutoLogin = None
+			self.idEditLine.SetText(id)
+			self.pwdEditLine.SetText(pwd)
+			self.__OnClickLoginButton()
+
 		if app.__AUTO_HUNT__:
 			if constInfo.autoHuntAutoLoginDict["status"] == 1 and constInfo.autoHuntAutoLoginDict["leftTime"] > 0 and constInfo.autoHuntAutoLoginDict["leftTime"] < app.GetGlobalTimeStamp():
 				autoHuntAutoLoginDict = constInfo.autoHuntAutoLoginDict
@@ -790,6 +799,25 @@ class LoginWindow(ui.ScriptWindow):
 				self.Connect(autoHuntAutoLoginDict["id"], autoHuntAutoLoginDict["pwd"])
 				constInfo.autoHuntAutoLoginDict["leftTime"] = -1
 
+
+	# The web page writes this file (login, then password) into the in-memory
+	# filesystem before the client starts; it never exists on Windows.
+	WEB_AUTO_LOGIN_FILE = "/m2w_autologin"
+
+	def __TakeWebAutoLogin(self):
+		if not os.path.exists(self.WEB_AUTO_LOGIN_FILE):
+			return None
+		try:
+			lines = open(self.WEB_AUTO_LOGIN_FILE).read().splitlines()
+		except IOError:
+			lines = []
+		try:
+			os.remove(self.WEB_AUTO_LOGIN_FILE)
+		except OSError:
+			pass
+		if len(lines) < 2 or not lines[0] or not lines[1]:
+			return None
+		return (lines[0], lines[1])
 
 	def EmptyFunc(self):
 		pass

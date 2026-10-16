@@ -17,6 +17,7 @@ A Metin2 server + client fork, self-hosted for ~10 players. The main goal is pla
 - `Tools/web/deploy/` — Traefik route (`metin2.yaml`), nginx site config, `deploy.sh`, `publish.sh`, `publish_cdn.sh`.
 - `Tools/web/cdn/` — the `metin2-corpus` Worker (assets only: `wrangler.jsonc`, `_headers`); host copy in `/home/m2web/cdn/`.
 - `web/portal/` — the site in front of the game: TanStack Start (React 19, SSR) + Tailwind 4 + react-hook-form/zod. Register and login are server functions (`src/lib/auth.ts`) that talk to the `account` DB directly; zod schemas in `src/server/validation.ts` are shared by forms and server. Production runs `node server.ts` (Hono static `/assets/*` + the Start fetch handler). Not deployed yet.
+- Portal → game auto-login: `sessionStorage["m2w.autologin"]` (portal `src/lib/launch.ts`) → `client.html` (template `Tools/web/kit/site/client.html`) moves it into `/m2w_autologin` in the engine's memory FS in `Module.preRun` → `Tools/binary_unpack/root/intrologin.py` reads, deletes and logs in. Changing either side needs no engine rebuild: root pack + `scripts rewrite uiscript data link` + `package`.
 - `home/` — server runtime tree (configs, `share/locale`, `share/data`, protos) mirrored onto the VM under `/usr/home`.
 - `sql/` — schema reconstructed from the C++ queries (no original dump), all `utf8mb4`.
 
