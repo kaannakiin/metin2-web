@@ -16,7 +16,7 @@ A Metin2 server + client fork, self-hosted for ~10 players. The main goal is pla
 - `Tools/web/kit/` — **repo copies** of our changes to the kit (`stage_port.py`, `compat/`, `tools/`, `site/`, `gr2_bitknit/`, `webclient.toml`). The live kit is on the host at `/home/m2web/kit` (= `/work/kit` in the container). A change must land in both places (`scp`).
 - `Tools/web/deploy/` — Traefik route (`metin2.yaml`), nginx site config, `deploy.sh`, `publish.sh`, `publish_cdn.sh`.
 - `Tools/web/cdn/` — the `metin2-corpus` Worker (assets only: `wrangler.jsonc`, `_headers`); host copy in `/home/m2web/cdn/`.
-- `web/portal/` — the site in front of the game: TanStack Start (React 19, SSR) + Tailwind 4 + react-hook-form/zod. Register and login are server functions (`src/lib/auth.ts`) that talk to the `account` DB directly; zod schemas in `src/server/validation.ts` are shared by forms and server. Production runs `node server.ts` (Hono static `/assets/*` + the Start fetch handler). Not deployed yet.
+- `web/portal/` — the site in front of the game: TanStack Start (React 19, SSR) + Tailwind 4 + react-hook-form/zod. Register and login are server functions (`src/lib/auth.ts`) that talk to the `account` DB directly; zod schemas in `src/server/validation.ts` are shared by forms and server. Production runs `node server.ts` (Hono static `/assets/*` + the Start fetch handler) as container `m2web-portal`.
 - Portal → game auto-login: `sessionStorage["m2w.autologin"]` (portal `src/lib/launch.ts`) → `client.html` (template `Tools/web/kit/site/client.html`) moves it into `/m2w_autologin` in the engine's memory FS in `Module.preRun` → `Tools/binary_unpack/root/intrologin.py` reads, deletes and logs in. Changing either side needs no engine rebuild: root pack + `scripts rewrite uiscript data link` + `package`.
 - `home/` — server runtime tree (configs, `share/locale`, `share/data`, protos) mirrored onto the VM under `/usr/home`.
 - `sql/` — schema reconstructed from the C++ queries (no original dump), all `utf8mb4`.
@@ -25,11 +25,18 @@ A Metin2 server + client fork, self-hosted for ~10 players. The main goal is pla
 
 ```text
 browser ─https─▶ Cloudflare ─┬─ /corpus/* ─▶ Worker metin2-corpus (static assets, never reaches the host)
-                              └─ the rest ──▶ Traefik (coolify-proxy) ─┬─ /      ─▶ m2web-site   (nginx, serves /home/m2web/www)
-                                                                       └─ /to/… ─▶ m2web-bridge (node, host network, 10.0.1.1:11496)
-                                                                                      └─ TCP ─▶ KVM VM 192.168.122.10 (FreeBSD 14.5 i386)
-                                                                                                MariaDB, db 15000, auth 30001, ch99 30003, ch1 30101/30103/30105
+                              └─ the rest ──▶ Traefik (coolify-proxy, Cloudflare IPs only)
+                                               ├─ /client.*, /preload.js, /sw.js, /asan/ ─▶ m2web-site   (nginx, /home/m2web/www)
+                                               ├─ /to/…                                  ─▶ m2web-bridge (node, host network, 10.0.1.1:11496) ─TCP─┐
+                                               └─ everything else                        ─▶ m2web-portal (node, host network, 10.0.1.1:11497) ─SQL─┤
+                                                                                                                                                    ▼
+                                         KVM VM 192.168.122.10 (FreeBSD 14.5 i386): MariaDB 127.0.0.1 + 192.168.122.10 (portal user only),
+                                         db 15000, auth 30001, ch99 30003, ch1 30101/30103/30105
 ```
+
+- Routes: `Tools/web/deploy/metin2.yaml` (live copy `/data/coolify/proxy/dynamic/metin2.yaml`, install with `apply_traefik.sh`, which rolls back if the site stops answering). Every router has an `ipAllowList` of Cloudflare's ranges: the portal trusts `CF-Connecting-IP`, so a direct hit on the origin must get 403. Refresh the ranges from `GET /client/v4/ips` if Cloudflare changes them.
+- Portal deploy: sync `web/portal` to `/home/m2web/portal-src` (no `node_modules`, `dist`, `.env*`), then `/home/m2web/deploy_portal.sh` (tests + build in a scratch copy, then swaps). Secrets live only in `/root/.metin2/portal.env` (root, 600): DB password (`portal@192.168.122.1`, SELECT/INSERT on `account.account` only) and the Turnstile secret (widget `metin2-portal`, site key `0x4AAAAAAFYZbZBCwl5IYp-B`).
+- Auto mode refuses VM service restarts and Traefik/IaC changes even with allow rules; prepare a script and hand those steps to the user.
 
 - `metin2.kaanakin.dev` is **proxied by Cloudflare** (Free plan, zone `kaanakin.dev`), managed through the Cloudflare MCP server (`.mcp.json`). Settings and why: `CALISMA_NOTLARI.md` §6.
 - Cloudflare: stay on free features only. Never enable anything metered (Argo, Load Balancing, paid add-ons, R2/Workers beyond free limits) without the user's explicit OK. Keep "Always Use HTTPS" off at the edge: Traefik renews Let's Encrypt with the HTTP-01 challenge on port 80.

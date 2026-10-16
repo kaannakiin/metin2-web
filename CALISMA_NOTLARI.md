@@ -205,7 +205,11 @@ Zone `kaanakin.dev`, **Free plan**; sadece ücretsiz özellikler (fatura riski y
 
 ### Portal ve otomatik giriş (2026-10-16)
 
-- Portal: `web/portal` (TanStack Start + Tailwind + react-hook-form/zod), kayıt/giriş sunucu fonksiyonları `account` DB'sine doğrudan bağlanır. **Henüz yayında değil** (Traefik rotası, MariaDB `portal` kullanıcısı, Cloudflare IP allowlist, Turnstile anahtarları yapılacak).
+- Portal: `web/portal` (TanStack Start + Tailwind + react-hook-form/zod), kayıt/giriş sunucu fonksiyonları `account` DB'sine doğrudan bağlanır. **CANLI ✅** `https://metin2.kaanakin.dev/`.
+- Yayın düzeni: container `m2web-portal` (host ağı, `10.0.1.1:11497`, salt okunur, uid 1000), UFW `10.0.1.0/24 → 10.0.1.1:11497`. Traefik: `/` portal, `/client.*` `/preload.js` `/sw.js` `/asan/` nginx, `/to/` bridge; hepsinde Cloudflare IP allowlist (doğrudan origin → 403, test edildi). Cloudflare cache kuralına portalın `/assets/*` dosyaları eklendi (`MISS` → `HIT`).
+- MariaDB artık `127.0.0.1,192.168.122.10` dinliyor (`zz-metin2.cnf`, yedek `zz-metin2.cnf.bak-portal`); `portal@192.168.122.1` sadece `account.account` SELECT/INSERT. Script: `Tools/web/deploy/vm_portal_db.sh` (oyunu durdurup MariaDB'yi yeniden başlatır).
+- Gizli değerler sadece host'ta: `/root/.metin2/portal.env` + `portal-db.pw` (root, 600). Turnstile secret sohbete girmedi: host'ta üretilen RSA anahtarıyla şifrelenip orada çözüldü, anahtar silindi.
+- Uçtan uca test (canlı, Playwright, `webtest02`, sonra silindi): gerçek Turnstile ile kayıt → yanlış şifre mesajı → doğru şifre → oyun giriş ekranını atlayıp krallık seçimine geçti.
 - Otomatik giriş akışı: portal girişten sonra `sessionStorage["m2w.autologin"]` = `{login, password, expires: +60 s}` → `client.html` okur ve hemen siler, `Module.preRun`'da motorun bellek dosya sistemine `/m2w_autologin` (iki satır) yazar → `intrologin.py` `Open()` sonunda dosyayı okur ve siler, ilk `OnUpdate`'te alanları doldurup giriş butonunu çağırır (F1–F4 hızlı girişiyle aynı yol, hata pencereleri aynen çalışır). Windows'ta dosya hiç olmaz.
 - Motor derlenmedi: sadece root pack + `scripts rewrite uiscript data link` + `package` (host `/home/m2web/autologin.sh`). `link` şart: yeni `?v=` ile tarayıcılar yeni `client.data`'yı alır.
 - Şablon: `kit/site/client.html` (repo kopyası `Tools/web/kit/site/client.html`; `__BRIDGE__`/`__VERSION__` link adımında doluyor).
