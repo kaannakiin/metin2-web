@@ -23,5 +23,5 @@ docker run -d --name m2web-site --restart unless-stopped --network coolify \
     -v /home/m2web/site-nginx.conf:/etc/nginx/conf.d/default.conf:ro nginx:1.27-alpine
 
 # one-time, already applied:
-#   ufw allow from 10.0.1.0/24 to 10.0.1.1 port 11496 proto tcp comment "metin2 bridge, traefik only"
+#   ufw allow from 10.0.1.6 to 10.0.1.1 port 11496 proto tcp comment "metin2 bridge, traefik only"
 #   cp metin2.yaml /data/coolify/proxy/dynamic/metin2.yaml

@@ -174,7 +174,7 @@ tarayıcı ─https─▶ Traefik (coolify-proxy, Let's Encrypt)
 - `/` → `/client.html?deflang=tr` (Türkçe).
 - Bridge sadece `https://metin2.kaanakin.dev` origin'ini kabul ediyor, izin listesi dışındaki adresleri TCP açmadan reddediyor (test edildi: `:22` → `unknown_target`, yabancı origin → 401).
 - Bridge host ağında, çünkü coolify ağındaki container'lar libvirt VM'ine ulaşamıyor (test edildi).
-- UFW: `10.0.1.0/24 → 10.0.1.1:11496` (sadece Traefik'in ağı; internetten kapalı).
+- UFW: `10.0.1.6 → 10.0.1.1:11496` (sadece Traefik container'ı `coolify-proxy`; internetten ve coolify ağındaki diğer container'lardan kapalı).
 - Traefik: `/data/coolify/proxy/dynamic/metin2.yaml` (yeni dosya, diğer servislere dokunulmadı).
 - Sunucu adresi/portları client'a stage yamasıyla gömülü (`ENABLE_BINARY_SERVERINFO`): `webclient.toml` `[server] address/ch1_port/auth_port`.
 - Kopyalar: `Tools/web/deploy/` (`deploy.sh`, `site-nginx.conf`, `metin2.yaml`). Yeniden yayın: container'da `webclient.py package` + `tools/bridge_config.py --site https://metin2.kaanakin.dev`, host'ta `deploy.sh`.
@@ -206,7 +206,7 @@ Zone `kaanakin.dev`, **Free plan**; sadece ücretsiz özellikler (fatura riski y
 ### Portal ve otomatik giriş (2026-10-16)
 
 - Portal: `web/portal` (TanStack Start + Tailwind + react-hook-form/zod), kayıt/giriş sunucu fonksiyonları `account` DB'sine doğrudan bağlanır. **CANLI ✅** `https://metin2.kaanakin.dev/`.
-- Yayın düzeni: container `m2web-portal` (host ağı, `10.0.1.1:11497`, salt okunur, uid 1000), UFW `10.0.1.0/24 → 10.0.1.1:11497`. Traefik: `/` portal, `/client.*` `/preload.js` `/sw.js` `/asan/` nginx, `/to/` bridge; hepsinde Cloudflare IP allowlist (doğrudan origin → 403, test edildi). Cloudflare cache kuralına portalın `/assets/*` dosyaları eklendi (`MISS` → `HIT`).
+- Yayın düzeni: container `m2web-portal` (host ağı, `10.0.1.1:11497`, salt okunur, uid 1000), UFW `10.0.1.6 → 10.0.1.1:11497`. Traefik: `/` portal, `/client.*` `/preload.js` `/sw.js` `/asan/` nginx, `/to/` bridge; hepsinde Cloudflare IP allowlist (doğrudan origin → 403, test edildi). Cloudflare cache kuralına portalın `/assets/*` dosyaları eklendi (`MISS` → `HIT`).
 - MariaDB artık `127.0.0.1,192.168.122.10` dinliyor (`zz-metin2.cnf`, yedek `zz-metin2.cnf.bak-portal`); `portal@192.168.122.1` sadece `account.account` SELECT/INSERT. Script: `Tools/web/deploy/vm_portal_db.sh` (oyunu durdurup MariaDB'yi yeniden başlatır).
 - Gizli değerler sadece host'ta: `/root/.metin2/portal.env` + `portal-db.pw` (root, 600). Turnstile secret sohbete girmedi: host'ta üretilen RSA anahtarıyla şifrelenip orada çözüldü, anahtar silindi.
 - Uçtan uca test (canlı, Playwright, `webtest02`, sonra silindi): gerçek Turnstile ile kayıt → yanlış şifre mesajı → doğru şifre → oyun giriş ekranını atlayıp krallık seçimine geçti.
@@ -321,3 +321,10 @@ Granny 2.11 (sürüm 7) dosyaları animasyon eğrilerini sıkıştırılmış `c
 - Tarayıcı testi (1920×899 pencere): kullanıcı adı alanı (958,395), şifre (958,465), giriş butonu (960,523), karakter seçiminde başlat (1020,788). Tıklamalar `mouse.down`/`up` arasında ~100 ms beklemeyle; hızlı tıklama algılanmıyor. Ekran görüntüsü aracı bazen eski kareyi döndürüyor → tekrar al.
 - zsh'de `$c:refs` gibi ifadeler `:r` değiştiricisi olarak yorumlanıyor → `${c}` yaz ya da bash script kullan.
 - Kaynak dosyalar stage'de UTF-8 okunuyor (`errors='ignore'`) → yama desenleri ASCII olmalı.
+
+### UFW: portal ve bridge sadece Traefik'e açık (2026-10-16)
+
+- Güvenlik incelemesi: `10.0.1.0/24` kuralı coolify ağındaki ~30 başka container'ın portala Traefik'i atlayıp doğrudan ulaşmasına ve sahte `CF-Connecting-IP` ile IP başına sınırı aşmasına izin veriyordu (bridge'de de aynısı).
+- Kurallar `10.0.1.6` (`coolify-proxy`'nin coolify ağındaki IP'si) ile değiştirildi, `/24` kuralları silindi.
+- Doğrulandı: Cloudflare üzerinden portal 200, oyun 200, bridge 426 (WebSocket bekliyor); doğrudan origin 403; Traefik container'ından portal 200 / bridge 426; `m2web-site` container'ından portal zaman aşımı; diğer Coolify siteleri yanıt veriyor (502/504 yok), Traefik logunda hata yok.
+- Risk: Coolify proxy'yi yeniden oluşturursa IP değişebilir ve site kapanır. `deploy_portal.sh` her deploy'da bunu kontrol edip uyarıyor; o durumda iki UFW kuralını yeni IP'ye taşı.

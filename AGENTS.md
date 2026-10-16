@@ -34,7 +34,7 @@ browser ─https─▶ Cloudflare ─┬─ /corpus/* ─▶ Worker metin2-corpu
                                          db 15000, auth 30001, ch99 30003, ch1 30101/30103/30105
 ```
 
-- Routes: `Tools/web/deploy/metin2.yaml` (live copy `/data/coolify/proxy/dynamic/metin2.yaml`, install with `apply_traefik.sh`, which rolls back if the site stops answering). Every router has an `ipAllowList` of Cloudflare's ranges: the portal trusts `CF-Connecting-IP`, so a direct hit on the origin must get 403. Refresh the ranges from `GET /client/v4/ips` if Cloudflare changes them.
+- Routes: `Tools/web/deploy/metin2.yaml` (live copy `/data/coolify/proxy/dynamic/metin2.yaml`, install with `apply_traefik.sh`, which rolls back if the site stops answering). Every router has an `ipAllowList` of Cloudflare's ranges: the portal trusts `CF-Connecting-IP`, so a direct hit on the origin must get 403. Refresh the ranges from `GET /client/v4/ips` if Cloudflare changes them. UFW lets only `coolify-proxy` (10.0.1.6 on the coolify network) reach 10.0.1.1:11496/11497; if Coolify recreates the proxy with another IP, move both rules (`deploy_portal.sh` warns).
 - Portal deploy: sync `web/portal` to `/home/m2web/portal-src` (no `node_modules`, `dist`, `.env*`), then `/home/m2web/deploy_portal.sh` (tests + build in a scratch copy, then swaps). Secrets live only in `/root/.metin2/portal.env` (root, 600): DB password (`portal@192.168.122.1`, SELECT/INSERT on `account.account` only) and the Turnstile secret (widget `metin2-portal`, site key `0x4AAAAAAFYZbZBCwl5IYp-B`).
 - Auto mode refuses VM service restarts and Traefik/IaC changes even with allow rules; prepare a script and hand those steps to the user.
 
