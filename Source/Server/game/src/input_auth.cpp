@@ -20,12 +20,13 @@ namespace
 		int		iCount;
 		time_t	tWindowEnd;
 		time_t	tLockedUntil;
+		time_t	tLastFailure;
 		int		iLocks;
 	};
 
 	const int LOGIN_FAILURE_LIMIT_PER_ACCOUNT_SOURCE = 5;
-	const int LOGIN_FAILURE_LIMIT_PER_ACCOUNT = 30;
 	const int LOGIN_FAILURE_LIMIT_PER_HOST = 20;
+	const int LOGIN_FAILURE_LIMIT_PER_ACCOUNT = 30;
 	const time_t LOGIN_FAILURE_WINDOW = 300;
 	const time_t LOGIN_FAILURE_BACKOFF_RESET = 3600;
 	const int LOGIN_FAILURE_MAX_BACKOFF_STEPS = 4;
@@ -45,28 +46,44 @@ namespace
 		return AccountKey(c_szLogin) + "@" + d->GetHostName();
 	}
 
+	std::string HostKey(LPDESC d)
+	{
+		return std::string("h:") + d->GetHostName();
+	}
+
 	bool IsLocked(const std::string& stKey)
 	{
 		auto it = s_mapLoginFailures.find(stKey);
 		return it != s_mapLoginFailures.end() && it->second.tLockedUntil > get_global_time();
 	}
 
-	void AddFailure(const std::string& stKey, int iLimit)
+	bool FailedRecently(const std::string& stKey)
+	{
+		auto it = s_mapLoginFailures.find(stKey);
+		return it != s_mapLoginFailures.end() && it->second.tLastFailure + LOGIN_FAILURE_WINDOW > get_global_time();
+	}
+
+	void EvictStale(time_t tNow)
+	{
+		for (auto it = s_mapLoginFailures.begin(); it != s_mapLoginFailures.end();)
+		{
+			if (it->second.tWindowEnd <= tNow && it->second.tLockedUntil + LOGIN_FAILURE_BACKOFF_RESET <= tNow)
+				it = s_mapLoginFailures.erase(it);
+			else
+				++it;
+		}
+	}
+
+	void AddFailure(const std::string& stKey, int iLimit, bool bBackoff)
 	{
 		const time_t tNow = get_global_time();
 
 		if (s_mapLoginFailures.size() >= LOGIN_FAILURE_MAX_ENTRIES)
-		{
-			for (auto it = s_mapLoginFailures.begin(); it != s_mapLoginFailures.end();)
-			{
-				if (it->second.tWindowEnd <= tNow && it->second.tLockedUntil <= tNow)
-					it = s_mapLoginFailures.erase(it);
-				else
-					++it;
-			}
-		}
+			EvictStale(tNow);
 
 		SLoginFailures& r = s_mapLoginFailures[stKey];
+		r.tLastFailure = tNow;
+
 		if (r.tWindowEnd <= tNow)
 		{
 			r.iCount = 0;
@@ -76,30 +93,47 @@ namespace
 		if (r.tLockedUntil + LOGIN_FAILURE_BACKOFF_RESET <= tNow)
 			r.iLocks = 0;
 
-		if (++r.iCount >= iLimit)
+		if (++r.iCount < iLimit)
+			return;
+
+		r.iCount = 0;
+		if (bBackoff)
 		{
 			r.iLocks = MIN(r.iLocks + 1, LOGIN_FAILURE_MAX_BACKOFF_STEPS);
 			r.tLockedUntil = tNow + LOGIN_FAILURE_WINDOW * (1 << (r.iLocks - 1));
-			r.iCount = 0;
 		}
+		else
+			r.tLockedUntil = tNow + LOGIN_FAILURE_WINDOW;
 	}
 }
 
 bool IsLoginThrottled(LPDESC d, const char* c_szLogin)
 {
-	if (IsLocked(AccountSourceKey(d, c_szLogin)) || IsLocked(AccountKey(c_szLogin)))
+	const std::string stSource = AccountSourceKey(d, c_szLogin);
+	const bool bProxied = IsTrustedProxyIP(d->GetHostName());
+
+	if (IsLocked(stSource))
 		return true;
 
-	return !IsTrustedProxyIP(d->GetHostName()) && IsLocked(std::string("h:") + d->GetHostName());
+	if (!bProxied && IsLocked(HostKey(d)))
+		return true;
+
+	// The account-wide lock only stops sources that already failed: the owner,
+	// coming from a clean address, can always log in, while a distributed
+	// attack gets one try per new address until the lock expires.
+	if (IsLocked(AccountKey(c_szLogin)))
+		return FailedRecently(stSource) || (!bProxied && FailedRecently(HostKey(d)));
+
+	return false;
 }
 
 void OnLoginFailed(LPDESC d, const char* c_szLogin)
 {
-	AddFailure(AccountSourceKey(d, c_szLogin), LOGIN_FAILURE_LIMIT_PER_ACCOUNT_SOURCE);
-	AddFailure(AccountKey(c_szLogin), LOGIN_FAILURE_LIMIT_PER_ACCOUNT);
+	AddFailure(AccountSourceKey(d, c_szLogin), LOGIN_FAILURE_LIMIT_PER_ACCOUNT_SOURCE, true);
+	AddFailure(AccountKey(c_szLogin), LOGIN_FAILURE_LIMIT_PER_ACCOUNT, false);
 
 	if (!IsTrustedProxyIP(d->GetHostName()))
-		AddFailure(std::string("h:") + d->GetHostName(), LOGIN_FAILURE_LIMIT_PER_HOST);
+		AddFailure(HostKey(d), LOGIN_FAILURE_LIMIT_PER_HOST, true);
 }
 
 void OnLoginSucceeded(LPDESC d, const char* c_szLogin)
