@@ -180,6 +180,19 @@ tarayıcı ─https─▶ Traefik (coolify-proxy, Let's Encrypt)
 - Kopyalar: `Tools/web/deploy/` (`deploy.sh`, `site-nginx.conf`, `metin2.yaml`). Yeniden yayın: container'da `webclient.py package` + `tools/bridge_config.py --site https://metin2.kaanakin.dev`, host'ta `deploy.sh`.
 - Container'lar `--restart unless-stopped`; VM autostart açık → host yeniden başlarsa her şey kalkar.
 
+### Cloudflare (2026-10-16) — proxy açık
+
+Zone `kaanakin.dev`, **Free plan**; sadece ücretsiz özellikler (fatura riski yok). Zone'da tek kayıt var: `A metin2 → 88.99.1.151`, proxied.
+
+- Cache Rules (`http_request_cache_settings`), ikisi birbirini dışlıyor:
+  1. `/corpus/*.bin` (`manifest.bin` hariç) + `?v=` ile istenen `client.js/.wasm/.data` → cache, edge ve tarayıcı TTL'i origin'den (1 yıl).
+  2. metin2 host'unda geri kalan her şey (html, `manifest.bin`, `order.txt`, `sw.js`, `preload.js`, `/to/` bridge, `/asan/`) → cache yok.
+- Zone ayarları: SSL **Full (strict)** (origin'de Let's Encrypt), min TLS 1.2, Browser Cache TTL **0 = origin başlıklarına uy** (4 saat kalsaydı yeni `client.html` geç gelirdi), Smart Tiered Cache açık.
+- **Always Use HTTPS kapalı kalmalı**: Traefik Let's Encrypt'i HTTP-01 ile (port 80) yeniliyor, yönlendirmeyi Traefik yapıyor.
+- Doğrulandı: html/manifest/order/sw → `DYNAMIC`; wasm/data/chunk → `MISS` sonra `HIT`; WebSocket site origin'i `101`, yabancı origin `401`.
+- Yayında purge gerekmez: değişen motor dosyaları yeni `?v=` alır, chunk adları içerik hash'i.
+- Risk: Cloudflare CDN şartları büyük non-HTML dosya sunumunu kısıtlayabiliyor (corpus 5.5 GB). ~10 oyuncuda sorun beklenmiyor; büyürse corpus R2'ye (egress ücretsiz, ama ücretsiz kotanın üstü faturalı) taşınabilir.
+
 ### Canlı testte bulunan ve düzeltilen sorunlar (tarayıcıda, sırayla)
 
 1. `__builtin__` → `builtins` (fork aynı satırı `UserInterface.cpp`'de de kullanıyor).

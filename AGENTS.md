@@ -27,7 +27,8 @@ browser ─https─▶ Traefik (coolify-proxy) ─┬─ /      ─▶ m2web-sit
                                                                     MariaDB, db 15000, auth 30001, ch99 30003, ch1 30101/30103/30105
 ```
 
-- DNS for `metin2.kaanakin.dev` is in a Cloudflare zone (Free plan); the record is currently **DNS-only** (not proxied). The Cloudflare MCP server (`.mcp.json`) can manage it.
+- `metin2.kaanakin.dev` is **proxied by Cloudflare** (Free plan, zone `kaanakin.dev`), managed through the Cloudflare MCP server (`.mcp.json`). Settings and why: `CALISMA_NOTLARI.md` §6.
+- Cloudflare: stay on free features only. Never enable anything metered (Argo, Load Balancing, paid add-ons, R2/Workers beyond free limits) without the user's explicit OK. Keep "Always Use HTTPS" off at the edge: Traefik renews Let's Encrypt with the HTTP-01 challenge on port 80.
 - The host also runs unrelated production services (mailcow, Coolify apps, tunnels). Never touch them; add new Traefik config as separate files under `/data/coolify/proxy/dynamic/`.
 - Game ports are not reachable from the internet; the bridge only accepts the site origin and an allowlist of `ip:port` targets.
 
@@ -35,6 +36,7 @@ browser ─https─▶ Traefik (coolify-proxy) ─┬─ /      ─▶ m2web-sit
 
 Understand this before changing nginx, the service worker or adding a CDN:
 
+- Cloudflare cache rules mirror the origin headers: hashed chunks and `?v=` engine files are cached at the edge; everything else on the host is never cached. Nothing needs purging on publish. A new unhashed file that should be cached needs a rule change.
 - `client.html` is `no-cache` and stamps `client.js/.wasm/.data` and `preload.js` with `?v=<build time>`; those are cached for a year. A new build is picked up because the HTML changes.
 - Game files are packed into a content-addressed **corpus**: `corpus/<md5>.bin` 4 MB chunks (`immutable`), plus `corpus/manifest.bin` and `corpus/order.txt` (not hashed, so `no-cache`). ~5.5 GB, ~1370 files.
 - The engine reads chunks with **synchronous XHR** (`compat/webfs_web.cpp`), which bypasses the service worker. `sw.js` + `preload.js` only serve the async prefetch/background downloads from Cache Storage (`m2w-corpus`). What actually limits blocking downloads is the chunk memory budget (`runtime.js`, `?corpusMB`).
