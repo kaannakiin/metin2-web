@@ -1,11 +1,11 @@
 <ScriptFile>
-	<CreateEterPack ArchivePath="../../Client/pack/bgm" BuildKeyfile="false" >
-		<File ArchivedPath="bgm/characterselect.mp3"><![CDATA[../binary_unpack/bgm/characterselect.mp3]]></File>
-		<File ArchivedPath="bgm/desert.mp3"><![CDATA[../binary_unpack/bgm/desert.mp3]]></File>
-		<File ArchivedPath="bgm/enter_the_east.mp3"><![CDATA[../binary_unpack/bgm/enter_the_east.mp3]]></File>
-		<File ArchivedPath="bgm/login_window.mp3"><![CDATA[../binary_unpack/bgm/login_window.mp3]]></File>
-		<File ArchivedPath="bgm/m2bg.mp3"><![CDATA[../binary_unpack/bgm/m2bg.mp3]]></File>
-		<File ArchivedPath="bgm/shadow_dungeon.mp3"><![CDATA[../binary_unpack/bgm/shadow_dungeon.mp3]]></File>
-		<File ArchivedPath="bgm/wedding.mp3"><![CDATA[../binary_unpack/bgm/wedding.mp3]]></File>
+	<CreateEterPack ArchivePath="../../content/client/runtime/pack/bgm" BuildKeyfile="false" >
+		<File ArchivedPath="bgm/characterselect.mp3"><![CDATA[../../content/client/packs/bgm/characterselect.mp3]]></File>
+		<File ArchivedPath="bgm/desert.mp3"><![CDATA[../../content/client/packs/bgm/desert.mp3]]></File>
+		<File ArchivedPath="bgm/enter_the_east.mp3"><![CDATA[../../content/client/packs/bgm/enter_the_east.mp3]]></File>
+		<File ArchivedPath="bgm/login_window.mp3"><![CDATA[../../content/client/packs/bgm/login_window.mp3]]></File>
+		<File ArchivedPath="bgm/m2bg.mp3"><![CDATA[../../content/client/packs/bgm/m2bg.mp3]]></File>
+		<File ArchivedPath="bgm/shadow_dungeon.mp3"><![CDATA[../../content/client/packs/bgm/shadow_dungeon.mp3]]></File>
+		<File ArchivedPath="bgm/wedding.mp3"><![CDATA[../../content/client/packs/bgm/wedding.mp3]]></File>
 	</CreateEterPack>
 </ScriptFile>

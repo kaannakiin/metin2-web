@@ -97,7 +97,7 @@ Farm mob’ların çoğu proto’da zaten 0 yang; asıl yang metin + (kaplı) bo
 | +7→+8 | 40 | 55 | orta |
 | +8→+9 | 30 (sert zincirde 10) | 35 (sertte 25) | uğraş |
 
-Dosyalar: `sql/seed_shop_refine_pet.sql`, `sql/update_mid_pvp_refine.sql` (canlı DB), `Tools/binary_unpack/locale/common/refine_table.txt` (client %).
+Dosyalar: `content/server/sql/seed_shop_refine_pet.sql`, `content/server/sql/update_mid_pvp_refine.sql` (canlı DB), `content/client/packs/locale/common/refine_table.txt` (client %).
 
 **Average (efsun):**
 - `ENABLE_MULTI_AFFIX_APPLY_SYSTEM` zaten açık → add attribute ile 5 bonus tek seferde.

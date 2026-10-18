@@ -1,1 +1,0 @@
-content/server/sql

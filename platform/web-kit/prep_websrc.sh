@@ -1,15 +1,8 @@
 #!/bin/bash
 # Runs inside the m2web-build container: /work/anka2/apps/client -> /work/websrc
-# Uses -L so a compat symlink at Source/Binary is never copied as a bare link.
 set -euo pipefail
 cd /work
-if [ ! -d websrc ]; then
-    if [ -d anka2/apps/client ]; then
-        cp -aL anka2/apps/client websrc
-    else
-        cp -aL anka2/Source/Binary websrc
-    fi
-fi
+[ -d websrc ] || cp -aL anka2/apps/client websrc
 
 L=websrc/source/UserInterface/Locale_inc.h
 for f in ENABLE_FOXFS_ENCRYPT ENABLE_DIRECTX9_UPDATE ENABLE_LOAD_INDEX_BINARY \

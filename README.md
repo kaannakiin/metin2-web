@@ -34,7 +34,7 @@ Bu proje, Anka2 MMORPG oyunu için geliştirilmiş sunucu ve istemci kaynak kodl
 ### Client (Binary)
 
 ```
-Source/Binary/
+apps/client/
 ├── source/                    # Kaynak kodlar
 │   ├── UserInterface/        # Ana kullanıcı arayüzü modülü (182 dosya)
 │   ├── GameLib/              # Oyun mantığı kütüphanesi (98 dosya)
@@ -75,7 +75,7 @@ Source/Binary/
 ### Server
 
 ```
-Source/Server/
+apps/server/
 ├── game/                     # Oyun sunucusu
 │   └── src/                  # Kaynak kodlar (316 dosya)
 │       ├── char.cpp          # Karakter yönetimi
@@ -124,7 +124,7 @@ pkg install boost-all cryptopp ccache llvm-devel gmake devil lzo2 \
 
 **Build Komutları:**
 ```bash
-cd Source/Server/game/src
+cd apps/server/game/src
 make clean
 make
 ```

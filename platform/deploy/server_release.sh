@@ -18,9 +18,8 @@ stage() {
     tar -C "$RELEASE" -cf - apps/server | $VM '
         set -e
         rm -rf /usr/metin2-next
-        mkdir -p /usr/metin2-next/out /usr/metin2-next/Source
+        mkdir -p /usr/metin2-next/out
         tar -x -C /usr/metin2-next -f -
-        ln -sfn ../apps/server /usr/metin2-next/Source/Server
         if [ -d /usr/metin2/apps/server ]; then
             LIVE=/usr/metin2/apps/server
         else

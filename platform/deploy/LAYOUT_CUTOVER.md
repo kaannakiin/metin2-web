@@ -1,6 +1,6 @@
 # Layout cutover (VM) — run by hand
 
-Repo side is done on `main` (tag `pre-layout-20261018` = pre-move). Live FreeBSD tree is still `/usr/metin2/Source/Server` until you install.
+Repo is hard-cut (tags: `pre-layout-20261018` = pre-move, `pre-hardcut-20261018` = pre-symlink-drop). Live FreeBSD tree may still be `/usr/metin2/Source/Server` until you install; after install it is only `/usr/metin2/apps/server`.
 
 Do **not** skip the backup. `install` restarts `metin2` and the bridge.
 
@@ -29,5 +29,4 @@ After a successful install, `gmake` on the VM:
 
 ```sh
 cd /usr/metin2/apps/server && gmake -j4 all
-# Source/Server is a symlink to apps/server
 ```

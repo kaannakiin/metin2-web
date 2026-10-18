@@ -1,5 +1,5 @@
 <ScriptFile>
-	<CreateEterPackXml Input="../binary_unpack/etc:d:/ymir work/" ArchivePath="../../Client/pack/etc" XmlPath="xml/etc_create.xml">
+	<CreateEterPackXml Input="../../content/client/packs/etc:d:/ymir work/" ArchivePath="../../content/client/runtime/pack/etc" XmlPath="xml/etc_create.xml">
 		<Ignore Pattern="[a-zA-z0-9]+.psd" />
 		<Ignore Pattern="[a-zA-z0-9]+.uas" />
 		<Ignore Pattern="[a-zA-z0-9]+.pdn" />

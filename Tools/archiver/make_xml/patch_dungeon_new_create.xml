@@ -1,5 +1,5 @@
 <ScriptFile>
-	<CreateEterPackXml Input="../binary_unpack/patch_dungeon_new" ArchivePath="../../Client/pack/patch_dungeon_new" XmlPath="xml/patch_dungeon_new_create.xml">
+	<CreateEterPackXml Input="../../content/client/packs/patch_dungeon_new" ArchivePath="../../content/client/runtime/pack/patch_dungeon_new" XmlPath="xml/patch_dungeon_new_create.xml">
 		<Ignore Pattern="*.psd" />
 		<Ignore Pattern="*.uas" />
 		<Ignore Pattern="*.pdn" />

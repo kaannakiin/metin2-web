@@ -1,5 +1,5 @@
 <ScriptFile>
-	<CreateEterPackXml Input="../binary_unpack/best_system:" ArchivePath="../../Client/pack/best_system" XmlPath="xml/best_system_create.xml">
+	<CreateEterPackXml Input="../../content/client/packs/best_system:" ArchivePath="../../content/client/runtime/pack/best_system" XmlPath="xml/best_system_create.xml">
 		<Ignore Pattern="[a-zA-z0-9]+.csv" />
 		<Ignore Pattern="[a-zA-z0-9]+error_lookup.py" />
 		<Ignore Pattern="[a-zA-z0-9]+test[a-zA-z0-9]+.py" />

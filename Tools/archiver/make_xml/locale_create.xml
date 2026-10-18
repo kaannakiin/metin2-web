@@ -1,5 +1,5 @@
 <ScriptFile>
-	<CreateEterPackXml Input="../binary_unpack/locale:locale/" ArchivePath="../../Client/pack/locale" XmlPath="xml/locale_create.xml">
+	<CreateEterPackXml Input="../../content/client/packs/locale:locale/" ArchivePath="../../content/client/runtime/pack/locale" XmlPath="xml/locale_create.xml">
 		<Ignore Pattern="[a-zA-z0-9]+.csv" />
 		<Ignore Pattern="[a-zA-z0-9]+.png" />
 		<Ignore Pattern="[a-zA-z0-9]+.psd" />

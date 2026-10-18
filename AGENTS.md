@@ -23,8 +23,9 @@ Real paths (edit these):
 - `platform/deploy` — Traefik route (`metin2.yaml`), nginx, `deploy.sh`, `publish.sh`, `publish_cdn.sh`, `release_upload.sh`, `server_release.sh`.
 - `platform/cdn` — the `metin2-corpus` Worker (assets only); host copy in `/home/m2web/cdn/`.
 - `vendor/` — third-party / unused-in-day-to-day (`jpeg-9d`, `FoxFS_Src`, `DumpProto`).
+- `Tools/archiver`, `Tools/dump_proto` — pack XML / proto dump tools (archiver CDATA paths point at `content/client/packs`).
 
-Compat symlinks (one cycle; do not treat as source of truth): `Source/Server` → `apps/server`, `Source/Binary` → `apps/client`, `Client` → `content/client/runtime`, `Tools/binary_unpack` → `content/client/packs`, `Tools/web/{kit,deploy,cdn}` → `platform/…`, `web/portal` → `apps/portal`, `home` → `runtime/freebsd`, `sql` → `content/server/sql`. `git archive` does not follow them — release scripts list real paths.
+No old-name aliases (`Source/`, `Client/`, `home/`, `sql/`, `web/portal`, `Tools/binary_unpack`, `Tools/web/`). Rollback tags: `pre-layout-20261018`, `pre-hardcut-20261018`.
 
 - Portal → game auto-login: `sessionStorage["m2w.autologin"]` (portal `src/lib/launch.ts`) → `client.html` (template `platform/web-kit/site/client.html`) moves it into `/m2w_autologin` in the engine's memory FS in `Module.preRun` → `content/client/packs/root/intrologin.py` reads, deletes and logs in. Changing either side needs no engine rebuild: root pack + `scripts rewrite uiscript data link` + `package`.
 
@@ -73,7 +74,7 @@ Server (on the VM):
 ```sh
 ssh root@88.99.1.151                                   # host
 ssh -i /root/.ssh/metin2_vm root@192.168.122.10        # VM, from the host
-# After layout cutover: apps/server. Until then live tree may still be Source/Server (symlink also present post-install).
+# Until first layout install, live tree may still be /usr/metin2/Source/Server on the VM.
 cd /usr/metin2/apps/server && gmake -j4 all            # binaries -> /usr/home/share/bin/{db,game}
 service metin2 start|stop|status
 ```

@@ -1,6 +1,6 @@
 # Repository architecture
 
-Canonical layout after the 2026-10 layout migration. Old path names remain as **compat symlinks** for one cycle; edit the real paths only.
+Canonical layout after the 2026-10 hard-cut. There are no compat symlinks for old names — edit these paths only. Rollback tag: `pre-hardcut-20261018`.
 
 ## Tree
 
@@ -12,7 +12,7 @@ apps/
 content/
   client/
     packs/                # unpacked assets (icons, maps, root UI, …)
-    runtime/              # Client/ pack tree + configs for the kit
+    runtime/              # pack output tree + configs for the kit
   server/
     sql/                  # schema, migrations, seeds
 runtime/
@@ -24,26 +24,9 @@ platform/
   make_eterpacks.py
 vendor/                   # jpeg-9d, FoxFS_Src, DumpProto
 Tools/
-  archiver/               # pack XML (still uses ../binary_unpack via symlink)
+  archiver/               # pack XML → ../../content/client/packs
   dump_proto/
 ```
-
-## Compat symlinks
-
-| Symlink | Target |
-|---------|--------|
-| `Source/Server` | `apps/server` |
-| `Source/Binary` | `apps/client` |
-| `Client` | `content/client/runtime` |
-| `Tools/binary_unpack` | `content/client/packs` |
-| `Tools/web/kit` | `platform/web-kit` |
-| `Tools/web/deploy` | `platform/deploy` |
-| `Tools/web/cdn` | `platform/cdn` |
-| `web/portal` | `apps/portal` |
-| `home` | `runtime/freebsd` |
-| `sql` | `content/server/sql` |
-
-`git archive` does **not** dereference symlinks. `platform/deploy/release_upload.sh` therefore lists `apps/server` and `platform/…` explicitly.
 
 ## Where to change what
 
@@ -59,10 +42,8 @@ Tools/
 
 ## VM cutover
 
-Until the first `server_release.sh install` from this layout, the live FreeBSD tree may still be `/usr/metin2/Source/Server`. Staging uses `/usr/metin2-next/apps/server` and adds `Source/Server` → `apps/server` on the next tree. Backup helper: `platform/deploy/layout_cutover_backup.sh` (host, as root).
+Until the first `server_release.sh install` from this layout, the live FreeBSD tree may still be `/usr/metin2/Source/Server`. Staging uses only `/usr/metin2-next/apps/server`. Backup helper: `platform/deploy/layout_cutover_backup.sh` (host, as root). After install: `/usr/metin2/apps/server`.
 
 ## Follow-ups (not done yet)
 
-- Remove compat symlinks once muscle memory and host mounts use real paths.
 - Split `runtime/freebsd/share/{locale,conf}` into `content/server/` and generate the runtime tree.
-- Rewrite `Tools/archiver/xml/*` to point at `content/client/packs` without the symlink.

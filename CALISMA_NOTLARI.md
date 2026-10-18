@@ -6,11 +6,11 @@ Bu dosya, yapılanları ve kaldığımız yeri kaydeder. Şifreler burada YOK; n
 
 ### Repo klasör düzeni (2026-10-18)
 
-- Kaynak ağaç: `apps/`, `content/`, `runtime/freebsd/`, `platform/`, `vendor/` — özet: `docs/ARCHITECTURE.md`, agent kuralları: `AGENTS.md`.
-- Eski path'ler (`Source/Server`, `Source/Binary`, `Client`, `Tools/binary_unpack`, `Tools/web/*`, `web/portal`, `home`, `sql`) **compat symlink**; düzenleme gerçek path'te yapılır.
-- Tag: `pre-layout-20261018` (taşıma öncesi). Branch: `layout/apps-content-platform`.
-- **VM hâlâ eski ağaçta olabilir** (`/usr/metin2/Source/Server`) ta ki bakım penceresinde `platform/deploy/layout_cutover_backup.sh` + `release_upload` + `server_release.sh stage/build/install` çalıştırılana kadar. Install sonrası live: `/usr/metin2/apps/server` (+ `Source/Server` symlink).
-- Release script path'leri: `platform/deploy/release_upload.sh`, `platform/deploy/server_release.sh` (artık `apps/server` / `platform/web-kit` arşivler).
+- Kaynak ağaç (hard-cut, tek isim): `apps/`, `content/`, `runtime/freebsd/`, `platform/`, `vendor/` — özet: `docs/ARCHITECTURE.md`, agent kuralları: `AGENTS.md`.
+- Compat symlink yok. Eski isimler (`Source/`, `Client/`, `home/`, `sql/`, `Tools/binary_unpack`, `Tools/web/`, `web/portal`) kaldırıldı.
+- Tag'ler: `pre-layout-20261018` (taşıma öncesi), `pre-hardcut-20261018` (symlink drop öncesi).
+- **VM hâlâ eski ağaçta olabilir** (`/usr/metin2/Source/Server`) ta ki bakım penceresinde `platform/deploy/layout_cutover_backup.sh` + `release_upload` + `server_release.sh stage/build/install` çalıştırılana kadar. Install sonrası live: yalnızca `/usr/metin2/apps/server`.
+- Release script path'leri: `platform/deploy/release_upload.sh`, `platform/deploy/server_release.sh`.
 
 ---
 
