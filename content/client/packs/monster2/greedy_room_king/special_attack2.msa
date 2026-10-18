@@ -1,0 +1,34 @@
+ScriptType               MotionData
+
+MotionFileName           "D:\Ymir Work\monster2\greedy_room_king\special_attack2.GR2"
+MotionDuration           1.666667
+Accumulation           0.00	0.00	0.00
+
+Group MotionEventData
+{
+    MotionEventDataCount     2
+    Group Event00
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Bip01 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/greedy_room_king_s2_making.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event01
+    {
+        MotionEventType      1
+        StartingTime         0.048662
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "Bip01 Prop1"
+        FollowingEnable      1
+        EffectFileName       "d:/ymir work/effect/monster2/greedy_room_king_s2_making2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+}

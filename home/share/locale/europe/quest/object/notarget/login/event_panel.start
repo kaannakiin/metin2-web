@@ -1,2 +1,0 @@
-if pc . get_gm_level ( ) >= 4 then send_letter ( "GM: Etkinlik Paneli" ) 
- return end 

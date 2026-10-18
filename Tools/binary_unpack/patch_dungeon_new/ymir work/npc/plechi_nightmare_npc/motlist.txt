@@ -1,3 +1,0 @@
-GENERAL WAIT stay00.msa 70
-GENERAL WAIT1 stay01.msa 30
-GENERAL DEAD dead.msa 100

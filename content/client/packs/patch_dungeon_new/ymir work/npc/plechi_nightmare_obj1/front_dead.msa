@@ -1,0 +1,22 @@
+ScriptType               MotionData
+
+MotionFileName           "D:/Ymir Work/npc/plechi_nightmare_obj1/front_dead.GR2"
+MotionDuration           3.000000
+Accumulation             0.00	0.00	0.00
+
+Group MotionEventData
+{
+    MotionEventDataCount     1
+    Group Event00
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Dummy01"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/npc/nightmare_obj1_dead.mse"
+        EffectPosition       0.000000 -450.000000 290.000000
+    }
+}

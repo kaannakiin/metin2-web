@@ -1,0 +1,513 @@
+ScriptType               MotionData
+
+MotionFileName           "D:\Ymir Work\monster2\moonlight_king\wait.GR2"
+MotionDuration           2.000000
+Accumulation           0.00	0.00	0.00
+
+Group MotionEventData
+{
+    MotionEventDataCount     30
+    Group Event00
+    {
+        MotionEventType      1
+        StartingTime         2.000000
+        
+        IndependentFlag      0
+        IsTerrainAttach      0
+        AttachingEnable      0
+        AttachingBoneName    "Bip01 L Toe02"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_blow.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event01
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      1
+        IsTerrainAttach      1
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_drop.mse"
+        EffectPosition       -3000.000000 0.000000 0.000000
+    }
+    Group Event02
+    {
+        MotionEventType      4
+        StartingTime         2.000000
+        DuringTime           0.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.000000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         -3000.000000 0.000000 0.000000
+        }
+    }
+    Group Event03
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      1
+        IsTerrainAttach      1
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_drop.mse"
+        EffectPosition       3000.000000 0.000000 0.000000
+    }
+    Group Event04
+    {
+        MotionEventType      4
+        StartingTime         2.000000
+        DuringTime           0.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.000000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         3000.000000 0.000000 0.000000
+        }
+    }
+    Group Event05
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      1
+        IsTerrainAttach      1
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_drop.mse"
+        EffectPosition       0.000000 -2400.000000 0.000000
+    }
+    Group Event06
+    {
+        MotionEventType      4
+        StartingTime         2.000000
+        DuringTime           0.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.000000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         0.000000 -2400.000000 0.000000
+        }
+    }
+    Group Event07
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      1
+        IsTerrainAttach      1
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_drop.mse"
+        EffectPosition       -3000.000000 3000.000000 0.000000
+    }
+    Group Event08
+    {
+        MotionEventType      4
+        StartingTime         2.000000
+        DuringTime           0.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.000000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         -3000.000000 3000.000000 0.000000
+        }
+    }
+    Group Event09
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      1
+        IsTerrainAttach      1
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_drop.mse"
+        EffectPosition       3000.000000 3000.000000 0.000000
+    }
+    Group Event10
+    {
+        MotionEventType      4
+        StartingTime         2.000000
+        DuringTime           0.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.000000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         3000.000000 3000.000000 0.000000
+        }
+    }
+    Group Event11
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      1
+        IsTerrainAttach      1
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_drop.mse"
+        EffectPosition       -3000.000000 1400.000000 0.000000
+    }
+    Group Event12
+    {
+        MotionEventType      4
+        StartingTime         2.000000
+        DuringTime           0.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.000000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         -3000.000000 1400.000000 0.000000
+        }
+    }
+    Group Event13
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      1
+        IsTerrainAttach      1
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_drop.mse"
+        EffectPosition       3000.000000 1400.000000 0.000000
+    }
+    Group Event14
+    {
+        MotionEventType      4
+        StartingTime         2.000000
+        DuringTime           0.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.000000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         3000.000000 1400.000000 0.000000
+        }
+    }
+    Group Event15
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      1
+        IsTerrainAttach      1
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_drop.mse"
+        EffectPosition       -2000.000000 -1800.000000 0.000000
+    }
+    Group Event16
+    {
+        MotionEventType      4
+        StartingTime         2.000000
+        DuringTime           0.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.000000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         -2000.000000 -1800.000000 0.000000
+        }
+    }
+    Group Event17
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      1
+        IsTerrainAttach      1
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_drop.mse"
+        EffectPosition       2000.000000 -1800.000000 0.000000
+    }
+    Group Event18
+    {
+        MotionEventType      4
+        StartingTime         2.000000
+        DuringTime           0.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.000000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         2000.000000 -1800.000000 0.000000
+        }
+    }
+    Group Event19
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      1
+        IsTerrainAttach      1
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_drop.mse"
+        EffectPosition       0.000000 1400.000000 0.000000
+    }
+    Group Event20
+    {
+        MotionEventType      4
+        StartingTime         2.000000
+        DuringTime           0.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.000000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         0.000000 1400.000000 0.000000
+        }
+    }
+    Group Event21
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      1
+        IsTerrainAttach      1
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_drop.mse"
+        EffectPosition       0.000000 -600.000000 0.000000
+    }
+    Group Event22
+    {
+        MotionEventType      4
+        StartingTime         2.000000
+        DuringTime           0.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.000000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         0.000000 -600.000000 0.000000
+        }
+    }
+    Group Event23
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      1
+        IsTerrainAttach      1
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_drop.mse"
+        EffectPosition       0.000000 3400.000000 0.000000
+    }
+    Group Event24
+    {
+        MotionEventType      4
+        StartingTime         2.000000
+        DuringTime           0.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.000000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         0.000000 3400.000000 0.000000
+        }
+    }
+    Group Event25
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      1
+        IsTerrainAttach      1
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_drop.mse"
+        EffectPosition       0.000000 -4600.000000 0.000000
+    }
+    Group Event26
+    {
+        MotionEventType      4
+        StartingTime         2.000000
+        DuringTime           0.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.000000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         0.000000 -4600.000000 0.000000
+        }
+    }
+    Group Event27
+    {
+        MotionEventType      1
+        StartingTime         0.030000
+        
+        IndependentFlag      0
+        IsTerrainAttach      0
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s3_making2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event28
+    {
+        MotionEventType      1
+        StartingTime         1.000000
+        
+        IndependentFlag      0
+        IsTerrainAttach      0
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_making.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event29
+    {
+        MotionEventType      2
+        StartingTime         1.990000
+        
+        DuringTime           0.500000
+        Power                300
+        AffectingRange       500
+    }
+}

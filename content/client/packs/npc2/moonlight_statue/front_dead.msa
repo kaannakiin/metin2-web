@@ -1,0 +1,33 @@
+ScriptType               MotionData
+
+MotionFileName           "D:\Ymir Work\npc2\moonlight_statue\front_dead.gr2"
+MotionDuration           6.333333
+
+Group MotionEventData
+{
+    MotionEventDataCount     2
+    Group Event00
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "eff"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_statue_loading.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event01
+    {
+        MotionEventType      1
+        StartingTime         5.190000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_statue_blow.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+}

@@ -1,0 +1,7 @@
+title subImage
+version 1.0
+image "public/akira_biolog/button.tga"
+left 0
+top 1
+right 198
+bottom 21

@@ -1,8 +1,16 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
-Son güncelleme: 2026-10-15. Hobi amaçlı, ~10 kişilik sunucu. **Ana hedef: oyunun tarayıcıda (WebAssembly) oynanması.**
+Son güncelleme: 2026-10-18. Hobi amaçlı, ~10 kişilik sunucu. **Ana hedef: oyunun tarayıcıda (WebAssembly) oynanması.**
 
 Bu dosya, yapılanları ve kaldığımız yeri kaydeder. Şifreler burada YOK; nerede durdukları yazılı.
+
+### Repo klasör düzeni (2026-10-18)
+
+- Kaynak ağaç: `apps/`, `content/`, `runtime/freebsd/`, `platform/`, `vendor/` — özet: `docs/ARCHITECTURE.md`, agent kuralları: `AGENTS.md`.
+- Eski path'ler (`Source/Server`, `Source/Binary`, `Client`, `Tools/binary_unpack`, `Tools/web/*`, `web/portal`, `home`, `sql`) **compat symlink**; düzenleme gerçek path'te yapılır.
+- Tag: `pre-layout-20261018` (taşıma öncesi). Branch: `layout/apps-content-platform`.
+- **VM hâlâ eski ağaçta olabilir** (`/usr/metin2/Source/Server`) ta ki bakım penceresinde `platform/deploy/layout_cutover_backup.sh` + `release_upload` + `server_release.sh stage/build/install` çalıştırılana kadar. Install sonrası live: `/usr/metin2/apps/server` (+ `Source/Server` symlink).
+- Release script path'leri: `platform/deploy/release_upload.sh`, `platform/deploy/server_release.sh` (artık `apps/server` / `platform/web-kit` arşivler).
 
 ---
 
@@ -366,4 +374,4 @@ Granny 2.11 (sürüm 7) dosyaları animasyon eğrilerini sıkıştırılmış `c
 
 - Plan ve durum tablosu (fazlar F0–F4, açık ayrıntılar orada, repoda değil): <https://claude.ai/code/artifact/d1cd7bf2-4024-462d-8172-403fad8de3e5>
 - F0 (client) yerelde hazır, henüz yayında değil: `LOCALE_CHAT`/`LOCALE_WHISPER`/`WHISPER` dinamik paket olarak kayıtlı (metin keserken `memory access out of bounds` çökmesinin muhtemel kök nedeni), `recv` -1'de okuma pozisyonu geri sarılmıyor, bozuk akışta client çökmek yerine giriş ekranına dönüyor, FPS sayacında sıfıra bölme düzeltildi.
-- Server + bridge yayını tek adımda (bridge PROXY satırı yazıyor, server onu bekliyor; biri yalnız giderse herkes düşer): Mac'te `Tools/web/deploy/release_upload.sh` (commit'lenmiş hali host'ta `/root/metin2-release`'e), host'ta `server_release.sh stage` → `build` → bakım penceresinde `install` (geri alma: `rollback`). Makefile'lar binary'yi her zaman `/usr/home/share/bin`'e taşıyor; `build` bu yüzden `GAMEDIR`/`DBDIR`'i `/usr/metin2-next/out`'a yönlendiriyor. VM CONFIG'lerine dosya kopyalanmaz (DB şifreleri farklı), sadece `TRUSTED_PROXY_IP` satırı eklenir.
+- Server + bridge yayını tek adımda (bridge PROXY satırı yazıyor, server onu bekliyor; biri yalnız giderse herkes düşer): Mac'te `platform/deploy/release_upload.sh` (commit'lenmiş hali host'ta `/root/metin2-release`'e), host'ta `/root/metin2-release/platform/deploy/server_release.sh stage` → `build` → bakım penceresinde `install` (geri alma: `rollback`). Layout cutover öncesi: `platform/deploy/layout_cutover_backup.sh`. Makefile'lar binary'yi her zaman `/usr/home/share/bin`'e taşıyor; `build` bu yüzden `GAMEDIR`/`DBDIR`'i `/usr/metin2-next/out`'a yönlendiriyor. VM CONFIG'lerine dosya kopyalanmaz (DB şifreleri farklı), sadece `TRUSTED_PROXY_IP` satırı eklenir.

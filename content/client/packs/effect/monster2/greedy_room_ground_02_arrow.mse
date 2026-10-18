@@ -1,0 +1,114 @@
+BoundingSphereRadius   8000.000000
+BoundingSpherePosition 0.000000 1500.000000 0.000000
+
+Group Mesh
+{
+    StartTime           0.000000
+    List TimeEventPosition
+    {
+        0.000000 "MOVING_TYPE_DIRECT" 0.000000 0.000000 20.000000
+    }
+    
+    StaticRotation      0.000000 0.000000 0.000000
+    MeshFileName               	"greedy_room_ground_02_arrow.mde"
+    MeshAnimationLoopEnable    	0
+    MeshAnimationLoopCount     	0
+    MeshAnimationFrameDelay    	0.040000
+    
+    MeshElementCount           	1
+    Group MeshElement00
+    {
+        BillboardType              	0
+        BlendingEnable             	1
+        BlendingSrcType            	5
+        BlendingDestType           	2
+        
+        TextureAnimationLoopEnable 	1
+        TextureAnimationFrameDelay 	0.020000
+        TextureAnimationStartFrame 	0
+        
+        ColorOperationType         	5
+        ColorFactor                	0.654902 0.262745 0.972549 1.000000
+        List TimeEventAlpha
+        {
+            0.000000 0.500000
+            0.500000 1.000000
+            1.000000 0.500000
+            1.000090 0.000000
+        }
+    }
+}
+Group Mesh
+{
+    StartTime           1.000000
+    List TimeEventPosition
+    {
+        0.000000 "MOVING_TYPE_DIRECT" 0.000000 0.000000 20.000000
+    }
+    
+    StaticRotation      0.000000 0.000000 0.000000
+    MeshFileName               	"greedy_room_ground_02_arrow.mde"
+    MeshAnimationLoopEnable    	0
+    MeshAnimationLoopCount     	0
+    MeshAnimationFrameDelay    	0.040000
+    
+    MeshElementCount           	1
+    Group MeshElement00
+    {
+        BillboardType              	0
+        BlendingEnable             	1
+        BlendingSrcType            	5
+        BlendingDestType           	2
+        
+        TextureAnimationLoopEnable 	1
+        TextureAnimationFrameDelay 	0.020000
+        TextureAnimationStartFrame 	0
+        
+        ColorOperationType         	5
+        ColorFactor                	0.654902 0.262745 0.972549 1.000000
+        List TimeEventAlpha
+        {
+            0.000000 0.500000
+            0.500000 1.000000
+            1.000000 0.500000
+            1.000090 0.000000
+        }
+    }
+}
+Group Mesh
+{
+    StartTime           2.008000
+    List TimeEventPosition
+    {
+        0.000000 "MOVING_TYPE_DIRECT" 0.000000 0.000000 20.000000
+    }
+    
+    StaticRotation      0.000000 0.000000 0.000000
+    MeshFileName               	"greedy_room_ground_02_arrow.mde"
+    MeshAnimationLoopEnable    	0
+    MeshAnimationLoopCount     	0
+    MeshAnimationFrameDelay    	0.040000
+    
+    MeshElementCount           	1
+    Group MeshElement00
+    {
+        BillboardType              	0
+        BlendingEnable             	1
+        BlendingSrcType            	5
+        BlendingDestType           	2
+        
+        TextureAnimationLoopEnable 	1
+        TextureAnimationFrameDelay 	0.020000
+        TextureAnimationStartFrame 	0
+        
+        ColorOperationType         	5
+        ColorFactor                	0.654902 0.262745 0.972549 1.000000
+        List TimeEventAlpha
+        {
+            0.000000 0.500000
+            0.500000 1.000000
+            1.000000 0.500000
+            1.000090 0.000000
+        }
+    }
+}

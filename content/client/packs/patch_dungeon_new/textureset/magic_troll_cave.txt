@@ -1,0 +1,54 @@
+TextureSet
+
+TextureCount 5
+
+Start Texture001
+    "d:\ymir work\zone\plechi_dungeon\magic_troll_cave\wall_tex.dds"
+    4.000000
+    4.000000
+    0.000000
+    0.000000
+    1
+    0
+    0
+End Texture001
+Start Texture002
+    "d:\ymir work\terrainmaps\plechi_env_map\dirt\dirt10.dds"
+    4.000000
+    4.000000
+    0.000000
+    0.000000
+    1
+    0
+    0
+End Texture002
+Start Texture003
+    "d:\ymir work\terrainmaps\plechi_env_map\fantasy\fantasy59.dds"
+    4.000000
+    4.000000
+    0.000000
+    0.000000
+    1
+    0
+    0
+End Texture003
+Start Texture004
+    "d:\ymir work\terrainmaps\plechi_env_map\field\field35.dds"
+    4.000000
+    4.000000
+    0.000000
+    0.000000
+    1
+    0
+    0
+End Texture004
+Start Texture005
+    "d:\ymir work\terrainmaps\plechi_env_map\fantasy\fantasy60.dds"
+    2.000000
+    2.000000
+    0.000000
+    0.000000
+    1
+    0
+    0
+End Texture005

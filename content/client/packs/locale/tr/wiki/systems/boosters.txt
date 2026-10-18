@@ -1,0 +1,27 @@
+[BANNER_IMG = d:/ymir work/ui/game/wiki/skins.tga]
+
+[COLOR=0xffd700; Y_PADDING=15; CENTER_ALIGN; FONT_SIZE=20]Güçlendiricileri Nereden Elde Edebilirsiniz?
+[COLOR=0xe65454;Y_PADDING=15;CENTER_ALIGN; FONT_SIZE=15]Güçlendiriciler Gaya marketinden veya Eþya Maðazasýndan elde edilebilir.
+[COLOR=0xe65454;Y_PADDING=15;CENTER_ALIGN; FONT_SIZE=15]Güçlendiriciler kalýcýdýr ancak kullanabilmek için süreleri dolu olmalýdýr.
+[COLOR=0xe65454;Y_PADDING=15;CENTER_ALIGN; FONT_SIZE=15]Süre, Gaya veya Eþya Maðazasýndan alýnabilen “Booster Time” ile uzatýlabilir.
+[COLOR=0xe65454;Y_PADDING=15;CENTER_ALIGN; FONT_SIZE=15]Bir güçlendiriciye en fazla 300 gün süre eklenebilir.
+
+
+[COLOR=0xffd700; Y_PADDING=15; CENTER_ALIGN; FONT_SIZE=20]Güçlendirici Bonus Listesi
+
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Saldýrý Hýzý
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Hareket Hýzý
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Büyü Hýzý
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Yaratýklara Karþý Güç
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Metin Taþlarýna Karþý Güç
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Bosslara Karþý Güç
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Deneyim (EXP) Bonusu
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Düþürme (Drop) Bonusu
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Yarý Ýnsanlara Karþý Güç
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Orklara Karþý Güç
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Hayvanlara Karþý Güç
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Mistikliklere Karþý Güç
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Ölümsüzlere Karþý Güç
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Þeytanlara Karþý Güç
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Maksimum HP Yenilenmesi
+[Y_PADDING=250;X_PADDING = 55;CENTER_ALIGN; FONT_SIZE=15]Maksimum SP Yenilenmesi

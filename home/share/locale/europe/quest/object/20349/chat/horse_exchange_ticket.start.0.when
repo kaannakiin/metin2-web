@@ -1,1 +1,0 @@
-return pc . countitem ( "50005" ) >= 1

@@ -1,0 +1,121 @@
+
+[BANNER_IMG = d:/ymir work/ui/game/wiki/bio_wall.tga]
+
+[COLOR=0xffd700;FONT_SIZE=15;Y_PADDING=-10]Ýçerik Listesi:
+[Y_PADDING=2;COLOR=0x63FFB2;FONT_SIZE=14]*1. Genel Bilgiler
+[COLOR=0x63FFB2;FONT_SIZE=14]*2. Görevler ve Ödüller
+[COLOR=0x63FFB2;FONT_SIZE=14]*3. Ödül Yeniden Seçimi
+
+
+[COLOR=0xffd700; Y_PADDING=15; CENTER_ALIGN; FONT_SIZE=14]1. Genel Bilgiler
+[Y_PADDING=10;X_PADDING = 55;FONT_SIZE=13]*Biyolog eþyalarý mini haritadaki veya F7 tuþundaki buton aracýlýðýyla teslim edilir.
+[Y_PADDING=2;X_PADDING = 55;FONT_SIZE=13]*Biyolog eþyalarý ayný paneldeki Biyolog dükkânýndan alýnabilir.
+[Y_PADDING=2;X_PADDING = 55;FONT_SIZE=13]*Her görevi tamamlamak için gereken taþlar ayný dükkândan temin edilir.
+[IMG=d:/ymir work/ui/game/wiki/emoji/btn_biolog_normal.png; Y=140; X=13]
+
+[COLOR=ef4f00;FONT_SIZE=15;Y_PADDING=5;X_PADDING=10]1.1 Biyolog Özel Eþyalarý
+[Y_PADDING=10;X_PADDING = 75;FONT_SIZE=13]*Biyolog görevlerini hýzlandýrmak için 2 özel eþya bulunmaktadýr:
+[Y_PADDING=2;X_PADDING = 75;FONT_SIZE=13]*Araþtýrmacýnýn Ýksiri baþarý olasýlýðýný artýrmak için kullanýlýr.
+[Y_PADDING=2;X_PADDING = 75;FONT_SIZE=13]*Biyolog Ýksiri bekleme süresini kaldýrmak için kullanýlýr.
+[ITEM=71035; IS_LINK=1; Y=209; X=5]
+[ITEM=30250; IS_LINK=1; Y=209; X=35]
+
+[COLOR=ef4f00;FONT_SIZE=15;Y_PADDING=5;X_PADDING=10]1.2 Biyolog Görevleri
+[Y_PADDING=10;X_PADDING = 75;FONT_SIZE=13]*Görevler 30. seviyeden 105. seviyeye kadar baþlar. Her görev tamamlandýðýnda
+[Y_PADDING=2;X_PADDING = 75;FONT_SIZE=13]oyuncuya kalýcý bir bonus ödül verir. Her görevi tamamlamak için
+[Y_PADDING=2;X_PADDING = 75;FONT_SIZE=13]Biyolog dükkânýndan son taþý almayý unutmayýn.
+
+
+[IMG=d:/ymir work/ui/game/wiki/divider_long.tga; Y=320; CENTER_ALIGN]
+
+[COLOR=0xffd700; Y_PADDING=15; CENTER_ALIGN; FONT_SIZE=15]2. Görevler ve Ödüller
+[COLOR=0xe65454;Y_PADDING=10;CENTER_ALIGN]*Bir sonraki görevi baþlatmak için önceki görevi tamamlamalýsýnýz.
+
+[COLOR=ef4f00;FONT_SIZE=15;;X_PADDING=10]Lv. 30 Biyolog Görevi
+[Y_PADDING=8;X_PADDING = 55;FONT_SIZE=13]*Eþya: 10x Ork Diþi
+[Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Bekleme süresi: 10 Dakika
+[COLOR=0x83E889;Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Ödül: Savunma +80
+[ITEM=300000; IS_LINK=1; Y=402; X=10]
+
+[COLOR=ef4f00;FONT_SIZE=15;;X_PADDING=10]Lv. 40 Biyolog Görevi
+[Y_PADDING=8;X_PADDING = 55;FONT_SIZE=13]*Eþya: 15x Lanet Kitabý
+[Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Bekleme süresi: 10 Dakika
+[COLOR=0x83E889;Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Ödül: Saldýrý Deðeri +60
+[ITEM=300001; IS_LINK=1; Y=470; X=10]
+
+[COLOR=ef4f00;FONT_SIZE=15;;X_PADDING=10]Lv. 50 Biyolog Görevi
+[Y_PADDING=8;X_PADDING = 55;FONT_SIZE=13]*Eþya: 15x Þeytan Hatýrasý
+[Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Bekleme süresi: 15 Dakika
+[COLOR=0x83E889;Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Ödül: Canavarlara karþý güçlü: +5%
+[ITEM=300002; IS_LINK=1; Y=535; X=10]
+
+[COLOR=ef4f00;FONT_SIZE=15;;X_PADDING=10]Lv. 60 Biyolog Görevi
+[Y_PADDING=8;X_PADDING = 55;FONT_SIZE=13]*Eþya: 20x Buz Mermeri
+[Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Bekleme süresi: 15 Dakika
+[COLOR=0x83E889;Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Ödül: Metin taþlarýna karþý güçlü: +5%
+[ITEM=300003; IS_LINK=1; Y=601; X=10]
+
+[COLOR=ef4f00;FONT_SIZE=15;;X_PADDING=10]Lv. 70 Biyolog Görevi
+[Y_PADDING=8;X_PADDING = 55;FONT_SIZE=13]*Eþya: 25x Zelkova Dalý
+[Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Bekleme süresi: 30 Dakika
+[COLOR=0x83E889;Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Ödül: Patronlara karþý güçlü: +5%
+[ITEM=300004; IS_LINK=1; Y=673; X=10]
+
+[COLOR=ef4f00;FONT_SIZE=15;;X_PADDING=10]Lv. 80 Biyolog Görevi
+[Y_PADDING=8;X_PADDING = 55;FONT_SIZE=13]*Eþya: 30x Tugyi’nin Tableti
+[Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Bekleme süresi: 30 Dakika
+[COLOR=0x83E889;Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Ödül: +1000 HP
+[ITEM=300005; IS_LINK=1; Y=733; X=10]
+
+[COLOR=ef4f00;FONT_SIZE=15;;X_PADDING=10]Lv. 85 Biyolog Görevi
+[Y_PADDING=8;X_PADDING = 55;FONT_SIZE=13]*Eþya: 40x Kýzýl Hayalet Aðacý Dalý
+[Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Bekleme süresi: 45 Dakika
+[COLOR=0x83E889;Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Ödül: Patronlara karþý güçlü: +8%
+[ITEM=300006; IS_LINK=1; Y=801; X=10]
+
+[COLOR=ef4f00;FONT_SIZE=15;;X_PADDING=10]Lv. 90 Biyolog Görevi
+[Y_PADDING=8;X_PADDING = 55;FONT_SIZE=13]*Eþya: 50x Liderin Notlarý
+[Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Bekleme süresi: 60 Dakika
+[COLOR=0x83E889;Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Ödül: Canavarlara karþý güçlü: +8%
+[ITEM=300007; IS_LINK=1; Y=862; X=10]
+
+[COLOR=ef4f00;FONT_SIZE=15;;X_PADDING=10]Lv. 92 Biyolog Görevi
+[Y_PADDING=8;X_PADDING = 55;FONT_SIZE=13]*Eþya: 10x Kötülük Mücevheri
+[Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Bekleme süresi: 2 Saat
+[COLOR=0x83E889;Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Ödül: Maks. HP +1200
+[ITEM=300008; IS_LINK=1; Y=933; X=10]
+
+[COLOR=ef4f00;FONT_SIZE=15;;X_PADDING=10]Lv. 94 Biyolog Görevi
+[Y_PADDING=8;X_PADDING = 55;FONT_SIZE=13]*Eþya: 20x Bilgelik Mücevheri
+[Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Bekleme süresi: 2 Saat
+[COLOR=0x83E889;Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Ödül: Yarý Ýnsanlara karþý güçlü: +10%
+[ITEM=300009; IS_LINK=1; Y=998; X=10]
+
+[COLOR=ef4f00;FONT_SIZE=15;;X_PADDING=10]Lv. 98 Biyolog Görevi
+[Y_PADDING=8;X_PADDING = 55;FONT_SIZE=13]*Eþya: 35x Lotus Çiçeði
+[Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Bekleme süresi: 3 Saat
+[COLOR=0x83E889;Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Ödül: Canavarlara karþý güçlü +10%
+[ITEM=300010; IS_LINK=1; Y=1060; X=10]
+
+[COLOR=ef4f00;FONT_SIZE=15;;X_PADDING=10]Lv. 100 Biyolog Görevi
+[Y_PADDING=8;X_PADDING = 55;FONT_SIZE=13]*Eþya: x40 Zümrüt Tohumu
+[Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Bekleme süresi: 3 Saat
+[COLOR=0x83E889;Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Ödül: Metin Taþlarýna karþý güçlü +10%
+[ITEM=300011; IS_LINK=1; Y=1127; X=10]
+[IMG=d:/ymir work/ui/game/wiki/divider_long.tga; Y=1245; CENTER_ALIGN]
+
+[COLOR=ef4f00;FONT_SIZE=15;;X_PADDING=10]Lv. 105 Biyolog Görevi
+[Y_PADDING=8;X_PADDING = 55;FONT_SIZE=13]*Eþya: x50 Mavi Kristal
+[Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Bekleme süresi: 3 Saat
+[COLOR=0x83E889;Y_PADDING=1;X_PADDING = 55;FONT_SIZE=13]*Ödül: Bosslara karþý güçlü +10%
+[ITEM=300012; IS_LINK=1; Y=1193; X=10]
+
+
+
+[COLOR=0xffd700; Y_PADDING=15; CENTER_ALIGN; FONT_SIZE=15]3. Ödül Yeniden Seçimi
+[Y_PADDING=10;X_PADDING = 55;FONT_SIZE=13]*Biyolog Parþömeni ile Biyolog Görevi ödülünü yeniden seçebilirsiniz.
+[Y_PADDING=2;X_PADDING = 55;FONT_SIZE=13]*Hangi görevin ödülünü sýfýrlamak istediðinizi seçmeniz gerekir.
+[Y_PADDING=2;X_PADDING = 55;FONT_SIZE=13]*1 Biyolog Sýfýrlama Eþyasý ile yalnýzca 1 Biyolog ödülünü yeniden seçebilirsiniz.
+[ITEM=70028; IS_LINK=1; Y=1280; X=10]
+
+

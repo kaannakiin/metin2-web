@@ -1,0 +1,21 @@
+[BANNER_IMG = d:/ymir work/ui/game/wiki/skins.tga]
+
+[COLOR=0xffd700; Y_PADDING=15; CENTER_ALIGN; FONT_SIZE=20]Ruh Týlsýmý Bonus Listesi
+[COLOR=0xe65454;Y_PADDING=15;CENTER_ALIGN; FONT_SIZE=15]Bu bonuslardan yararlanabilmek için tüm týlsýmlarýn +25 seviyesinde olmasý gerekir.
+[COLOR=0xe65454;Y_PADDING=15;CENTER_ALIGN; FONT_SIZE=15]Tüm týlsýmlar +25 seviyesine ulaþtýðýnda, 
+[COLOR=0xe65454;Y_PADDING=15;CENTER_ALIGN; FONT_SIZE=15]x1 Týlsým Ruh Özelliði kullanarak tüm x5 bonusu ekleyebilirsiniz.
+
+
+[COLOR=ef4f00;FONT_SIZE=30;Y_PADDING=30;X_PADDING = 55;FONT_SIZE=17]Ruh Týlsýmý
+[Y_PADDING=30;X_PADDING = 55;FONT_SIZE=15]* Maksimum HP +2000
+[Y_PADDING=30;X_PADDING = 55;FONT_SIZE=15]* Canlýlýk (VIT) Maks. +12
+[Y_PADDING=30;X_PADDING = 55;FONT_SIZE=15]* Zeka (INT) Maks. +12
+[Y_PADDING=30;X_PADDING = 55;FONT_SIZE=15]* Güç (STR) Maks. +12
+[Y_PADDING=30;X_PADDING = 55;FONT_SIZE=15]* Çeviklik (DEX) Maks. +12
+[Y_PADDING=30;X_PADDING = 55;FONT_SIZE=15]* Yarý Ýnsanlara Karþý Güç Maks. +10%
+[Y_PADDING=30;X_PADDING = 55;FONT_SIZE=15]* Kritik Vuruþ Þansý Maks. +10%
+[Y_PADDING=30;X_PADDING = 55;FONT_SIZE=15]* Delici Vuruþ Þansý Maks. +10%
+[Y_PADDING=30;X_PADDING = 55;FONT_SIZE=15]* Yaratýklara Karþý Güç Maks. +10%
+[Y_PADDING=30;X_PADDING = 55;FONT_SIZE=15]* Metin Taþlarýna Karþý Güç Maks. +10%
+[Y_PADDING=30;X_PADDING = 55;FONT_SIZE=15]* Bosslara Karþý Güç Maks. +10%
+[ITEM=91066; IS_LINK=1; Y=170; X=10]

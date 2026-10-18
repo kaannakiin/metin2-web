@@ -1,0 +1,1373 @@
+#include "stdafx.h"
+#include <math.h>
+#include "ProtoReader.h"
+#include "CsvReader.h"
+#include <sstream>
+
+#include "../../common/service.h"
+
+using namespace std;
+
+inline string trim_left(const string& str)
+{
+	string::size_type n = str.find_first_not_of(" \t\v\n\r");
+	return n == string::npos ? str : str.substr(n, str.length());
+}
+
+inline string trim_right(const string& str)
+{
+	string::size_type n = str.find_last_not_of(" \t\v\n\r");
+	return n == string::npos ? str : str.substr(0, n + 1);
+}
+
+string trim(const string& str)
+{
+	return trim_left(trim_right(str));
+}
+
+static string* StringSplit(string strOrigin, string strTok)
+{
+	uint32_t cutAt;
+	int32_t index = 0;
+	string* strResult = new string[30];
+	while ((cutAt = strOrigin.find_first_of(strTok)) != strOrigin.npos)
+	{
+		if (cutAt > 0) 
+			strResult[index++] = strOrigin.substr(0, cutAt);
+
+		strOrigin = strOrigin.substr(cutAt+1);
+	}
+
+	if (strOrigin.length() > 0)
+		strResult[index++] = strOrigin.substr(0, cutAt);
+
+	for (int32_t i = 0; i < index; i++){
+		strResult[i] = trim(strResult[i]);
+	}
+
+	return strResult;
+}
+
+int32_t get_Item_Type_Value(const string &inputString)
+{
+	string arType[] =
+	{
+		"ITEM_NONE",			//0
+		"ITEM_WEAPON",			//1
+		"ITEM_ARMOR",			//2
+		"ITEM_USE",				//3
+		"ITEM_AUTOUSE",			//4
+		"ITEM_MATERIAL",		//5
+		"ITEM_SPECIAL",			//6
+		"ITEM_TOOL",			//7
+		"ITEM_LOTTERY",			//8
+		"ITEM_ELK",				//9
+		"ITEM_METIN",			//10
+		"ITEM_CONTAINER",		//11
+		"ITEM_FISH",			//12
+		"ITEM_ROD",				//13
+		"ITEM_RESOURCE",		//14
+		"ITEM_CAMPFIRE",		//15
+		"ITEM_UNIQUE",			//16
+		"ITEM_SKILLBOOK",		//17
+		"ITEM_QUEST",			//18
+		"ITEM_POLYMORPH",		//19
+		"ITEM_TREASURE_BOX",	//20
+		"ITEM_TREASURE_KEY",	//21
+		"ITEM_SKILLFORGET",		//22
+		"ITEM_GIFTBOX",			//23
+		"ITEM_PICK",			//24
+		"ITEM_HAIR",			//25
+		"ITEM_TOTEM",			//26
+		"ITEM_BLEND",			//27
+		"ITEM_COSTUME",			//28
+		"ITEM_DS",				//29
+		"ITEM_SPECIAL_DS",		//30
+		"ITEM_EXTRACT",			//31
+		"ITEM_SECONDARY_COIN",	//32
+		"ITEM_RING",			//33
+#ifdef ENABLE_MOUNT_SYSTEM
+		"ITEM_MOUNT",			//34
+#endif
+#ifdef ENABLE_PET_SYSTEM
+		"ITEM_PET",				//35
+#endif
+#ifdef ENABLE_GROWTH_PET_SYSTEM
+		"ITEM_GROWTH_PET",		//36
+#endif
+#ifdef ENABLE_NEW_ITEM_TYPE_GACHA
+		"ITEM_GACHA",			//37
+#endif
+#ifdef ENABLE_PASSIVE_SYSTEM
+		"ITEM_PASSIVE"			//38
+#endif
+	};
+
+	int32_t retInt = -1;
+	for (uint32_t j = 0; j < sizeof(arType)/sizeof(arType[0]); j++)
+	{
+		string tempString = arType[j];
+		if (inputString.find(tempString)!=string::npos && tempString.find(inputString)!=string::npos)
+		{
+			retInt = j;
+			break;
+		}
+	}
+
+	return retInt;
+}
+
+int32_t get_Item_SubType_Value(uint32_t type_value, const string &inputString)
+{
+	static std::map<int32_t, std::vector<std::string>> subtypes;
+
+	subtypes[ITEM_WEAPON] =
+	{
+		"WEAPON_SWORD",
+		"WEAPON_DAGGER",
+		"WEAPON_BOW",
+		"WEAPON_TWO_HANDED",
+		"WEAPON_BELL",
+		"WEAPON_FAN",
+		"WEAPON_ARROW",
+		"WEAPON_MOUNT_SPEAR"
+	};
+
+	subtypes[ITEM_ARMOR] =
+	{
+		"ARMOR_BODY",
+		"ARMOR_HEAD",
+		"ARMOR_SHIELD",
+		"ARMOR_WRIST",
+		"ARMOR_FOOTS",
+		"ARMOR_NECK",
+		"ARMOR_EAR",
+		"ARMOR_BELT",
+#ifdef ENABLE_PENDANT_SYSTEM
+		"ARMOR_PENDANT",
+#endif
+		"ARMOR_NUM_TYPES"
+	};
+
+	subtypes[ITEM_USE] =
+	{
+		"USE_POTION",
+		"USE_TALISMAN",
+		"USE_TUNING",
+		"USE_MOVE",
+		"USE_TREASURE_BOX",
+		"USE_MONEYBAG",
+		"USE_BAIT",
+		"USE_ABILITY_UP",
+		"USE_AFFECT",
+		"USE_CREATE_STONE",
+		"USE_SPECIAL",
+		"USE_POTION_NODELAY",
+		"USE_CLEAR",
+		"USE_INVISIBILITY",
+		"USE_DETACHMENT",
+		"USE_BUCKET",
+		"USE_POTION_CONTINUE",
+		"USE_CLEAN_SOCKET",
+		"USE_CHANGE_ATTRIBUTE",
+		"USE_ADD_ATTRIBUTE",
+		"USE_ADD_ACCESSORY_SOCKET",
+		"USE_PUT_INTO_ACCESSORY_SOCKET",
+		"USE_ADD_ATTRIBUTE2",
+		"USE_RECIPE",
+		"USE_CHANGE_ATTRIBUTE2",
+		"USE_BIND",
+		"USE_UNBIND",
+		"USE_TIME_CHARGE_PER",
+		"USE_TIME_CHARGE_FIX",
+		"USE_PUT_INTO_BELT_SOCKET"
+#ifdef ENABLE_TITLE_SYSTEM
+		,"USE_PUT_INTO_RING_SOCKET"
+		,"USE_TITLE"
+#else
+		,"USE_PUT_INTO_RING_SOCKET"
+#endif
+#ifdef ENABLE_RENEWAL_AFFECT
+		,"USE_AFFECT_PLUS"
+#endif
+#ifdef ENABLE_BONUS_COSTUME_SYSTEM
+		,"USE_CHANGE_COSTUME_ATTR"
+		,"USE_RESET_COSTUME_ATTR"
+#endif
+#ifdef ENABLE_AURA_COSTUME_SYSTEM
+		,"USE_PUT_INTO_AURA_SOCKET"
+#endif
+#ifdef __ENABLE_COLLECTIONS_SYSTEM__
+		,"USE_COLLECTION_SCROLL",
+#endif
+	};
+
+#ifdef ENABLE_PASSIVE_SYSTEM
+	subtypes[ITEM_PASSIVE] =
+	{
+		"PASSIVE_JOB"
+	};
+#endif
+
+	subtypes[ITEM_AUTOUSE] =
+	{
+		"AUTOUSE_POTION",
+		"AUTOUSE_ABILITY_UP",
+		"AUTOUSE_BOMB",
+		"AUTOUSE_GOLD",
+		"AUTOUSE_MONEYBAG",
+		"AUTOUSE_TREASURE_BOX"
+	};
+
+	subtypes[ITEM_MATERIAL] =
+	{
+		"MATERIAL_LEATHER",
+		"MATERIAL_BLOOD",
+		"MATERIAL_ROOT",
+		"MATERIAL_NEEDLE",
+		"MATERIAL_JEWEL",
+		"MATERIAL_DS_REFINE_NORMAL",
+		"MATERIAL_DS_REFINE_BLESSED",
+		"MATERIAL_DS_REFINE_HOLLY"
+#ifdef ENABLE_PASSIVE_SYSTEM
+		,"MATERIAL_PASSIVE_WEAPON"
+		,"MATERIAL_PASSIVE_ARMOR"
+		,"MATERIAL_PASSIVE_ACCE"
+		,"MATERIAL_PASSIVE_ELEMENT"
+#endif
+	};
+
+	subtypes[ITEM_SPECIAL] =
+	{
+		"SPECIAL_MAP",
+		"SPECIAL_KEY",
+		"SPECIAL_DOC",
+		"SPECIAL_SPIRIT"
+	};
+
+	subtypes[ITEM_TOOL] =
+	{
+		"TOOL_FISHING_ROD"
+	};
+
+	subtypes[ITEM_LOTTERY] =
+	{
+		"LOTTERY_TICKET",
+		"LOTTERY_INSTANT"
+	};
+
+	subtypes[ITEM_METIN] =
+	{
+		"METIN_NORMAL",
+		"METIN_GOLD"
+	};
+
+	subtypes[ITEM_FISH] =
+	{
+		"FISH_ALIVE",
+		"FISH_DEAD"
+	};
+
+	subtypes[ITEM_RESOURCE] =
+	{
+		"RESOURCE_FISHBONE",
+		"RESOURCE_WATERSTONEPIECE",
+		"RESOURCE_WATERSTONE",
+		"RESOURCE_BLOOD_PEARL",
+		"RESOURCE_BLUE_PEARL",
+		"RESOURCE_WHITE_PEARL",
+		"RESOURCE_BUCKET",
+		"RESOURCE_CRYSTAL",
+		"RESOURCE_GEM",
+		"RESOURCE_STONE",
+		"RESOURCE_METIN",
+		"RESOURCE_ORE"
+#ifdef ENABLE_AURA_COSTUME_SYSTEM
+		,"RESOURCE_AURA"
+#endif
+	};
+
+	subtypes[ITEM_UNIQUE] =
+	{
+		"UNIQUE_NONE",
+		"UNIQUE_BOOK",
+		"UNIQUE_SPECIAL_RIDE",
+		"UNIQUE_3",
+		"UNIQUE_4",
+		"UNIQUE_5",
+		"UNIQUE_6",
+		"UNIQUE_7",
+		"UNIQUE_8",
+		"UNIQUE_9",
+		"USE_SPECIAL",
+	};
+
+	subtypes[ITEM_COSTUME] =
+	{
+		"COSTUME_BODY",
+		"COSTUME_HAIR"
+#ifdef ENABLE_ACCE_COSTUME_SYSTEM
+		,"COSTUME_ACCE"
+#endif
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+		,"COSTUME_WEAPON"
+#endif
+#ifdef ENABLE_MOUNT_PET_SKIN
+		,"COSTUME_MOUNT"
+		,"COSTUME_PET"
+#endif
+#ifdef ENABLE_AURA_COSTUME_SYSTEM
+		,"COSTUME_AURA"
+#endif
+	};
+
+	subtypes[ITEM_DS] =
+	{
+		"DS_SLOT1",
+		"DS_SLOT2",
+		"DS_SLOT3",
+		"DS_SLOT4",
+		"DS_SLOT5",
+		"DS_SLOT6"
+	};
+
+	subtypes[ITEM_EXTRACT] =
+	{
+		"EXTRACT_DRAGON_SOUL",
+		"EXTRACT_DRAGON_HEART"
+	};
+
+#ifdef ENABLE_GROWTH_PET_SYSTEM
+	subtypes[ITEM_GROWTH_PET] =
+	{
+		"PET_EGG",
+		"PET_UPBRINGING",
+		"PET_BAG",
+		"PET_FEEDSTUFF",
+		"PET_SKILL",
+		"PET_SKILL_DEL_BOOK",
+		"PET_NAME_CHANGE",
+		"PET_EXPFOOD",
+		"PET_SKILL_ALL_DEL_BOOK",
+		"PET_EXPFOOD_PER",
+		"PET_ATTR_DETERMINE",
+		"PET_ATTR_CHANGE",
+		"PET_PAY",
+		"PET_PRIMIUM_FEEDSTUFF",
+	};
+#endif
+
+	if (type_value < 0 || type_value >= ITEM_TYPE_MAX)
+	{
+		sys_err("Out of range type! (type_value: %d, max valid type: %d)", type_value, ITEM_TYPE_MAX);
+		return -1;
+	}
+
+	// Don't process if there are no subtypes for this type 
+	if (subtypes.count(type_value) == 0)
+		return 0;
+	
+	std::string trimmedInput = trim(inputString);
+
+	// Allow no subtype for ITEM_QUEST
+	if (type_value == ITEM_QUEST && (trimmedInput.compare("NONE") == 0 || trimmedInput.compare("0") == 0))
+		return 0;
+
+	for (size_t i = 0, size = subtypes[type_value].size(); i < size; ++i)
+	{
+		// Found the subtype that's specified
+		if (trimmedInput.compare(subtypes[type_value][i]) == 0)
+			return i;
+	}
+		
+	sys_err("Subtype %s is not valid for type %d", trimmedInput.c_str(), type_value);
+
+	return -1;
+}
+
+int32_t get_Item_AntiFlag_Value(const string &inputString)
+{
+	string arAntiFlag[] =
+	{
+		"ANTI_FEMALE",
+		"ANTI_MALE",
+		"ANTI_MUSA",
+		"ANTI_ASSASSIN",
+		"ANTI_SURA",
+		"ANTI_MUDANG",
+		"ANTI_GET",
+		"ANTI_DROP",
+		"ANTI_SELL",
+		"ANTI_EMPIRE_A",
+		"ANTI_EMPIRE_B",
+		"ANTI_EMPIRE_C",
+		"ANTI_SAVE",
+		"ANTI_GIVE",
+		"ANTI_PKDROP",
+		"ANTI_STACK",
+		"ANTI_MYSHOP",
+		"ANTI_SAFEBOX"
+#ifdef ENABLE_DESTROY_DIALOG
+		,"ANTI_DESTROY"
+#endif
+#ifdef ENABLE_GROWTH_PET_SYSTEM
+		,"ANTI_PETFEED"
+#endif
+		,"ANTI_RT_REMOVE"
+	};
+
+	int32_t retValue = 0;
+	string* arInputString = StringSplit(inputString, "|");
+	for(uint32_t i = 0; i < sizeof(arAntiFlag)/sizeof(arAntiFlag[0]); i++)
+	{
+		string tempString = arAntiFlag[i];
+		for (uint32_t j = 0; j < 30 ; j++)
+		{
+			string tempString2 = arInputString[j];
+			if (tempString2.compare(tempString) == 0)
+				retValue = retValue + pow((float)2, (float)i);
+
+			if (tempString2.compare("") == 0)
+				break;
+		}
+	}
+	delete []arInputString;
+
+	return retValue;
+}
+
+int32_t get_Item_Flag_Value(const string &inputString)
+{
+
+	string arFlag[] = 
+		{
+			"ITEM_TUNABLE",
+			"ITEM_SAVE",
+			"ITEM_STACKABLE",
+			"COUNT_PER_1GOLD",
+			"ITEM_SLOW_QUERY",
+			"ITEM_UNIQUE",
+			"ITEM_MAKECOUNT",
+			"ITEM_IRREMOVABLE",
+			"CONFIRM_WHEN_USE",
+			"QUEST_USE",
+			"QUEST_USE_MULTIPLE",
+			"QUEST_GIVE",
+			"ITEM_QUEST",
+			"LOG",
+			"STACKABLE",
+			"SLOW_QUERY",
+			"REFINEABLE",
+			"IRREMOVABLE",
+			"ITEM_APPLICABLE"
+		};
+
+	int32_t retValue = 0;
+	string* arInputString = StringSplit(inputString, "|");
+	for (uint32_t i = 0; i < sizeof(arFlag)/sizeof(arFlag[0]); i++)
+	{
+		string tempString = arFlag[i];
+		for (uint32_t j = 0; j < 30; j++)
+		{
+			string tempString2 = arInputString[j];
+			if (tempString2.compare(tempString) == 0)
+				retValue = retValue + pow((float)2, (float)i);
+
+			if (tempString2.compare("") == 0)
+				break;
+		}
+	}
+	delete []arInputString;
+
+	return retValue;
+}
+
+int32_t get_Item_WearFlag_Value(const string &inputString)
+{
+	string arWearrFlag[] =
+	{
+		"WEAR_BODY",
+		"WEAR_HEAD",
+		"WEAR_FOOTS",
+		"WEAR_WRIST",
+		"WEAR_WEAPON",
+		"WEAR_NECK",
+		"WEAR_EAR",
+		"WEAR_SHIELD",
+		"WEAR_UNIQUE",
+		"WEAR_ARROW",
+		"WEAR_HAIR",
+		"WEAR_ABILITY",
+		"WEAR_COSTUME_BODY",
+		"WEAR_COSTUME_HAIR"
+#ifdef ENABLE_ACCE_COSTUME_SYSTEM
+		,"WEAR_COSTUME_ACCE"
+#endif
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+		,"WEAR_COSTUME_WEAPON"
+#endif
+#ifdef ENABLE_MOUNT_PET_SKIN
+		,"WEAR_COSTUME_MOUNT"
+		,"WEAR_COSTUME_PET"
+#endif
+#ifdef ENABLE_AURA_COSTUME_SYSTEM
+		,"WEAR_COSTUME_AURA"
+#endif
+		,"WEAR_BELT"
+#ifdef ENABLE_MOUNT_SYSTEM
+		,"WEAR_MOUNT"
+#endif
+#ifdef ENABLE_PET_SYSTEM
+		,"WEAR_PET"
+#endif
+#ifdef ENABLE_PENDANT_SYSTEM
+		,"WEAR_PENDANT"
+#endif
+	};
+
+	int32_t retValue = 0;
+	string* arInputString = StringSplit(inputString, "|");
+	for(uint32_t i = 0; i < sizeof(arWearrFlag)/sizeof(arWearrFlag[0]); i++)
+	{
+		string tempString = arWearrFlag[i];
+		for (uint32_t j = 0; j < 30 ; j++)
+		{
+			string tempString2 = arInputString[j];
+			if (tempString2.compare(tempString) == 0)
+				retValue = retValue + pow((float)2, (float)i);
+
+			if (tempString2.compare("") == 0)
+				break;
+		}
+	}
+	delete []arInputString;
+
+	return retValue;
+}
+
+int32_t get_Item_Immune_Value(const string &inputString)
+{
+
+	string arImmune[] =
+	{
+		"PARA",
+		"CURSE",
+		"STUN",
+		"SLEEP",
+		"SLOW",
+		"POISON",
+		"TERROR",
+	};
+
+	int32_t retValue = 0;
+	string* arInputString = StringSplit(inputString, "|");
+	for (uint32_t i = 0; i <sizeof(arImmune)/sizeof(arImmune[0]); i++)
+	{
+		string tempString = arImmune[i];
+		for (uint32_t j = 0; j < 30 ; j++)
+		{
+			string tempString2 = arInputString[j];
+			if (tempString2.compare(tempString) == 0)
+				retValue = retValue + pow((float)2,(float)i);
+
+			if (tempString2.compare("") == 0)
+				break;
+		}
+	}
+	delete []arInputString;
+
+	return retValue;
+}
+
+int32_t get_Item_LimitType_Value(const string &inputString)
+{
+	string arLimitType[] =
+	{
+		"LIMIT_NONE",
+		"LEVEL",
+		"STR",
+		"DEX",
+		"INT",
+		"CON",
+		"REAL_TIME",
+		"REAL_TIME_FIRST_USE",
+		"TIMER_BASED_ON_WEAR",
+#ifdef ENABLE_PITTY_REFINE
+		"PITTY_REFINE",
+#endif
+	};
+
+	int32_t retInt = -1;
+	for (uint32_t j = 0; j < sizeof(arLimitType)/sizeof(arLimitType[0]); j++)
+	{
+		string tempString = arLimitType[j];
+		string tempInputString = trim(inputString);
+		if (tempInputString.compare(tempString) == 0)
+		{
+			retInt = j;
+			break;
+		}
+	}
+
+	return retInt;
+}
+
+int32_t get_Item_ApplyType_Value(const string &inputString)
+{
+	// NOTE: Apply values are NOT a dense 0..N index.
+	// Some entries have explicit values and gaps (e.g. 92..96, 99.., 115.., 118..).
+	// Returning the index here breaks item_proto generation when feature flags differ.
+	const string tempInputString = trim(inputString);
+
+	if (tempInputString == "APPLY_BLEEDING_REDUCE")			return APPLY_BLEEDING_REDUCE;
+	if (tempInputString == "APPLY_BLEEDING_PCT")			return APPLY_BLEEDING_PCT;
+	if (tempInputString == "APPLY_ATTBONUS_WOLFMAN")		return APPLY_ATTBONUS_WOLFMAN;
+	if (tempInputString == "APPLY_RESIST_WOLFMAN")			return APPLY_RESIST_WOLFMAN;
+	if (tempInputString == "APPLY_RESIST_CLAW")				return APPLY_RESIST_CLAW;
+
+	if (tempInputString == "APPLY_ACCEDRAIN_RATE")			return APPLY_ACCEDRAIN_RATE;
+	if (tempInputString == "APPLY_RESIST_MAGIC_REDUCTION")	return APPLY_RESIST_MAGIC_REDUCTION;
+
+	if (tempInputString == "APPLY_ENCHANT_ELECT")			return APPLY_ENCHANT_ELECT;
+	if (tempInputString == "APPLY_ENCHANT_FIRE")			return APPLY_ENCHANT_FIRE;
+	if (tempInputString == "APPLY_ENCHANT_ICE")				return APPLY_ENCHANT_ICE;
+	if (tempInputString == "APPLY_ENCHANT_WIND")			return APPLY_ENCHANT_WIND;
+	if (tempInputString == "APPLY_ENCHANT_EARTH")			return APPLY_ENCHANT_EARTH;
+	if (tempInputString == "APPLY_ENCHANT_DARK")			return APPLY_ENCHANT_DARK;
+
+	if (tempInputString == "APPLY_ATTBONUS_CZ")				return APPLY_ATTBONUS_CZ;
+	if (tempInputString == "APPLY_ATTBONUS_INSECT")			return APPLY_ATTBONUS_INSECT;
+	if (tempInputString == "APPLY_ATTBONUS_DESERT")			return APPLY_ATTBONUS_DESERT;
+	if (tempInputString == "APPLY_ATTBONUS_SWORD")			return APPLY_ATTBONUS_SWORD;
+	if (tempInputString == "APPLY_ATTBONUS_TWOHAND")		return APPLY_ATTBONUS_TWOHAND;
+	if (tempInputString == "APPLY_ATTBONUS_DAGGER")			return APPLY_ATTBONUS_DAGGER;
+	if (tempInputString == "APPLY_ATTBONUS_BELL")			return APPLY_ATTBONUS_BELL;
+	if (tempInputString == "APPLY_ATTBONUS_FAN")			return APPLY_ATTBONUS_FAN;
+	if (tempInputString == "APPLY_ATTBONUS_BOW")			return APPLY_ATTBONUS_BOW;
+	if (tempInputString == "APPLY_ATTBONUS_CLAW")			return APPLY_ATTBONUS_CLAW;
+
+	if (tempInputString == "APPLY_RESIST_HUMAN")			return APPLY_RESIST_HUMAN;
+	if (tempInputString == "APPLY_RESIST_MOUNT_FALL")		return APPLY_RESIST_MOUNT_FALL;
+	if (tempInputString == "UNK17")							return 117;
+	if (tempInputString == "APPLY_MOUNT")					return APPLY_MOUNT;
+
+	if (tempInputString == "APPLY_ATTBONUS_STONE")			return APPLY_ATTBONUS_STONE;
+	if (tempInputString == "APPLY_ATTBONUS_BOSS")			return APPLY_ATTBONUS_BOSS;
+	if (tempInputString == "APPLY_ATTBONUS_ELEMENTS")		return APPLY_ATTBONUS_ELEMENTS;
+	if (tempInputString == "APPLY_ENCHANT_ELEMENTS")		return APPLY_ENCHANT_ELEMENTS;
+	if (tempInputString == "APPLY_ATTBONUS_CHARACTERS")		return APPLY_ATTBONUS_CHARACTERS;
+	if (tempInputString == "APPLY_ENCHANT_CHARACTERS")		return APPLY_ENCHANT_CHARACTERS;
+	if (tempInputString == "APPLY_RESIST_MONSTER")			return APPLY_RESIST_MONSTER;
+
+	if (tempInputString == "APPLY_ATTBONUS_MEDI_PVM")		return APPLY_ATTBONUS_MEDI_PVM;
+	if (tempInputString == "APPLY_ATTBONUS_PVM_STR")		return APPLY_ATTBONUS_PVM_STR;
+	if (tempInputString == "APPLY_ATTBONUS_PVM_BERSERKER")	return APPLY_ATTBONUS_PVM_BERSERKER;
+
+	if (tempInputString == "APPLY_SUNGMA_STR")				return APPLY_SUNGMA_STR;
+	if (tempInputString == "APPLY_SUNGMA_HP")				return APPLY_SUNGMA_HP;
+	if (tempInputString == "APPLY_SUNGMA_MOVE")				return APPLY_SUNGMA_MOVE;
+	if (tempInputString == "APPLY_SUNGMA_IMMUNE")			return APPLY_SUNGMA_IMMUNE;
+
+	string arApplyType[] =
+	{
+		"APPLY_NONE",
+		"APPLY_MAX_HP",
+		"APPLY_MAX_SP",
+		"APPLY_CON",
+		"APPLY_INT",
+		"APPLY_STR",
+		"APPLY_DEX",
+		"APPLY_ATT_SPEED",
+		"APPLY_MOV_SPEED",
+		"APPLY_CAST_SPEED",
+		"APPLY_HP_REGEN",
+		"APPLY_SP_REGEN",
+		"APPLY_POISON_PCT",
+		"APPLY_STUN_PCT",
+		"APPLY_SLOW_PCT",
+		"APPLY_CRITICAL_PCT",
+		"APPLY_PENETRATE_PCT",
+		"APPLY_ATTBONUS_HUMAN",
+		"APPLY_ATTBONUS_ANIMAL",
+		"APPLY_ATTBONUS_ORC",
+		"APPLY_ATTBONUS_MILGYO",
+		"APPLY_ATTBONUS_UNDEAD",
+		"APPLY_ATTBONUS_DEVIL",
+		"APPLY_STEAL_HP",
+		"APPLY_STEAL_SP",
+		"APPLY_MANA_BURN_PCT",
+		"APPLY_DAMAGE_SP_RECOVER",
+		"APPLY_BLOCK",
+		"APPLY_DODGE",
+		"APPLY_RESIST_SWORD",
+		"APPLY_RESIST_TWOHAND",
+		"APPLY_RESIST_DAGGER",
+		"APPLY_RESIST_BELL",
+		"APPLY_RESIST_FAN",
+		"APPLY_RESIST_BOW",
+		"APPLY_RESIST_FIRE",
+		"APPLY_RESIST_ELEC",
+		"APPLY_RESIST_MAGIC",
+		"APPLY_RESIST_WIND",
+		"APPLY_REFLECT_MELEE",
+		"APPLY_REFLECT_CURSE",
+		"APPLY_POISON_REDUCE",
+		"APPLY_KILL_SP_RECOVER",
+		"APPLY_EXP_DOUBLE_BONUS",
+		"APPLY_GOLD_DOUBLE_BONUS",
+		"APPLY_ITEM_DROP_BONUS",
+		"APPLY_POTION_BONUS",
+		"APPLY_KILL_HP_RECOVER",
+		"APPLY_IMMUNE_STUN",
+		"APPLY_IMMUNE_SLOW",
+		"APPLY_IMMUNE_FALL",
+		"APPLY_SKILL",
+		"APPLY_BOW_DISTANCE",
+		"APPLY_ATT_GRADE_BONUS",
+		"APPLY_DEF_GRADE_BONUS",
+		"APPLY_MAGIC_ATT_GRADE",
+		"APPLY_MAGIC_DEF_GRADE",
+		"APPLY_CURSE_PCT",
+		"APPLY_MAX_STAMINA",
+		"APPLY_ATTBONUS_WARRIOR",
+		"APPLY_ATTBONUS_ASSASSIN",
+		"APPLY_ATTBONUS_SURA",
+		"APPLY_ATTBONUS_SHAMAN",
+		"APPLY_ATTBONUS_MONSTER",
+		"APPLY_MALL_ATTBONUS",
+		"APPLY_MALL_DEFBONUS",
+		"APPLY_MALL_EXPBONUS",
+		"APPLY_MALL_ITEMBONUS",
+		"APPLY_MALL_GOLDBONUS",
+		"APPLY_MAX_HP_PCT",
+		"APPLY_MAX_SP_PCT",
+		"APPLY_SKILL_DAMAGE_BONUS",
+		"APPLY_NORMAL_HIT_DAMAGE_BONUS",
+		"APPLY_SKILL_DEFEND_BONUS",
+		"APPLY_NORMAL_HIT_DEFEND_BONUS",
+		"APPLY_PC_BANG_EXP_BONUS",
+		"APPLY_PC_BANG_DROP_BONUS",
+		"APPLY_EXTRACT_HP_PCT",
+		"APPLY_RESIST_WARRIOR",
+		"APPLY_RESIST_ASSASSIN",
+		"APPLY_RESIST_SURA",
+		"APPLY_RESIST_SHAMAN",
+		"APPLY_ENERGY",
+		"APPLY_DEF_GRADE",
+		"APPLY_COSTUME_ATTR_BONUS",
+		"APPLY_MAGIC_ATTBONUS_PER",
+		"APPLY_MELEE_MAGIC_ATTBONUS_PER",
+		"APPLY_RESIST_ICE",
+		"APPLY_RESIST_EARTH",
+		"APPLY_RESIST_DARK",
+		"APPLY_ANTI_CRITICAL_PCT",
+		"APPLY_ANTI_PENETRATE_PCT",
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		"APPLY_BLEEDING_REDUCE",
+		"APPLY_BLEEDING_PCT",
+		"APPLY_ATTBONUS_WOLFMAN",
+		"APPLY_RESIST_WOLFMAN",
+		"APPLY_RESIST_CLAW",
+#endif
+#ifdef ENABLE_ACCE_COSTUME_SYSTEM
+		"APPLY_ACCEDRAIN_RATE",
+#endif
+#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+		"APPLY_RESIST_MAGIC_REDUCTION", // 97,98
+#endif
+		"APPLY_ENCHANT_ELECT",
+		"APPLY_ENCHANT_FIRE",
+		"APPLY_ENCHANT_ICE",
+		"APPLY_ENCHANT_WIND",
+		"APPLY_ENCHANT_EARTH",
+		"APPLY_ENCHANT_DARK", // 99-104
+		"APPLY_ATTBONUS_CZ",
+		"APPLY_ATTBONUS_INSECT",
+		"APPLY_ATTBONUS_DESERT",
+		"APPLY_ATTBONUS_SWORD",
+		"APPLY_ATTBONUS_TWOHAND", // 105,109
+		"APPLY_ATTBONUS_DAGGER",
+		"APPLY_ATTBONUS_BELL",
+		"APPLY_ATTBONUS_FAN",
+		"APPLY_ATTBONUS_BOW",
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		"APPLY_ATTBONUS_CLAW",
+#endif
+		"APPLY_RESIST_HUMAN", // 110,115
+		"APPLY_RESIST_MOUNT_FALL",
+		"UNK17",
+		"APPLY_MOUNT",
+#ifdef ENABLE_NEW_BONUS_SYSTEM
+		"APPLY_ATTBONUS_STONE",
+		"APPLY_ATTBONUS_BOSS",
+		"APPLY_ATTBONUS_ELEMENTS",
+		"APPLY_ENCHANT_ELEMENTS",
+		"APPLY_ATTBONUS_CHARACTERS",
+		"APPLY_ENCHANT_CHARACTERS",
+		"APPLY_RESIST_MONSTER",
+#endif
+#ifdef ENABLE_AVG_PVM
+		"APPLY_ATTBONUS_MEDI_PVM",
+#endif
+		"APPLY_ATTBONUS_PVM_STR",
+		"APPLY_ATTBONUS_PVM_BERSERKER",
+#ifdef ENABLE_CONQUEROR_LEVEL
+		"APPLY_SUNGMA_STR",
+		"APPLY_SUNGMA_HP",
+		"APPLY_SUNGMA_MOVE",
+		"APPLY_SUNGMA_IMMUNE",
+		"APPLY_CONQUEROR_POINT"
+#endif
+	};
+
+
+	int32_t retInt = -1;
+	for (uint32_t j = 0; j < sizeof(arApplyType)/sizeof(arApplyType[0]); j++)
+	{
+		string tempString = arApplyType[j];
+		if (tempInputString.compare(tempString) == 0)
+		{
+			retInt = j;
+			break;
+		}
+	}
+
+	return retInt;
+}
+
+int32_t get_Mob_Rank_Value(const string &inputString)
+{
+	string arRank[] =
+	{
+		"PAWN",
+		"S_PAWN",
+		"KNIGHT",
+		"S_KNIGHT",
+		"BOSS",
+		"KING",
+	};
+
+	int32_t retInt = -1;
+	for (uint32_t j = 0; j < sizeof(arRank)/sizeof(arRank[0]); j++)
+	{
+		string tempString = arRank[j];
+		string tempInputString = trim(inputString);
+
+		if (tempInputString.compare(tempString) == 0)
+		{
+			retInt = j;
+			break;
+		}
+	}
+
+	return retInt;
+}
+
+int32_t get_Mob_Type_Value(const string &inputString)
+{
+	string arType[] =
+	{
+		"MONSTER",
+		"NPC",
+		"STONE",
+		"WARP",
+		"DOOR",
+		"BUILDING",
+		"PC",
+		"POLYMORPH_PC",
+		"HORSE",
+		"GOTO"
+#ifdef ENABLE_PET_SYSTEM
+		,"PET"
+#endif
+#ifdef ENABLE_MOUNT_SYSTEM
+		,"MOUNT"
+#endif
+#ifdef ENABLE_GROWTH_PET_SYSTEM
+		,"GROWTH_PET"
+#endif
+	};
+
+	int32_t retInt = -1;
+	for (uint32_t j = 0; j < sizeof(arType)/sizeof(arType[0]); j++)
+	{
+		string tempString = arType[j];
+		string tempInputString = trim(inputString);
+
+		if (tempInputString.compare(tempString) == 0)
+		{
+			retInt = j;
+			break;
+		}
+	}
+
+	return retInt;
+}
+
+int32_t get_Mob_BattleType_Value(const string &inputString)
+{
+	string arBattleType[] =
+	{
+		"MELEE",
+		"RANGE",
+		"MAGIC",
+		"SPECIAL",
+		"POWER",
+		"TANKER",
+		"SUPER_POWER",
+		"SUPER_TANKER",
+	};
+
+	int32_t retInt = -1;
+	for (uint32_t j = 0; j < sizeof(arBattleType)/sizeof(arBattleType[0]); j++)
+	{
+		string tempString = arBattleType[j];
+		string tempInputString = trim(inputString);
+
+		if (tempInputString.compare(tempString) == 0)
+		{
+			retInt = j;
+			break;
+		}
+	}
+
+	return retInt;
+}
+
+int32_t get_Mob_Size_Value(const string &inputString)
+{
+	string arSize[] =
+	{
+		"SMALL", //@fixme201 SAMLL to SMALL
+		"MEDIUM",
+		"BIG",
+	};
+
+	int32_t retInt = 0;
+	for (uint32_t j = 0; j < sizeof(arSize)/sizeof(arSize[0]); j++)
+	{
+		string tempString = arSize[j];
+		string tempInputString = trim(inputString);
+
+		if (tempInputString.compare(tempString) == 0)
+		{
+			retInt = j + 1;
+			break;
+		}
+	}
+
+	return retInt;
+}
+
+int32_t get_Mob_AIFlag_Value(const string &inputString)
+{
+	string arAIFlag[] =
+	{
+		"AGGR",
+		"NOMOVE",
+		"COWARD",
+		"NOATTSHINSU",
+		"NOATTCHUNJO",
+		"NOATTJINNO",
+		"ATTMOB",
+		"BERSERK",
+		"STONESKIN",
+		"GODSPEED",
+		"DEATHBLOW",
+		"REVIVE",
+	};
+
+	int32_t retValue = 0;
+	string* arInputString = StringSplit(inputString, ",");
+	for(uint32_t i = 0; i < sizeof(arAIFlag)/sizeof(arAIFlag[0]); i++)
+	{
+		string tempString = arAIFlag[i];
+		for (uint32_t j = 0; j < 30 ; j++)
+		{
+			string tempString2 = arInputString[j];
+			if (tempString2.compare(tempString) == 0)
+				retValue = retValue + pow((float)2, (float)i);
+
+			if (tempString2.compare("") == 0)
+				break;
+		}
+	}
+	delete []arInputString;
+
+	return retValue;
+}
+
+int32_t get_Mob_RaceFlag_Value(const string &inputString)
+{
+	string arRaceFlag[] =
+	{
+		"ANIMAL",
+		"UNDEAD",
+		"DEVIL",
+		"HUMAN",
+		"ORC",
+		"MILGYO",
+		"INSECT",
+		"FIRE",
+		"ICE",
+		"DESERT",
+		"TREE",
+		"ATT_ELEC",
+		"ATT_FIRE",
+		"ATT_ICE",
+		"ATT_WIND",
+		"ATT_EARTH",
+		"ATT_DARK",
+	};
+
+	int32_t retValue = 0;
+	string* arInputString = StringSplit(inputString, ",");
+	for(uint32_t i = 0; i < sizeof(arRaceFlag)/sizeof(arRaceFlag[0]); i++)
+	{
+		string tempString = arRaceFlag[i];
+		for (uint32_t j = 0; j < 30 ; j++)
+		{
+			string tempString2 = arInputString[j];
+			if (tempString2.compare(tempString) == 0)
+				retValue = retValue + pow((float)2, (float)i);
+
+			if (tempString2.compare("") == 0)
+				break;
+		}
+	}
+	delete []arInputString;
+
+	return retValue;
+}
+
+int32_t get_Mob_ImmuneFlag_Value(const string &inputString)
+{
+	string arImmuneFlag[] =
+	{
+		"STUN",
+		"SLOW",
+		"FALL",
+		"CURSE",
+		"POISON",
+		"TERROR",
+		"REFLECT",
+	};
+
+	int32_t retValue = 0;
+	string* arInputString = StringSplit(inputString, ",");
+	for(uint32_t i = 0; i < sizeof(arImmuneFlag)/sizeof(arImmuneFlag[0]); i++)
+	{
+		string tempString = arImmuneFlag[i];
+		for (uint32_t j = 0; j < 30 ; j++)
+		{
+			string tempString2 = arInputString[j];
+			if (tempString2.compare(tempString) == 0)
+				retValue = retValue + pow((float)2, (float)i);
+
+			if (tempString2.compare("") == 0)
+				break;
+		}
+	}
+	delete []arInputString;
+
+	return retValue;
+}
+
+string string_from_row(char *field, uint32_t length)
+{
+	auto buffer = new char[length+1];
+
+	strncpy(buffer, field, length);
+	buffer[length] = '\0';
+	string res = buffer;
+
+	delete []buffer;
+
+	return res;
+}
+#ifndef __DUMP_PROTO__
+bool Set_Proto_Mob_Table(TMobTable *mobTable, const cCsvTable &csvTable,std::map<int32_t, const char*> &nameMap)
+{
+	int32_t col = 0;
+	str_to_number(mobTable->dwVnum, csvTable.AsStringByIndex(col++));
+	strlcpy(mobTable->szName, csvTable.AsStringByIndex(col++), sizeof(mobTable->szName));
+
+	auto it = nameMap.find(mobTable->dwVnum);
+	if (it != nameMap.end())
+	{
+		const char * localeName = it->second;
+		strlcpy(mobTable->szLocaleName, localeName, sizeof (mobTable->szLocaleName));
+	}
+	else
+		strlcpy(mobTable->szLocaleName, mobTable->szName, sizeof (mobTable->szLocaleName));
+
+	//RANK
+	int32_t rankValue = get_Mob_Rank_Value(csvTable.AsStringByIndex(col++));
+	mobTable->bRank = rankValue;
+
+	//TYPE
+	int32_t typeValue = get_Mob_Type_Value(csvTable.AsStringByIndex(col++));
+	mobTable->bType = typeValue;
+
+	//BATTLE_TYPE
+	int32_t battleTypeValue = get_Mob_BattleType_Value(csvTable.AsStringByIndex(col++));
+	mobTable->bBattleType = battleTypeValue;
+
+	str_to_number(mobTable->bLevel, csvTable.AsStringByIndex(col++));
+
+	//SIZE
+	// int32_t sizeValue = get_Mob_Size_Value(csvTable.AsStringByIndex(col++));
+	// mobTable->bSize = sizeValue;
+	str_to_number(mobTable->bSize, csvTable.AsStringByIndex(col++));
+
+	//AI_FLAG
+	int32_t aiFlagValue = get_Mob_AIFlag_Value(csvTable.AsStringByIndex(col++));
+	mobTable->dwAIFlag = aiFlagValue;
+
+	// mount_capacity;
+	// col++;
+	str_to_number(mobTable->bMountCapacity, csvTable.AsStringByIndex(col++));
+
+	//RACE_FLAG
+	int32_t raceFlagValue = get_Mob_RaceFlag_Value(csvTable.AsStringByIndex(col++));
+	mobTable->dwRaceFlag = raceFlagValue;
+
+	//IMMUNE_FLAG
+	int32_t immuneFlagValue = get_Mob_ImmuneFlag_Value(csvTable.AsStringByIndex(col++));
+	mobTable->dwImmuneFlag = immuneFlagValue;
+
+	str_to_number(mobTable->bEmpire, csvTable.AsStringByIndex(col++));
+
+	strlcpy(mobTable->szFolder, csvTable.AsStringByIndex(col++), sizeof(mobTable->szFolder));
+
+	str_to_number(mobTable->bOnClickType, csvTable.AsStringByIndex(col++));	
+
+	str_to_number(mobTable->bStr, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->bDex, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->bCon, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->bInt, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->dwDamageRange[0], csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->dwDamageRange[1], csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->dwMaxHP, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->bRegenCycle, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->bRegenPercent,	csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->dwGoldMin, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->dwGoldMax, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->dwExp,	csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->wDef, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->sAttackSpeed, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->sMovingSpeed, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->bAggresiveHPPct, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->wAggressiveSight, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->wAttackRange, csvTable.AsStringByIndex(col++));
+
+	str_to_number(mobTable->dwDropItemVnum, csvTable.AsStringByIndex(col++));	//32
+	str_to_number(mobTable->dwResurrectionVnum, csvTable.AsStringByIndex(col++));
+	for (int32_t i = 0; i < MOB_ENCHANTS_MAX_NUM; ++i)
+		str_to_number(mobTable->cEnchants[i], csvTable.AsStringByIndex(col++));
+
+	for (int32_t i = 0; i < MOB_RESISTS_MAX_NUM; ++i)
+		str_to_number(mobTable->cResists[i], csvTable.AsStringByIndex(col++));
+
+	str_to_number(mobTable->fDamMultiply, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->dwSummonVnum, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->dwDrainSP, csvTable.AsStringByIndex(col++));
+
+	//Mob_Color
+	++col;
+
+	str_to_number(mobTable->dwPolymorphItemVnum, csvTable.AsStringByIndex(col++));
+
+	str_to_number(mobTable->Skills[0].bLevel, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->Skills[0].dwVnum, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->Skills[1].bLevel, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->Skills[1].dwVnum, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->Skills[2].bLevel, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->Skills[2].dwVnum, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->Skills[3].bLevel, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->Skills[3].dwVnum, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->Skills[4].bLevel, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->Skills[4].dwVnum, csvTable.AsStringByIndex(col++));
+
+	str_to_number(mobTable->bBerserkPoint, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->bStoneSkinPoint, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->bGodSpeedPoint, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->bDeathBlowPoint, csvTable.AsStringByIndex(col++));
+	str_to_number(mobTable->bRevivePoint, csvTable.AsStringByIndex(col++));
+
+	str_to_number(mobTable->fHitRange, csvTable.AsStringByIndex(col++));
+
+	sys_log(0, "MOB #%-5d %-24s level: %-3u rank: %u empire: %d", mobTable->dwVnum, mobTable->szLocaleName, mobTable->bLevel, mobTable->bRank, mobTable->bEmpire);
+
+	return true;
+}
+
+bool Set_Proto_Item_Table(TItemTable *itemTable, const cCsvTable &csvTable,std::map<int32_t, const char*> &nameMap)
+{
+	int32_t col = 0;
+
+	int32_t dataArray[33];
+	for (uint32_t i=0; i<sizeof(dataArray)/sizeof(dataArray[0]);i++)
+	{
+		int32_t validCheck = 0;
+		if (i == 2)
+		{
+			dataArray[i] = get_Item_Type_Value(csvTable.AsStringByIndex(col));
+			validCheck = dataArray[i];
+		}
+		else if (i == 3)
+		{
+			dataArray[i] = get_Item_SubType_Value(dataArray[i-1], csvTable.AsStringByIndex(col));
+			validCheck = dataArray[i];
+		}
+		else if (i == 5)
+		{
+			dataArray[i] = get_Item_AntiFlag_Value(csvTable.AsStringByIndex(col));
+			validCheck = dataArray[i];
+		}
+		else if (i == 6)
+		{
+			dataArray[i] = get_Item_Flag_Value(csvTable.AsStringByIndex(col));
+			validCheck = dataArray[i];
+		}
+		else if (i == 7)
+		{
+			dataArray[i] = get_Item_WearFlag_Value(csvTable.AsStringByIndex(col));
+			validCheck = dataArray[i];
+		}
+		else if (i == 8)
+		{
+			dataArray[i] = get_Item_Immune_Value(csvTable.AsStringByIndex(col));
+			validCheck = dataArray[i];
+		}
+		else if (i == 14)
+		{
+			dataArray[i] = get_Item_LimitType_Value(csvTable.AsStringByIndex(col));
+			validCheck = dataArray[i];
+		}
+		else if (i == 16)
+		{
+			dataArray[i] = get_Item_LimitType_Value(csvTable.AsStringByIndex(col));
+			validCheck = dataArray[i];
+		}
+		else if (i == 18)
+		{
+			dataArray[i] = get_Item_ApplyType_Value(csvTable.AsStringByIndex(col));
+			validCheck = dataArray[i];
+		}
+		else if (i == 20)
+		{
+			dataArray[i] = get_Item_ApplyType_Value(csvTable.AsStringByIndex(col));
+			validCheck = dataArray[i];
+		}
+		else if (i == 22)
+		{
+			dataArray[i] = get_Item_ApplyType_Value(csvTable.AsStringByIndex(col));
+			validCheck = dataArray[i];
+		}
+		else
+			str_to_number(dataArray[i], csvTable.AsStringByIndex(col));
+
+		if (validCheck == -1)
+		{
+			std::ostringstream dataStream;
+
+			for (uint32_t j = 0; j < i; ++j)
+				dataStream << dataArray[j] << ",";
+
+			// fprintf(stderr, "ItemProto Reading Failed : Invalid value.\n");
+			sys_err("ItemProto Reading Failed : Invalid value. (index: %d, col: %d, value: %s)", i, col, csvTable.AsStringByIndex(col));
+			sys_err("\t%d ~ %d Values: %s", 0, i, dataStream.str().c_str());
+
+			exit(0);
+		}
+
+		col = col + 1;
+	}
+
+	// Reading vnum and vnum range.
+	{
+		std::string s(csvTable.AsStringByIndex(0));
+		uint32_t pos = s.find("~");
+		if (std::string::npos == pos)
+		{
+			itemTable->dwVnum = dataArray[0];
+			itemTable->dwVnumRange = 0;
+		}
+		else
+		{
+			std::string s_start_vnum (s.substr(0, pos));
+			std::string s_end_vnum (s.substr(pos +1 ));
+
+			int32_t start_vnum = atoi(s_start_vnum.c_str());
+			int32_t end_vnum = atoi(s_end_vnum.c_str());
+			if (0 == start_vnum || (0 != end_vnum && end_vnum < start_vnum))
+			{
+				sys_err ("INVALID VNUM %s", s.c_str());
+				return false;
+			}
+
+			itemTable->dwVnum = start_vnum;
+			itemTable->dwVnumRange = end_vnum - start_vnum;
+		}
+	}
+
+	strlcpy(itemTable->szName, csvTable.AsStringByIndex(1), sizeof(itemTable->szName));
+
+	auto it = nameMap.find(itemTable->dwVnum);
+	if (it != nameMap.end())
+	{
+		const char * localeName = it->second;
+		strlcpy(itemTable->szLocaleName, localeName, sizeof (itemTable->szLocaleName));
+	}
+	else
+		strlcpy(itemTable->szLocaleName, itemTable->szName, sizeof (itemTable->szLocaleName));
+	itemTable->bType = dataArray[2];
+	itemTable->bSubType = dataArray[3];
+	itemTable->bSize = dataArray[4];
+	itemTable->dwAntiFlags = dataArray[5];
+	itemTable->dwFlags = dataArray[6];
+	itemTable->dwWearFlags = dataArray[7];
+	itemTable->dwImmuneFlag = dataArray[8];
+	itemTable->dwGold = dataArray[9];
+	itemTable->dwShopBuyPrice = dataArray[10];
+	itemTable->dwRefinedVnum = dataArray[11];
+	itemTable->wRefineSet = dataArray[12];
+	itemTable->bAlterToMagicItemPct = dataArray[13];
+	itemTable->cLimitRealTimeFirstUseIndex = -1;
+	itemTable->cLimitTimerBasedOnWearIndex = -1;
+
+	int32_t i;
+
+	for (i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
+	{
+		itemTable->aLimits[i].bType = dataArray[14+i*2];
+		itemTable->aLimits[i].lValue = dataArray[15+i*2];
+
+		if (LIMIT_REAL_TIME_START_FIRST_USE == itemTable->aLimits[i].bType)
+			itemTable->cLimitRealTimeFirstUseIndex = (char)i;
+
+		if (LIMIT_TIMER_BASED_ON_WEAR == itemTable->aLimits[i].bType)
+			itemTable->cLimitTimerBasedOnWearIndex = (char)i;
+
+	}
+
+	for (i = 0; i < ITEM_APPLY_MAX_NUM; ++i)
+	{
+		itemTable->aApplies[i].bType = dataArray[18+i*2];
+		itemTable->aApplies[i].lValue = dataArray[19+i*2];
+	}
+
+	for (i = 0; i < ITEM_VALUES_MAX_NUM; ++i)
+		itemTable->alValues[i] = dataArray[24+i];
+
+	//column for 'Specular'
+	itemTable->bGainSocketPct = dataArray[31];
+	itemTable->sAddonType = dataArray[32];
+
+	//test
+	str_to_number(itemTable->bWeight, "0");
+
+	return true;
+}
+#endif

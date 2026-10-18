@@ -1,0 +1,21 @@
+ScriptType               MotionData
+
+MotionFileName           "D:\ymir work\npc\plechi_gold_container\destroy.GR2"
+MotionDuration           5.000000
+
+Group MotionEventData
+{
+    MotionEventDataCount     1
+    Group Event00
+    {
+        MotionEventType      1
+        StartingTime         0.200000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Dummy01"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/npc/gold_container_destroy.mse"
+        EffectPosition       0.000000 0.000000 150.000000
+    }
+}

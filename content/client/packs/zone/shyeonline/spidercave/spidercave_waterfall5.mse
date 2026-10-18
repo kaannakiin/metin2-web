@@ -1,0 +1,167 @@
+BoundingSphereRadius   500.000000
+BoundingSpherePosition 0.000000 0.000000 0.000000
+
+Group Mesh
+{
+    StartTime           0.000000
+    List TimeEventPosition
+    {
+        0.000000 "MOVING_TYPE_DIRECT" 0.000000 0.000000 222.365997
+    }
+    
+    MeshFileName               	"0034_WaterFall_033r.mde"
+    MeshAnimationLoopEnable    	1
+    MeshAnimationLoopCount     	0
+    MeshAnimationFrameDelay    	0.016000
+    
+    MeshElementCount           	1
+    Group MeshElement00
+    {
+        BillboardType              	0
+        BlendingEnable             	1
+        BlendingSrcType            	12
+        BlendingDestType           	10
+        
+        TextureAnimationLoopEnable 	1
+        TextureAnimationFrameDelay 	0.000000
+        TextureAnimationStartFrame 	0
+        
+        ColorOperationType         	4
+        ColorFactor                	0.913725 0.913725 0.913725 1.000000
+        List TimeEventAlpha
+        {
+            0.000000 0.548673
+            0.780000 0.115044
+        }
+    }
+}
+Group Particle
+{
+    StartTime           0.000000
+    List TimeEventPosition
+    {
+        0.000000 "MOVING_TYPE_DIRECT" -4.363000 -15.447000 494.752991
+    }
+    
+    Group EmitterProperty
+    {
+        MaxEmissionCount        50
+    
+        CycleLength             0.100000
+        CycleLoopEnable         1
+        LoopCount               0
+    
+        EmitterShape            0
+        EmitterAdvancedType     0
+        EmitterEmitFromEdgeFlag  0
+        EmittingDirection       0.000000 0.000000 0.000000
+    
+        List TimeEventEmittingSize
+        {
+        }
+        List TimeEventEmittingAngularVelocity
+        {
+            0.041143 3.451328
+        }
+        List TimeEventEmittingDirectionX
+        {
+        }
+        List TimeEventEmittingDirectionY
+        {
+        }
+        List TimeEventEmittingDirectionZ
+        {
+            0.000000 -38.495575
+            0.145714 -11.855670
+            0.240000 -29.381443
+            0.302857 -50.000000
+        }
+        List TimeEventEmittingVelocity
+        {
+            0.004571 28.318584
+        }
+        List TimeEventEmissionCountPerSecond
+        {
+            0.000000 88.495575
+        }
+        List TimeEventLifeTime
+        {
+            0.000000 0.663717
+        }
+        List TimeEventSizeX
+        {
+            0.000000 300.000000
+        }
+        List TimeEventSizeY
+        {
+            0.000000 300.000000
+        }
+    }
+    
+    Group ParticleProperty
+    {
+        SrcBlendType                 5
+        DestBlendType                6
+        ColorOperationType           4
+        BillboardType                1
+        RotationType                 0
+        RotationSpeed                500.000000
+        RotationRandomStartingBegin  0
+        RotationRandomStartingEnd    0
+    
+        AttachEnable                 0
+        StretchEnable                1
+    
+        TexAniType                   0
+        TexAniDelay                  0.000000
+        TexAniRandomStartFrameEnable 0
+    
+        List TimeEventGravity
+        {
+            0.000000 243.298965
+            1.000000 1500.000000
+        }
+        List TimeEventAirResistance
+        {
+        }
+        List TimeEventScaleX
+        {
+            0.000000 0.212389
+            1.000000 0.268041
+        }
+        List TimeEventScaleY
+        {
+            0.000000 0.132743
+        }
+        List TimeEventColorRed
+        {
+            0.000000 0.145098
+            0.997436 0.752941
+        }
+        List TimeEventColorGreen
+        {
+            0.000000 0.211765
+            0.997436 0.929412
+        }
+        List TimeEventColorBlue
+        {
+            0.000000 0.196078
+            0.997436 0.929412
+        }
+        List TimeEventAlpha
+        {
+            0.000000 0.000000
+            0.765714 1.000000
+            0.776923 0.753012
+            0.976923 0.000000
+        }
+        List TimeEventRotation
+        {
+            0.000000 -90.000000
+        }
+        List TextureFiles
+        {
+            "D:\ymir work\effect\etc\_fall\fall_smoke.dds"
+        }
+    }
+}

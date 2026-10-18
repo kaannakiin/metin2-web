@@ -1,0 +1,112 @@
+ScriptType            RaceDataScript
+
+BaseModelFileName     "D:\ymir work\npc\npc_ticket\npc_ticket.GR2"
+
+Group ShapeData
+{
+    PathName 		 "D:\ymir work\npc\npc_ticket\"
+    ShapeDataCount 		 1
+	
+	Group ShapeData00
+ {
+  ShapeIndex   0
+
+  Model    "npc_ticket.gr2"
+  SourceSkin   "00.dds"
+  TargetSkin   "00.dds"
+  SourceSkin2   "gold.dds"
+  TargetSkin2   "gold.dds"
+ }
+}
+Group AttachingData
+{
+    AttachingDataCount       6
+    
+    Group AttachingData00
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "b_hair_bone_02"
+        
+        EffectScriptName     "D:\ymir work\essentialwork\efectos\carnaval\pet.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+    
+    Group AttachingData01
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "back_acc_l_bone_04"
+        
+        EffectScriptName     "D:\ymir work\essentialwork\efectos\carnaval\pet.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+    
+    Group AttachingData02
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "back_acc_r_bone_04"
+        
+        EffectScriptName     "D:\ymir work\essentialwork\efectos\carnaval\pet.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+    
+    Group AttachingData03
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "bone001_br"
+        
+        EffectScriptName     "D:\ymir work\essentialwork\efectos\carnaval\pet.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+    
+    Group AttachingData04
+    {
+        AttachingDataType    1
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "bip001-pelvis"
+        
+        CollisionType        3
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           50.000000
+            Position         0.000000 0.000000 0.000000
+        }
+    }
+    
+    Group AttachingData05
+    {
+        AttachingDataType    1
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "bip001-pelvis"
+        
+        CollisionType        1
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           46.000000
+            Position         0.000000 0.000000 0.000000
+        }
+    }
+}

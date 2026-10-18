@@ -1,0 +1,31 @@
+ScriptType               MotionData
+
+MotionFileName           "D:\Ymir Work\monster2\greedy_cave_spawn\normal_attack2.GR2"
+MotionDuration           1.000000
+
+Group MotionEventData
+{
+    MotionEventDataCount     2
+    Group Event00
+    {
+        MotionEventType      6
+        StartingTime         0.520000
+        
+        AttachingEnable      0
+        AttachingBoneName    "m_skeleton"
+        FlyFileName       "d:/ymir work/effect/monster2/greedy_cave_s_pawn_n2.msf"
+        FlyPosition       0.000000 -150.000000 100.000000
+    }
+    Group Event01
+    {
+        MotionEventType      1
+        StartingTime         0.010000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "Bip01 Prop1"
+        FollowingEnable      1
+        EffectFileName       "d:/ymir work/effect/monster2/greedy_cave_s_pawn_n1_making.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+}

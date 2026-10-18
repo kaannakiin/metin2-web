@@ -1,0 +1,62 @@
+ScriptType            RaceDataScript
+
+BaseModelFileName     "D:\Ymir Work\monster2\moonlight_boss\moonlight_boss.GR2"
+
+Group ShapeData
+{
+	PathName	"D:\Ymir Work\monster2\moonlight_boss\"
+
+	ShapeDataCount			1
+
+	Group ShapeData00
+	{
+		ShapeIndex			0
+
+		Model				"moonlight_boss.gr2"
+		SourceSkin			"moonlight_boss.dds"
+		TargetSkin			"moonlight_boss_2.dds"
+		SourceSkin2			"moonlight_boss_wea.dds"
+		TargetSkin2			"moonlight_boss_wea_2.dds"
+	}
+}
+
+Group AttachingData
+{
+    AttachingDataCount       2
+    
+    Group AttachingData00
+    {
+        AttachingDataType    1
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "Bip001"
+        
+        CollisionType        1
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           85.000000
+            Position         0.000000 30.000000 -70.000000
+        }
+    }
+    
+    Group AttachingData01
+    {
+        AttachingDataType    1
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "Bip001"
+        
+        CollisionType        3
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           89.000000
+            Position         0.000000 30.000000 -70.000000
+        }
+    }
+}

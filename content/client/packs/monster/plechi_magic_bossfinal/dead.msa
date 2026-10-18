@@ -1,0 +1,18 @@
+ScriptType               MotionData
+
+MotionFileName           "D:\ymir work\monster\plechi_magic_bossFinal\dead.GR2"
+MotionDuration           7.066667
+
+Group MotionEventData
+{
+    MotionEventDataCount     1
+	Group Event00
+    {
+        MotionEventType      2
+        StartingTime         0.00000
+
+        DuringTime           1.600000
+        Power                200
+        AffectingRange       20000
+    }
+}

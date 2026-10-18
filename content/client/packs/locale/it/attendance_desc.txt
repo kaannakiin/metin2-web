@@ -1,0 +1,8 @@
+[DELAY value;0]
+Patron Avcýsý etkinliði seviye 30 üzeri oyuncular için.[ENTER]
+Baþlangýçta Patron Canavarlar tarafsýz bölgelerde belirir:[ENTER]
+Seungryong Vadisi, Sohan Daðý, Yongbi Çölü ve Doyyumhwan'dýr[ENTER]
+Canavara her saldýrý 1 puan verir ve maksimum vuruþ 1 olur. [ENTER]
+Puan almak için Canavarý öldürmeniz gerekmektedir.[ENTER]
+Eðer öldüremezseniz kazandýðýnýz puanlar sayýlmaz.[ENTER]
+Ödülünü þehirdeki Bay B.'den teslim alabilirsin.[ENTER]

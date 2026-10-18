@@ -1,0 +1,30 @@
+ScriptType               MotionData
+
+MotionFileName           "D:\ymir work\npc\plechito_magictroll_cave\plechi_mt_runestone\destroy.GR2"
+MotionDuration           5.000000
+
+Group MotionEventData
+{
+    MotionEventDataCount     2
+    Group Event00
+    {
+        MotionEventType      1
+        StartingTime         0.165547
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "plechito_mt_runestone"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/npc/mt_runestone_destroy.mse"
+        EffectPosition       0.000000 0.000000 250.000000
+    }
+    Group Event01
+    {
+        MotionEventType      2
+        StartingTime         0.235547
+        
+        DuringTime           0.4057452
+        Power                90
+        AffectingRange       1300
+    }
+}

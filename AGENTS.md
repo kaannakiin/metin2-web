@@ -4,22 +4,29 @@ Guidance for coding agents working in this repository.
 
 ## What this is
 
-A Metin2 server + client fork, self-hosted for ~10 players. The main goal is playing the game **in the browser**: the Windows client (`Source/Binary`) is compiled to WebAssembly with a third-party port kit (nairoad/Metin2-WebClient, GPL-2.0) and talks to an unmodified-protocol FreeBSD server through a WebSocket→TCP bridge.
+A Metin2 server + client fork, self-hosted for ~10 players. The main goal is playing the game **in the browser**: the Windows client (`apps/client`) is compiled to WebAssembly with a third-party port kit (nairoad/Metin2-WebClient, GPL-2.0) and talks to an unmodified-protocol FreeBSD server through a WebSocket→TCP bridge.
 
-`CALISMA_NOTLARI.md` (Turkish) is the running log: what was done, why, what is still open. Read it before touching the web build, the deployment or the VM; update it when you change any of them. It deliberately holds no passwords, only where they live.
+`CALISMA_NOTLARI.md` (Turkish) is the running log: what was done, why, what is still open. Read it before touching the web build, the deployment or the VM; update it when you change any of them. It deliberately holds no passwords, only where they live. Map of the tree: `docs/ARCHITECTURE.md`.
 
 ## Layout that matters
 
-- `Source/Server` — game/db/auth servers (C++20, 32-bit, FreeBSD, `gmake`). Lua quests, `libthecore`, `libsql`.
-- `Source/Binary` — client (C++, Python 2.7 UI, D3D8). Built for Windows with `client.sln`; for the web it is copied to the build container and compiled by the kit.
-- `Client/` + `Tools/binary_unpack/` — client data (`root`, `locale`, `property`, `zone`…) that becomes EIX/EPK packs via `Tools/web/make_eterpacks.py`.
-- `Tools/web/kit/` — **repo copies** of our changes to the kit (`stage_port.py`, `compat/`, `tools/`, `site/`, `gr2_bitknit/`, `webclient.toml`). The live kit is on the host at `/home/m2web/kit` (= `/work/kit` in the container). A change must land in both places (`scp`).
-- `Tools/web/deploy/` — Traefik route (`metin2.yaml`), nginx site config, `deploy.sh`, `publish.sh`, `publish_cdn.sh`.
-- `Tools/web/cdn/` — the `metin2-corpus` Worker (assets only: `wrangler.jsonc`, `_headers`); host copy in `/home/m2web/cdn/`.
-- `web/portal/` — the site in front of the game: TanStack Start (React 19, SSR) + Tailwind 4 + react-hook-form/zod. Register and login are server functions (`src/lib/auth.ts`) that talk to the `account` DB directly; zod schemas in `src/server/validation.ts` are shared by forms and server. Production runs `node server.ts` (Hono static `/assets/*` + the Start fetch handler) as container `m2web-portal`.
-- Portal → game auto-login: `sessionStorage["m2w.autologin"]` (portal `src/lib/launch.ts`) → `client.html` (template `Tools/web/kit/site/client.html`) moves it into `/m2w_autologin` in the engine's memory FS in `Module.preRun` → `Tools/binary_unpack/root/intrologin.py` reads, deletes and logs in. Changing either side needs no engine rebuild: root pack + `scripts rewrite uiscript data link` + `package`.
-- `home/` — server runtime tree (configs, `share/locale`, `share/data`, protos) mirrored onto the VM under `/usr/home`.
-- `sql/` — schema reconstructed from the C++ queries (no original dump), all `utf8mb4`.
+Real paths (edit these):
+
+- `apps/server` — game/db/auth servers (C++20, 32-bit, FreeBSD, `gmake`). Lua quests, `libthecore`, `libsql`.
+- `apps/client` — client engine (C++, Python 2.7 UI, D3D8). Built for Windows with `client.sln`; for the web it is copied to the build container and compiled by the kit.
+- `apps/portal` — site in front of the game: TanStack Start (React 19, SSR) + Tailwind 4 + react-hook-form/zod. Register/login talk to the `account` DB; production runs `node server.ts` as container `m2web-portal`.
+- `content/client/packs` — unpacked client data (`root`, `locale`, `property`, `zone`…) that becomes EIX/EPK packs via `platform/make_eterpacks.py`.
+- `content/client/runtime` — Windows/runtime client tree (configs, `pack/`, …) used by the web kit as `client =`.
+- `content/server/sql` — schema/seeds (utf8mb4), reconstructed from the C++ queries.
+- `runtime/freebsd` — server runtime tree (configs, `share/locale`, `share/data`, protos) mirrored onto the VM under `/usr/home`.
+- `platform/web-kit` — **repo copies** of our kit changes (`stage_port.py`, `compat/`, `tools/`, `site/`, `gr2_bitknit/`, `webclient.toml`). Live kit: `/home/m2web/kit` (= `/work/kit` in the container). A change must land in both places (`scp`).
+- `platform/deploy` — Traefik route (`metin2.yaml`), nginx, `deploy.sh`, `publish.sh`, `publish_cdn.sh`, `release_upload.sh`, `server_release.sh`.
+- `platform/cdn` — the `metin2-corpus` Worker (assets only); host copy in `/home/m2web/cdn/`.
+- `vendor/` — third-party / unused-in-day-to-day (`jpeg-9d`, `FoxFS_Src`, `DumpProto`).
+
+Compat symlinks (one cycle; do not treat as source of truth): `Source/Server` → `apps/server`, `Source/Binary` → `apps/client`, `Client` → `content/client/runtime`, `Tools/binary_unpack` → `content/client/packs`, `Tools/web/{kit,deploy,cdn}` → `platform/…`, `web/portal` → `apps/portal`, `home` → `runtime/freebsd`, `sql` → `content/server/sql`. `git archive` does not follow them — release scripts list real paths.
+
+- Portal → game auto-login: `sessionStorage["m2w.autologin"]` (portal `src/lib/launch.ts`) → `client.html` (template `platform/web-kit/site/client.html`) moves it into `/m2w_autologin` in the engine's memory FS in `Module.preRun` → `content/client/packs/root/intrologin.py` reads, deletes and logs in. Changing either side needs no engine rebuild: root pack + `scripts rewrite uiscript data link` + `package`.
 
 ## Runtime topology (one Hetzner host, 88.99.1.151)
 
@@ -34,8 +41,8 @@ browser ─https─▶ Cloudflare ─┬─ /corpus/* ─▶ Worker metin2-corpu
                                          db 15000, auth 30001, ch99 30003, ch1 30101/30103/30105
 ```
 
-- Routes: `Tools/web/deploy/metin2.yaml` (live copy `/data/coolify/proxy/dynamic/metin2.yaml`, install with `apply_traefik.sh`, which rolls back if the site stops answering). Every router has an `ipAllowList` of Cloudflare's ranges: the portal trusts `CF-Connecting-IP`, so a direct hit on the origin must get 403. Refresh the ranges from `GET /client/v4/ips` if Cloudflare changes them. UFW lets only `coolify-proxy` (10.0.1.6 on the coolify network) reach 10.0.1.1:11496/11497; if Coolify recreates the proxy with another IP, move both rules (`deploy_portal.sh` warns).
-- Portal deploy: sync `web/portal` to `/home/m2web/portal-src` (no `node_modules`, `dist`, `.env*`), then `/home/m2web/deploy_portal.sh` (tests + build in a scratch copy, then swaps). Secrets live only in `/root/.metin2/portal.env` (root, 600): DB password (`portal@192.168.122.1`, SELECT/INSERT on `account.account` only) and the Turnstile secret (widget `metin2-portal`, site key `0x4AAAAAAFYZbZBCwl5IYp-B`).
+- Routes: `platform/deploy/metin2.yaml` (live copy `/data/coolify/proxy/dynamic/metin2.yaml`, install with `apply_traefik.sh`, which rolls back if the site stops answering). Every router has an `ipAllowList` of Cloudflare's ranges: the portal trusts `CF-Connecting-IP`, so a direct hit on the origin must get 403. Refresh the ranges from `GET /client/v4/ips` if Cloudflare changes them. UFW lets only `coolify-proxy` (10.0.1.6 on the coolify network) reach 10.0.1.1:11496/11497; if Coolify recreates the proxy with another IP, move both rules (`deploy_portal.sh` warns).
+- Portal deploy: sync `apps/portal` to `/home/m2web/portal-src` (no `node_modules`, `dist`, `.env*`), then `/home/m2web/deploy_portal.sh` (tests + build in a scratch copy, then swaps). Secrets live only in `/root/.metin2/portal.env` (root, 600): DB password (`portal@192.168.122.1`, SELECT/INSERT on `account.account` only) and the Turnstile secret (widget `metin2-portal`, site key `0x4AAAAAAFYZbZBCwl5IYp-B`).
 - Auto mode refuses VM service restarts and Traefik/IaC changes even with allow rules; prepare a script and hand those steps to the user.
 
 - `metin2.kaanakin.dev` is **proxied by Cloudflare** (Free plan, zone `kaanakin.dev`), managed through the Cloudflare MCP server (`.mcp.json`). Settings and why: `CALISMA_NOTLARI.md` §6.
@@ -50,7 +57,7 @@ Understand this before changing nginx, the service worker or adding a CDN:
 - `client.html` is `no-cache` and stamps `client.js/.wasm/.data` and `preload.js` with `?v=<build time>`; those are cached for a year. A new build is picked up because the HTML changes.
 - Game files are packed into a content-addressed **corpus**: `corpus/<sha256[:32]>.bin` 4 MB chunks (`immutable`), plus `corpus/manifest.bin` (the engine adds `?t=`) and `corpus/groups.txt` (not hashed, so `no-cache`). ~5.4 GB, ~1370 files.
 - Corpus layout (`tools/build_corpus.py` + `tools/corpus_groups.py`): `meta` (small descriptors: `.msa .msm .mse .txt`…), `motion` (all races' motion `.gr2`), `boot` (`tools/data/boot_files.txt`, a recorded first session), each in its own chunks; then each map's files together (villages first); then the rest by path. `groups.txt` lists the chunks of those groups and of every `map:<dir>` (its directory, texture set, environment and the property → model → texture closure of its areas).
-- `/corpus/*` is served by the `metin2-corpus` Worker (assets only, no script, so requests are free and do not count toward the Workers daily limit; headers from `Tools/web/cdn/_headers`). The client is unaware: it reads the same-origin `corpus/` path (`?corpus=` is ignored on the real site by design). The origin still has a copy; deleting the Worker route falls back to it instantly.
+- `/corpus/*` is served by the `metin2-corpus` Worker (assets only, no script, so requests are free and do not count toward the Workers daily limit; headers from `platform/cdn/_headers`). The client is unaware: it reads the same-origin `corpus/` path (`?corpus=` is ignored on the real site by design). The origin still has a copy; deleting the Worker route falls back to it instantly.
 - Cloudflare cache rules for the origin: `?v=` engine files cached at the edge, everything else never cached. Nothing needs purging on publish.
 - Only the current build's corpus is deployed (no previous chunks kept): after a publish, players with the game open must reload.
 - The engine reads chunks with **synchronous XHR** (`compat/webfs_web.cpp`), which bypasses the service worker and freezes the frame. Only a chunk already in page memory (`m2w.chunks`, budget `?corpusMB`, default 512/768 MB) avoids that, so `compat/runtime.js` `m2w.prefetchStart` fetches groups asynchronously: `meta`/`motion`/`boot` from page load, the maps of the account's characters on the select screen (`PythonNetworkStreamPhaseSelect.cpp`), and the map being entered first. The loading phase holds the main-character packet until that map is in memory or a minute has passed (`__WebMapPrefetched`, `m2w.mapReady`), so the loading screen keeps drawing. Chunks also go to Cache Storage (`m2w-corpus`; chunks of older builds are pruned). There is no whole-corpus download.
@@ -66,9 +73,12 @@ Server (on the VM):
 ```sh
 ssh root@88.99.1.151                                   # host
 ssh -i /root/.ssh/metin2_vm root@192.168.122.10        # VM, from the host
-cd /usr/metin2/Source/Server && gmake -j4 all          # binaries -> /usr/home/share/bin/{db,game}
+# After layout cutover: apps/server. Until then live tree may still be Source/Server (symlink also present post-install).
+cd /usr/metin2/apps/server && gmake -j4 all            # binaries -> /usr/home/share/bin/{db,game}
 service metin2 start|stop|status
 ```
+
+Server release (from Mac, committed tree): `platform/deploy/release_upload.sh` → on host `platform/deploy/server_release.sh stage|build|install`. Before first layout install on the VM: `platform/deploy/layout_cutover_backup.sh`.
 
 Web client (in container `m2web-build` on the host; bash, not sh):
 
@@ -76,14 +86,14 @@ Web client (in container `m2web-build` on the host; bash, not sh):
 cd /work/kit && source /work/emsdk/emsdk_env.sh && python3.13 webclient.py build --only <step>
 # steps: lzo cryptopp python stage eterbase eterpack engine unpack scripts rewrite uiscript corpus data link package
 # log: /work/step_<step>.log; trees and gr2 steps are skipped (no SpeedTree/Granny DLLs)
-python3 -I Tools/web/kit/patchcheck.py <kit_dir> Source/Binary/source   # every stage patch must still hit
+python3 -I platform/web-kit/patchcheck.py <kit_dir> apps/client/source   # every stage patch must still hit
 ```
 
 Run container scripts as files: write to `/home/m2web/x.sh`, then `ssh -o BatchMode=yes root@88.99.1.151 'docker exec m2web-build bash /work/x.sh'` (this form is allowlisted). Long jobs: `nohup` + `publish.sh`.
 
 Publish: `webclient.py package` and `tools/bridge_config.py --site https://metin2.kaanakin.dev` in the container, then `/home/m2web/publish.sh` on the host (refuses to sync an incomplete package). It runs `publish_cdn.sh` first (wrangler in a `node:22-alpine` container, token in `/root/.cloudflare/metin2-cdn.env`; only changed chunks upload, the first full upload took ~10 min) and then syncs the site. `deploy.sh` recreates the site and bridge containers.
 
-Portal (`web/portal`, Node ≥ 22.18, no build step for `server.ts`):
+Portal (`apps/portal`, Node ≥ 22.18, no build step for `server.ts`):
 
 ```sh
 npm install

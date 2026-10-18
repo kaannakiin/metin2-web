@@ -1,0 +1,179 @@
+ScriptType            RaceDataScript
+
+BaseModelFileName     "D:\Ymir Work\npc\plechito_halloween2023_mounts\plechi_h2023_mount13\plechi_h2023_mount13.GR2"
+
+Group ShapeData
+{
+    PathName 		 ""
+    ShapeDataCount 		 0
+}
+Group AttachingData
+{
+    AttachingDataCount       12
+    
+    Group AttachingData00
+    {
+        AttachingDataType    1
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "Bip01"
+        
+        CollisionType        1
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           85.000000
+            Position         0.000000 -60.000000 -20.000000
+        }
+    }
+    
+    Group AttachingData01
+    {
+        AttachingDataType    1
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "Bip01"
+        
+        CollisionType        3
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           100.000000
+            Position         0.000000 -60.000000 -20.000000
+        }
+    }
+    
+    Group AttachingData02
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "eff_foot1"
+        
+        EffectScriptName     "D:\ymir work\npc\plechito_halloween2023_mounts\plechi_h2023_mount13\foot_eff.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+    
+    Group AttachingData03
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "eff_foot2"
+        
+        EffectScriptName     "D:\ymir work\npc\plechito_halloween2023_mounts\plechi_h2023_mount13\foot_eff.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+    
+    Group AttachingData04
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "Bip01 R Hand|eff_hand1"
+        
+        EffectScriptName     "D:\ymir work\npc\plechito_halloween2023_mounts\plechi_h2023_mount13\foot_eff.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+    
+    Group AttachingData05
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "Bip01 L Hand|eff_hand1"
+        
+        EffectScriptName     "D:\ymir work\npc\plechito_halloween2023_mounts\plechi_h2023_mount13\foot_eff.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+    
+    Group AttachingData06
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "eff_crystal004"
+        
+        EffectScriptName     "D:\ymir work\npc\plechito_halloween2023_mounts\plechi_h2023_mount13\crystal_glow.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+    
+    Group AttachingData07
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "eff_crystal003"
+        
+        EffectScriptName     "D:\ymir work\npc\plechito_halloween2023_mounts\plechi_h2023_mount13\crystal_glow.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+    
+    Group AttachingData08
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "eff_crystal002"
+        
+        EffectScriptName     "D:\ymir work\npc\plechito_halloween2023_mounts\plechi_h2023_mount13\crystal_glow.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+    
+    Group AttachingData09
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "eff_crystal1"
+        
+        EffectScriptName     "D:\ymir work\npc\plechito_halloween2023_mounts\plechi_h2023_mount13\crystal_glow.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+    
+    Group AttachingData10
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "eff_pumpkin002"
+        
+        EffectScriptName     "D:\ymir work\npc\plechito_halloween2023_mounts\plechi_h2023_mount13\pumpkin_glow.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+    
+    Group AttachingData11
+    {
+        AttachingDataType    2
+        
+        isAttaching          1
+        AttachingModelIndex  0
+        AttachingBoneName    "eff_pumpkin1"
+        
+        EffectScriptName     "D:\ymir work\npc\plechito_halloween2023_mounts\plechi_h2023_mount13\pumpkin_glow.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+        EffectRotation       0.000000 0.000000 0.000000
+    }
+}

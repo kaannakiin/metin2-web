@@ -1,7 +1,0 @@
-AreaAmbienceDataFile
-
-
-ObjectCount 0
-
-NumWater 0
-
