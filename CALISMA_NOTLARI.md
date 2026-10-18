@@ -9,7 +9,7 @@ Bu dosya, yapılanları ve kaldığımız yeri kaydeder. Şifreler burada YOK; n
 - Kaynak ağaç (hard-cut, tek isim): `apps/`, `content/`, `runtime/freebsd/`, `platform/`, `vendor/` — özet: `docs/ARCHITECTURE.md`, agent kuralları: `AGENTS.md`.
 - Compat symlink yok. Eski isimler (`Source/`, `Client/`, `home/`, `sql/`, `Tools/binary_unpack`, `Tools/web/`, `web/portal`) kaldırıldı.
 - Tag'ler: `pre-layout-20261018` (taşıma öncesi), `pre-hardcut-20261018` (symlink drop öncesi).
-- **VM hâlâ eski ağaçta olabilir** (`/usr/metin2/Source/Server`) ta ki bakım penceresinde `platform/deploy/layout_cutover_backup.sh` + `release_upload` + `server_release.sh stage/build/install` çalıştırılana kadar. Install sonrası live: yalnızca `/usr/metin2/apps/server`.
+- **VM hard-cut canlı (2026-10-18, commit `8cceb8e22`)**: live `/usr/metin2/apps/server`; eski ağaç saklandı `/usr/metin2-prev-20261018-102041`; host tarball `/root/backups/metin2-{tree,bin}-20261018-hardcut.tar`. Geri alma: `platform/deploy/LAYOUT_CUTOVER.md`.
 - Release script path'leri: `platform/deploy/release_upload.sh`, `platform/deploy/server_release.sh`.
 
 ---
