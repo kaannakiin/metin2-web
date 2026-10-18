@@ -110,6 +110,12 @@ extern const DWORD exp_table_common[PLAYER_EXP_TABLE_MAX + 1];
 
 extern const DWORD *exp_table;
 
+// Mid-effort 1-99 PvP multipliers. See PVP_HEDEF.md.
+int GetMidPvpMobExpRate(int level);		// 100 = 1x mob EXP
+int GetMidPvpGoldAmountRate();			// 100 = 1x yang amount
+int GetMidPvpGoldKillCap();				// max yang from one kill (total)
+int GetMidPvpMetinYang(int stoneLevel);	// synthetic yang for 0-gold metins
+
 extern const DWORD guild_exp_table[GUILD_MAX_LEVEL + 1];
 
 #ifdef ENABLE_AURA_COSTUME_SYSTEM

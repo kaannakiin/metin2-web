@@ -256,6 +256,44 @@ const DWORD exp_table_common[PLAYER_EXP_TABLE_MAX + 1] =
 #endif
 };
 
+// Mid-effort 1-99 PvP (PVP_HEDEF.md): ~8-12h active to 99 with same-level farm.
+// Values are percent (100 = 1x). Tuned from mob_proto median EXP + ~1500 kills/h sim.
+// 1-30 is mostly clamped by the 10%/kill cap; 70-99 needs high rates because the table spikes.
+int GetMidPvpMobExpRate(int level)
+{
+	if (level < 30)
+		return 5000;	// 50x  -> ~0.5-1.5h (travel/quest padded)
+	if (level < 70)
+		return 8000;	// 80x  -> ~3.5h
+	if (level < 90)
+		return 45000;	// 450x -> ~2.8h
+	if (level < 99)
+		return 75000;	// 750x -> ~2.5h
+	return 100;			// 99+: practically no push until MAX_LEVEL is locked to 99
+}
+
+// Yang scarce: proto amount * this / 100. Boss bombs also hard-capped per kill.
+int GetMidPvpGoldAmountRate()
+{
+	return 50; // 50% of proto yang
+}
+
+int GetMidPvpGoldKillCap()
+{
+	return 400000; // one kill never floods the 10-player economy
+}
+
+// Classic metins have Min/MaxGold=0; give modest yang so upgrade costs are farmable.
+int GetMidPvpMetinYang(int stoneLevel)
+{
+	if (stoneLevel < 1)
+		stoneLevel = 1;
+	if (stoneLevel > 99)
+		stoneLevel = 99;
+	// lv10 ~1.5k, lv50 ~7.5k, lv90 ~13.5k (before gold amount rate)
+	return 500 + stoneLevel * 150;
+}
+
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 int s_aiAuraRefineInfo[AURA_GRADE_MAX_NUM][AURA_REFINE_INFO_MAX] = {
 //  [ Grade | LevelMin | LevelMax | NeedEXP | EvolMaterial | EvolMaterialCount | EvolCost | EvolPCT ]
@@ -808,16 +846,15 @@ const TApplyInfo aApplyInfo[MAX_APPLY_NUM] =
 #endif
 };
 
+// Mid-effort PvP: slightly better natural/high attr rolls (lv4/lv5 more common).
 const int aiItemMagicAttributePercentHigh[ITEM_ATTRIBUTE_MAX_LEVEL] =
 {
-	//25, 25, 40, 8, 2,
-	30, 40, 20, 8, 2
+	25, 35, 22, 12, 6
 };
 
 const int aiItemMagicAttributePercentLow[ITEM_ATTRIBUTE_MAX_LEVEL] =
 {
-	//45, 25, 20, 10, 0,
-	50, 40, 10, 0, 0
+	45, 40, 12, 3, 0
 };
 
 // ADD_ITEM_ATTRIBUTE

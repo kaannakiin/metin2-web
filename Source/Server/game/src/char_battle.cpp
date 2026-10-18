@@ -402,19 +402,16 @@ void CHARACTER::DeathPenalty(BYTE bTown)
 		}
 		// END_OF_NO_DEATH_PENALTY_BUG_FIX
 
-		int iLoss = ((GetNextExp() * aiExpLossPercents[MINMAX(1, GetLevel(), PLAYER_EXP_TABLE_MAX)]) / 100);
-
-		iLoss = MIN(800000, iLoss);
+		// Mid-effort PvP (PVP_HEDEF.md): no EXP loss on death — PvP should not punish leveling.
+		int iLoss = 0;
 
 		if (bTown)
 			iLoss = 0;
 
-		if (IsEquipUniqueItem(UNIQUE_ITEM_TEARDROP_OF_GODNESS))
-			iLoss /= 2;
+		sys_log(0, "DEATH_PENALTY(%s) EXP_LOSS: %d (disabled for mid-pvp)", GetName(), iLoss);
 
-		sys_log(0, "DEATH_PENALTY(%s) EXP_LOSS: %d percent %d%%", GetName(), iLoss, aiExpLossPercents[MIN(gPlayerMaxLevel, GetLevel())]);
-
-		PointChange(POINT_EXP, -iLoss, true);
+		if (iLoss > 0)
+			PointChange(POINT_EXP, -iLoss, true);
 	}
 }
 
@@ -627,6 +624,26 @@ bool CHARACTER::IsDead() const
 
 #define GetGoldMultipler() (distribution_test_server ? 3 : 1)
 
+// Mid-effort PvP: scale + hard-cap yang so bosses cannot print millions.
+static int MidPvpScaleGold(LPCHARACTER pkAttacker, int iGold)
+{
+	long long ll = iGold;
+	ll = ll * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker) / 100;
+	ll = ll * GetMidPvpGoldAmountRate() / 100;
+	if (ll < 0)
+		ll = 0;
+	if (ll > INT_MAX)
+		ll = INT_MAX;
+	return static_cast<int>(ll);
+}
+
+static void MidPvpClampKillTotal(int & iTotalGold)
+{
+	const int cap = GetMidPvpGoldKillCap();
+	if (iTotalGold > cap)
+		iTotalGold = cap;
+}
+
 void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 {
 	// ADD_PREMIUM
@@ -702,6 +719,20 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		pkAttacker->ChatPacket(CHAT_TYPE_PARTY, "gold_mul %d rate %d", iGoldMultipler, CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker));
 #endif
 
+	DWORD dwGoldMin = GetMobTable().dwGoldMin;
+	DWORD dwGoldMax = GetMobTable().dwGoldMax;
+	// Classic metins ship with 0 yang — give modest farm yang for upgrades (PVP_HEDEF).
+	if (IsStone() && dwGoldMax == 0)
+	{
+		const int y = GetMidPvpMetinYang(GetLevel());
+		dwGoldMin = static_cast<DWORD>(y * 80 / 100);
+		dwGoldMax = static_cast<DWORD>(y * 120 / 100);
+		if (dwGoldMin < 1)
+			dwGoldMin = 1;
+		if (dwGoldMax < dwGoldMin)
+			dwGoldMax = dwGoldMin;
+	}
+
 	//
 	// --------- actual drop handling -------------
 	//
@@ -713,7 +744,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 #endif
 
 	// If MOB_RANK is higher than BOSS, it is an unconditional money bomb.
-	if (GetMobRank() >= MOB_RANK_BOSS && !IsStone() && GetMobTable().dwGoldMax != 0)
+	if (GetMobRank() >= MOB_RANK_BOSS && !IsStone() && dwGoldMax != 0)
 	{
 #ifdef ENABLE_GOLD10_PCT
 		if (1 == number(1, iGold10DropPct))
@@ -721,14 +752,18 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 #endif
 
 		const int iSplitCount = number(25, 35);
+		const int iKillCap = GetMidPvpGoldKillCap();
+		const int iPieceCap = MAX(1, iKillCap / iSplitCount);
 
 		for (int i = 0; i < iSplitCount; ++i)
 		{
-			int iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax) / iSplitCount;
+			int iGold = number(dwGoldMin, dwGoldMax) / iSplitCount;
 			if (test_server)
 				sys_log(0, "iGold %d", iGold);
-			iGold = iGold * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker) / 100;
+			iGold = MidPvpScaleGold(pkAttacker, iGold);
 			iGold *= iGoldMultipler;
+			if (iGold > iPieceCap)
+				iGold = iPieceCap;
 
 			if (iGold == 0)
 			{
@@ -738,7 +773,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 			if (test_server)
 			{
 				sys_log(0, "Drop Moeny MobGoldAmountRate %d %d", CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker), iGoldMultipler);
-				sys_log(0, "Drop Money gold %d GoldMin %d GoldMax %d", iGold, GetMobTable().dwGoldMax, GetMobTable().dwGoldMax);
+				sys_log(0, "Drop Money gold %d GoldMin %d GoldMax %d", iGold, dwGoldMax, dwGoldMax);
 			}
 
 			// NOTE: Money bombs do not deal with third hand
@@ -762,11 +797,14 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		//
 		// money bomb drop
 		//
+		const int iPieceCap = MAX(1, GetMidPvpGoldKillCap() / 10);
 		for (int i = 0; i < 10; ++i)
 		{
-			int iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax);
-			iGold = iGold * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker) / 100;
+			int iGold = number(dwGoldMin, dwGoldMax);
+			iGold = MidPvpScaleGold(pkAttacker, iGold);
 			iGold *= iGoldMultipler;
+			if (iGold > iPieceCap)
+				iGold = iPieceCap;
 
 			if (iGold == 0)
 			{
@@ -792,9 +830,11 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		//
 		// money drop in the usual way
 		//
-		int iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax);
-		iGold = iGold * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker) / 100;
+		int iGold = number(dwGoldMin, dwGoldMax);
+		iGold = MidPvpScaleGold(pkAttacker, iGold);
 		iGold *= iGoldMultipler;
+		if (iGold > GetMidPvpGoldKillCap())
+			iGold = GetMidPvpGoldKillCap();
 
 		int iSplitCount = 0;
 
@@ -833,6 +873,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		}
 	}
 
+	MidPvpClampKillTotal(iTotalGold);
 	DBManager::instance().SendMoneyLog(MONEY_LOG_MONSTER, GetRaceNum(), iTotalGold);
 }
 
@@ -3671,10 +3712,15 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 		);
 	}
 
-	iExp = iExp * CHARACTER_MANAGER::instance().GetMobExpRate(to) / 100;
-	if (iExp < 0)
 	{
-	iExp = 1 * (to->GetNextExp() / 100);
+		long long llExp = iExp;
+		llExp = llExp * CHARACTER_MANAGER::instance().GetMobExpRate(to) / 100;
+		llExp = llExp * GetMidPvpMobExpRate(to->GetLevel()) / 100;
+		if (llExp < 0)
+			llExp = to->GetNextExp() / 100;
+		if (llExp > INT_MAX)
+			llExp = INT_MAX;
+		iExp = static_cast<int>(llExp);
 	}
 
 	iExp = MIN(to->GetNextExp() / 10, iExp);

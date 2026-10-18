@@ -367,30 +367,20 @@ void CHARACTER::SendHorseInfo()
 
 bool CHARACTER::CanUseHorseSkill()
 {
-	if (IsRiding())
-	{
+	// Classic military horse (grade 3): horse skills only.
+	// Item mounts (Young Lion etc.): return false so job skills are used instead
+	// (see ComputeSkill GetMountVnum() combat path).
+	if (!IsRiding())
+		return false;
+
+	if (GetMountVnum())
+		return false;
+
 #ifdef ENABLE_RIDING_EXTENDED
-		if (GetHorseGrade() >= 3)
+	return GetHorseGrade() >= 3;
 #else
-		if (GetHorseGrade() == 3)
+	return GetHorseGrade() == 3;
 #endif
-			return true;
-		else
-			return false;
-
-		if (GetMountVnum())
-		{
-			if (GetMountVnum() >= 20201 && GetMountVnum() <= 20249)
-				return true;
-
-			if (CMobVnumHelper::IsRamadanBlackHorse(GetMountVnum()))
-				return true;
-		}
-		else
-			return false;
-	}
-
-	return false;
 }
 
 void CHARACTER::SetHorseLevel(int iLevel)

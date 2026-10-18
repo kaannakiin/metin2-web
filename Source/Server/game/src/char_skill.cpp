@@ -1862,7 +1862,7 @@ int CHARACTER::ComputeSkillAtPosition(DWORD dwVnum, const PIXEL_POSITION& posTar
 	if (GetMountVnum())
 	{
 #ifdef ENABLE_STANDING_MOUNT
-		if (!IS_STANDING_MOUNT_VNUM(GetMountVnum()))
+		if (!GetMountVnum())
 			return BATTLE_NONE;
 #else
 		return BATTLE_NONE;
@@ -2230,7 +2230,7 @@ int CHARACTER::ComputeSkill(DWORD dwVnum, LPCHARACTER pkVictim, BYTE bSkillLevel
 	const bool bCanUseHorseSkill = CanUseHorseSkill();
 
 #ifdef ENABLE_STANDING_MOUNT
-	if (!IS_STANDING_MOUNT_VNUM(GetMountVnum()))
+	if (!GetMountVnum())
 	{
 		if (false == bCanUseHorseSkill && true == IsRiding())
 		{
@@ -2256,7 +2256,7 @@ int CHARACTER::ComputeSkill(DWORD dwVnum, LPCHARACTER pkVictim, BYTE bSkillLevel
 		return BATTLE_NONE;
 
 #ifdef ENABLE_STANDING_MOUNT
-	if (IS_STANDING_MOUNT_VNUM(GetMountVnum()))
+	if (GetMountVnum())
 	{
 		// Surfboard'dayken horse becerileri kullanýlamaz
 		if (pkSk->dwType == SKILL_TYPE_HORSE)
@@ -2947,7 +2947,7 @@ bool CHARACTER::UseSkill(DWORD dwVnum, LPCHARACTER pkVictim, bool bUseGrandMaste
 #endif
 	{
 #ifdef ENABLE_STANDING_MOUNT
-		if (!IS_STANDING_MOUNT_VNUM(GetMountVnum()))
+		if (!GetMountVnum())
 		{
 			if (false == bCanUseHorseSkill && true == IsRiding())
 			{
@@ -2969,7 +2969,7 @@ bool CHARACTER::UseSkill(DWORD dwVnum, LPCHARACTER pkVictim, bool bUseGrandMaste
 		return false;
 
 #ifdef ENABLE_STANDING_MOUNT
-	if (IS_STANDING_MOUNT_VNUM(GetMountVnum()))
+	if (GetMountVnum())
 	{
 		// Surfboard'dayken horse becerileri kullanýlamaz
 		if (pkSk->dwType == SKILL_TYPE_HORSE)
@@ -4735,27 +4735,28 @@ eMountType GetMountLevelByVnum(DWORD dwMountVnum, bool IsNew) // updated to 2014
 		case 20299: // Dyno Lv2 (no skill, yes atk)
 			return MOUNT_TYPE_COMBAT;
 			break;
-		// ### NO SKILL NO ATK
+		// ### MID-PVP: former NO SKILL/NO ATK mounts now MILITARY (full combat)
 		// @fixme116 begin
-		case 20101: // normal beginner horse (no guild)
-		case 20102: // normal beginner horse (guild member)
-		case 20103: // normal beginner horse (guild master)
+		case 20101: // beginner horse
+		case 20102:
+		case 20103:
 			if (IsNew)
 				return MOUNT_TYPE_NONE;
 		// @fixme116 end
-		case 20213: // Rudolph m Lv1 (no skill, no atk)
-		case 20216: // Rudolph f Lv1 (no skill, no atk)
-		// Special Lv1
-		case 20201: // Boar Lv1 (no skill, no atk)
-		case 20202: // Wolf Lv1 (no skill, no atk)
-		case 20203: // Tiger Lv1 (no skill, no atk)
-		case 20204: // Lion Lv1 (no skill, no atk)
-		//
-		case 20223: // Dyno Lv1 (no skill, no atk)
-		case 20228: // Turkey Lv1 (no skill, no atk)
-			return MOUNT_TYPE_NORMAL;
+		case 20213: // Rudolph m Lv1
+		case 20216: // Rudolph f Lv1
+		case 20201: // Boar Lv1 (Young Lion item uses 20204)
+		case 20202: // Wolf Lv1
+		case 20203: // Tiger Lv1
+		case 20204: // Lion Lv1 / welcome Young Lion mount
+		case 20223: // Dyno Lv1
+		case 20228: // Turkey Lv1
+			return MOUNT_TYPE_MILITARY;
 			break;
 		default:
+			// Unknown costume mounts: allow PvP combat (skills + attack)
+			if (dwMountVnum >= 20100 && dwMountVnum <= 20300)
+				return MOUNT_TYPE_MILITARY;
 			return MOUNT_TYPE_NONE;
 			break;
 	}
@@ -4877,11 +4878,11 @@ bool CHARACTER::CanUseSkill(DWORD dwSkillVnum) const
 	//if (true == IsHorseRiding())
 
 #ifdef ENABLE_STANDING_MOUNT
-	// Standing mount zerindeyken normal skill'ler kullanlabilir, mount kontroln atla
+	// mid-pvp: item mounts + standing mounts use job skills while riding
 	DWORD dwMountVnum = GetMountVnum();
-	bool bIsStandingMount = (dwMountVnum == 40003 || dwMountVnum == 40004 || dwMountVnum == 40005);
+	bool bCombatMount = (dwMountVnum != 0);
 
-	if (true == IsRiding() && !bIsStandingMount)
+	if (true == IsRiding() && !bCombatMount)
 #else
 	if (true == IsRiding())
 #endif
@@ -4889,12 +4890,12 @@ bool CHARACTER::CanUseSkill(DWORD dwSkillVnum) const
 		// Only advanced mounts can use other mount abilities (non-horse skills)
 #ifdef ENABLE_MOUNTSKILL_CHECK
 #ifdef ENABLE_STANDING_MOUNT
-		// Standing mount'lar iin mount skill check'i atla (normal skill'ler kullanlabilir)
-		if (!bIsStandingMount)
+		if (!bCombatMount)
 		{
 #endif
 			eMountType eIsMount = GetMountLevelByVnum(GetMountVnum(), false);
-			if (eIsMount != MOUNT_TYPE_MILITARY)
+			// mid-pvp: any classified mount may use job skills while riding
+			if (eIsMount == MOUNT_TYPE_NONE)
 			{
 				if (test_server)
 					sys_log(0, "CanUseSkill: Mount can't skill. vnum(%u) type(%d)", GetMountVnum(), static_cast<int>(eIsMount));

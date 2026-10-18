@@ -420,6 +420,10 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 			case 20117:
 			case 20118:
 				//
+			case 20201:
+			case 20202:
+			case 20203:
+			case 20204:
 			case 20205:
 			case 20206:
 			case 20207:

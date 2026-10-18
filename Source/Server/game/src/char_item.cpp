@@ -6290,9 +6290,10 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (item->GetSubType() == USE_CHANGE_ATTRIBUTE2)
 									{
+										// Mid-effort PvP: lv5 no longer near-impossible on special enchant.
 										int aiChangeProb[ITEM_ATTRIBUTE_MAX_LEVEL] = 
 										{
-											0, 0, 30, 40, 3
+											0, 0, 25, 45, 15
 										};
 
 										item2->ChangeAttribute(aiChangeProb);

@@ -332,26 +332,13 @@ bool CInstanceBase::SHORSE::IsHoverBoard()
 
 bool CInstanceBase::SHORSE::CanUseSkill()
 {
-#ifdef ENABLE_STANDING_MOUNT
-	// Standing mount üzerindeyken level kontrolü yapma
-	if (IsMounting())
-	{
-		if (IsHoverBoard())
-			return true;
-		
-		return 2 < GetLevel();
-	}
-#endif
-
+	// mid-pvp: all mounts may use job skills while riding
 	return true;
 }
 
 bool CInstanceBase::SHORSE::CanAttack()
 {
-	if (IsMounting())
-		if (GetLevel()<=1)
-			return false;
-
+	// mid-pvp: all mounts deal damage while riding (incl. Young Lion 20204)
 	return true;
 }
 

@@ -247,9 +247,10 @@ void CItem::ChangeAttribute(const int* aiChangeProb)
 		ApplyAddon(pProto->sAddonType);
 	}
 
+	// Mid-effort PvP (PVP_HEDEF.md): more lv4/lv5 on enchant rerolls so average is reachable.
 	static const int tmpChangeProb[ITEM_ATTRIBUTE_MAX_LEVEL] =
 	{
-		0, 10, 40, 35, 15,
+		0, 5, 30, 40, 25,
 	};
 
 	for (int i = GetAttributeCount(); i < iAttributeCount; ++i)
