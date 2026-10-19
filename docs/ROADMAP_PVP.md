@@ -10,6 +10,7 @@ Bu dosya **geliştirme sırası ve faz çıkış kriterleri**. Sayılar, ekonomi
 PVP_HEDEF.md              ← tasarım kilidi (exp, yang, shop, özellik Açık/Kapalı)
 docs/ROADMAP_PVP.md       ← fazlar, sırası, çıkış kriteri (bu dosya)
 docs/MID_PVP_FAZ0_1.md    ← Faz 0+1 yapılanlar (tekrar etme)
+docs/MID_PVP_FAZ2.md      ← Faz 2 QoL yapılanlar (tekrar etme)
 CALISMA_NOTLARI.md        ← web/deploy/VM ne yapıldı / ne açık
 ```
 
@@ -76,31 +77,29 @@ Offline: dört `platform/tools/mid_pvp_*.py` yeşil. Canlı: VM checklist uygula
 
 ---
 
-## Faz 2 — QoL’u çalışır hale getir — **sıradaki**
+## Faz 2 — QoL’u çalışır hale getir
 
 **Süre tahmini:** 1–2 hafta  
-**Durum:** sıradaki iş (Faz 0+1 done log: [`MID_PVP_FAZ0_1.md`](MID_PVP_FAZ0_1.md)). Kodda var; bağla + offline/statik assert + power’sız BP.
+**Durum:** tamam (2026-10-19) — done log: [`MID_PVP_FAZ2.md`](MID_PVP_FAZ2.md); VM/web sync checklist’te
 
-Sistemler (çoğu `ENABLE_*` / `__AUTO_HUNT__` ile mevcut):
+### Yapılanlar (özet)
 
-- Oto av + auto potion + multi-farm limiti (~2 client)
-- Switchbot (1–5 efsun; hedef değerde dur)
-- Offline pazar + arama (pazar vergisi = yang sink)
-- Uzaktan biyolog (klasik 30→94; 96/98 varsa yalnızca küçük PvM)
-- Hızlı ışınlanma + boss/NPC trace
-- Battle Pass: ücretsiz track; ödül = malzeme / kozmetik (power item yok)
-- Pet: düşük bonus veya 3 kademe; enum/kitap uyumsuzluğunu düzelt veya skill’leri kıs
+- Biolog client alias (`ENABLE_BIOLOG_SYSTEM`)
+- Free `battlepass_config.txt` + login seed; level mission gate 250→1; bonus affects 0
+- Teleport maxLevel 99; Yohara/100+ warp boards boş
+- Growth pet PASSIVE combat kapalı
+- Assert: `platform/tools/mid_pvp_qol_check.py`
 
 ### Çıkış kriteri
 
-Yeni karakter welcome → ~30 QoL ile geliyor; pazar / biyolog / oto av / switchbot kırık değil.
+Offline: beş `mid_pvp_*.py` yeşil. **Karşılandı (repo).** Canlı: VM_MID_PVP_APPLY + pack/Locale rebuild.
 
 ---
 
-## Faz 3 — İçerik omurgası (harita / metin / boss / zindan)
+## Faz 3 — İçerik omurgası (harita / metin / boss / zindan) — **sıradaki**
 
 **Süre tahmini:** 2–3 hafta  
-**Durum:** planlandı
+**Durum:** sıradaki iş
 
 1. Level akışı: 1–20 köy → 2. köy → Seungryong → Hwang → Yongbi/Örümcek → Sohan/Doyyum → Kızıl Orman → Sürgün 1–2 → opsiyonel 1 end map.
 2. Metin: band drop (küratörlü gear) + yüksek level’ın düşük farm tekeline engel.
@@ -164,9 +163,9 @@ Açma ta ki Faz 1–4 oturana kadar:
 
 ## Yakın 4 hafta (önerilen sıra)
 
-1. ~~Faz 0 — flag matrisi~~ **tamam**
-2. ~~Faz 1 — PvP harita + MAX 99 + offline sim~~ **repo tamam** → VM_MID_PVP_APPLY + web rebuild (Yohara)
-3. Faz 2 — oto av / pazar / biyolog / BP smoke test
+1. ~~Faz 0~~ **tamam**
+2. ~~Faz 1~~ **repo tamam** → VM sync
+3. ~~Faz 2 QoL~~ **repo tamam** ([`MID_PVP_FAZ2.md`](MID_PVP_FAZ2.md)) → Locale/pack + BP config sync
 4. Faz 3 — ilk 5 alan bossu + 2 zindan drop omurgası
 
 Web ASan / publish stabilitesi paralel.

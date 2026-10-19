@@ -141,11 +141,32 @@ void CHARACTER::Load_BattlePass()
 
 	Struct_BattlePass save_counts = {0, 0};
 
+	v_counts.clear();
+
 	snprintf(file_name, sizeof(file_name), "%s/battlepass_players/%s.txt", LocaleService_GetBasePath().c_str(),GetName());
 	fp = fopen(file_name, "r");
 
 	if (!fp)
+	{
+		// Mid-pvp free track: seed progress when config missions exist (no ticket item).
+		if (!missions_bp.empty())
+		{
+			FILE* fileID = fopen(file_name, "w");
+			if (fileID)
+			{
+				for (size_t i = 0; i < missions_bp.size(); ++i)
+					fprintf(fileID, "MISSION\t%d\t%d\n", 0, 0);
+				fclose(fileID);
+			}
+			for (size_t i = 0; i < missions_bp.size(); ++i)
+			{
+				Struct_BattlePass z = {0, 0};
+				v_counts.push_back(z);
+			}
+			ChatPacket(CHAT_TYPE_COMMAND, "battlepass_status %d", 1);
+		}
 		return;
+	}
 
 	while (fgets(one_line, 256, fp))
 	{
@@ -191,6 +212,12 @@ void CHARACTER::ExternBattlePass()
 	Infos_MissionsBP bp_missions = {0, 0, 0, 0};
 	Infos_FinalBP bp_final_reward = {0, 0, 0, 0};
 	Infos_Bonus_BattlePass bp_bonus_infos = {0, 0, 0, 0, 0, 0};
+
+	// Avoid duplicating config rows on every login.
+	rewards_bp.clear();
+	missions_bp.clear();
+	final_rewards.clear();
+	rewards_bonus_bp.clear();
 	
 	snprintf(file_name, sizeof(file_name), "%s/battlepass_config.txt", LocaleService_GetBasePath().c_str());
 	fp = fopen(file_name, "r");

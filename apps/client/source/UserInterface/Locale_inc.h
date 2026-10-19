@@ -170,6 +170,9 @@
 		#define USE_ITEMSHOP_RENEWED						// Oyun içi nesne market sistemi yenilemeyi etkinleþtirir;
 	#endif
 #define ENABLE_BIOLOGIST_SYSTEM								// Biyolog sistemini etkinleþtir
+#ifdef ENABLE_BIOLOGIST_SYSTEM
+#define ENABLE_BIOLOG_SYSTEM								// Alias for PythonBiologManager*.cpp
+#endif
 //#define ENABLE_YOHARA_SYSTEM          						// Yohara kýtasý ve SungMa tabanlý sistemleri etkinleþtirir
 	#ifdef ENABLE_YOHARA_SYSTEM
 		#define ENABLE_CONQUEROR_LEVEL						// Þampiyon seviyesi sistemini etkinleþtir;

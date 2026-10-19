@@ -1889,11 +1889,9 @@ bool CGrowthPet::UseSkill(BYTE bSkillAffect)
 
 	if (pSkillProto->GetSkillType() == PET_SKILL_USE_TYPE_PASSIVE)
 	{
-		if (!pSkillProto->dwPointOn)
-			return false;
-
-		if (m_pOwner->AddAffect(AFFECT_GROWTH_PET, pSkillProto->dwPointOn, wSkillValue, AFF_NONE, INFINITE_AFFECT_DURATION, 0, true, true))
-			return true;
+		// Mid-easy 1-99 PvP (Faz 2): no passive combat pet bonuses.
+		// Auto skills (heal / cleanse / etc.) still run below.
+		return false;
 	}
 	else if (pSkillProto->GetSkillType() == PET_SKILL_USE_TYPE_AUTO)
 	{

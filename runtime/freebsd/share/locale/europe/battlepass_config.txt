@@ -1,0 +1,28 @@
+# Mid-easy 1-99 PvP free Battle Pass (Faz 2).
+# Format: token values for CHARACTER::ExternBattlePass (char_pass.cpp).
+# Rewards: materials / books / cosmetics only — no combat gear, no REWARDS_BONUS power.
+# DO_MISSION type 1 = level-up (wired in char.cpp); type 32 = fishing (fishing.cpp).
+# ep = coin cost for battlepass_bitirici skip (0 = progress only via play).
+
+# Mission index 0 — level ups
+REWARDS_AND_NAME	50300	5	71084	20	71085	10	LevelFarm
+DO_MISSION	1	0	20	0
+REWARDS_BONUS	0	0	0	0	0	0
+
+# Mission index 1 — more level ups
+REWARDS_AND_NAME	50300	10	27102	100	27105	100	LevelPush
+DO_MISSION	1	0	40	0
+REWARDS_BONUS	0	0	0	0	0	0
+
+# Mission index 2 — fishing
+REWARDS_AND_NAME	71084	30	71085	15	50300	5	FishCalm
+DO_MISSION	32	0	50	0
+REWARDS_BONUS	0	0	0	0	0	0
+
+# Mission index 3 — fishing stretch
+REWARDS_AND_NAME	50300	15	71084	40	72726	1	FishLong
+DO_MISSION	32	0	100	0
+REWARDS_BONUS	0	0	0	0	0	0
+
+# Final track reward (materials only)
+FINAL_REWARD	50300	25	71084	50	71085	25

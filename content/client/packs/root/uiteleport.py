@@ -29,52 +29,40 @@ buttons_list = {
 
 	'subBoardsButtons': {
 		0: [
-		   {'btn_name': localeInfo.MAP_A1,						'index': 1,		'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_A3,						'index': 2,		'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_B1,						'index': 3,		'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_B3,						'index': 4,		'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_C1,						'index': 5,		'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_C3,						'index': 6,		'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0}
+		   {'btn_name': localeInfo.MAP_A1,						'index': 1,		'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_A3,						'index': 2,		'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_B1,						'index': 3,		'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_B3,						'index': 4,		'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_C1,						'index': 5,		'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_C3,						'index': 6,		'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0}
 		],
 		1: [
-		   {'btn_name': localeInfo.MAP_SPIDERDUNGEON,			'index': 13,	'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_SPIDERDUNGEON_02,		'index': 14,	'minLevel': 40,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_SPIDERDUNGEON_03,		'index': 15,	'minLevel': 40,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_SKIPIA_DUNGEON_01,		'index': 16,	'minLevel': 75,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_SKIPIA_DUNGEON_02,		'index': 17,	'minLevel': 75,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_SPIDERDUNGEON,			'index': 13,	'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_SPIDERDUNGEON_02,		'index': 14,	'minLevel': 40,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_SPIDERDUNGEON_03,		'index': 15,	'minLevel': 40,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_SKIPIA_DUNGEON_01,		'index': 16,	'minLevel': 75,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_SKIPIA_DUNGEON_02,		'index': 17,	'minLevel': 75,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
 		],
 		2: [
-		   {'btn_name': localeInfo.MAP_CAPE,					'index': 19,	'minLevel': 90,	'maxLevel': 110,	'costReq': 5000000,	'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_DAWN,					'index': 20,	'minLevel': 90,	'maxLevel': 110,	'costReq': 5000000,	'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_BAY,						'index': 21,	'minLevel': 90,	'maxLevel': 110,	'costReq': 5000000,	'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_THUNDER,					'index': 22,	'minLevel': 90,	'maxLevel': 110,	'costReq': 5000000,	'itemReq': 0}
+			# Mid-PvP: Yohara warps removed (Faz 2)
 		],
 		3: [
-		   {'btn_name': localeInfo.MAP_A2,						'index': 7,		'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_DESERT,					'index': 8,		'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_SNOW,					'index': 9,		'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_N_FLAME_01,				'index': 10,	'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_NUSLUCK,					'index': 18,	'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_TRENT,					'index': 11,	'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_TRENT02,					'index': 12,	'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_A2,						'index': 7,		'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_DESERT,					'index': 8,		'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_SNOW,					'index': 9,		'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_N_FLAME_01,				'index': 10,	'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_NUSLUCK,					'index': 18,	'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_TRENT,					'index': 11,	'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_TRENT02,					'index': 12,	'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0},
 		],
 		4: [
-		   {'btn_name': localeInfo.MAP_MAGIC_FOREST,			'index': 24,		'minLevel': 100,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0}
+			# Mid-PvP: 100+ maps removed (Faz 2)
 		],
 		5: [
-		   {'btn_name': localeInfo.MAP_ABANDONED_CASTLE,		'index': 25,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_DONGAN_PLAIN,			'index': 26,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_SEOGAN_SWAMP,			'index': 27,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_NAMGAN_GAP,			    'index': 28,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_NORTH_WIND_CACHE,		'index': 29,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_NORTH_R_CLIFF,	        'index': 30,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_NORTH_WIND_DESCEN,		'index': 31,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_MYSTERIOUS_DUNGEON,		'index': 32,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_YILAD_PASS,			    'index': 33,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_CRYSTAL_CAVE,			'index': 34,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0}
+			# Mid-PvP: 100+ maps removed (Faz 2)
 		],
 		6: [
-		   {'btn_name': localeInfo.MAP_TRADE,					'index': 23,	'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0}
+		   {'btn_name': localeInfo.MAP_TRADE,					'index': 23,	'minLevel': 1,	'maxLevel': 99,	'costReq': 0,		'itemReq': 0}
 		],
 	}
 }

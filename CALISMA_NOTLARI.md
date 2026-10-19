@@ -300,7 +300,7 @@ Granny 2.11 (sürüm 7) dosyaları animasyon eğrilerini sıkıştırılmış `c
 
 ## 7. Sıradaki adımlar
 
-**Oyun dengesi / 1–99 PvP** (web’den ayrı omurga): kilidi `PVP_HEDEF.md`, fazlar `docs/ROADMAP_PVP.md`, **Faz 0+1 yapılanlar (tekrar etme)** `docs/MID_PVP_FAZ0_1.md`. Sıradaki: Faz 2 QoL. Canlıya alma: `platform/deploy/VM_MID_PVP_APPLY.md`. Bu bölümde yalnızca web/VM işleri.
+**Oyun dengesi / 1–99 PvP** (web’den ayrı omurga): kilidi `PVP_HEDEF.md`, fazlar `docs/ROADMAP_PVP.md`, done-log `docs/MID_PVP_FAZ0_1.md` + `docs/MID_PVP_FAZ2.md`. Sıradaki: Faz 3 içerik/boss. Canlıya alma: `platform/deploy/VM_MID_PVP_APPLY.md`. Bu bölümde yalnızca web/VM işleri.
 
 1. ASan ile heap taşmasını bul ve düzelt (yukarıdaki "AÇIK SORUN").
 2. Normal kütüphaneleri yeniden derle + yayınla; `kaannakiin`/`numan` ile oyuna girip birkaç dakika stabil kaldığını doğrula.

@@ -31,6 +31,13 @@ Dosyalar: `content/server/sql/`.
 - `mid_pvp_rewards.lua` + `quest_list` satırı
 - Quest compile (`qc` / mevcut `make_sg` akışı) sonra game restart
 
+## 4b. Faz 2 QoL locale / packs
+
+- `share/locale/europe/battlepass_config.txt` (free BP; power yok)
+- `battlepass_players/` dizini yazılabilir olsun (login seed)
+- Client pack: `uiteleport.py` (max 99) — pack rebuild / publish
+- `Locale_inc.h` biolog alias → **web/client rebuild** şart
+
 ## 5. Drop / proto (önceki mid-pvp işi)
 
 `mob_drop_item.txt` vb. sync + db proto reload ihtiyacına göre.
@@ -57,4 +64,5 @@ python3 platform/tools/mid_pvp_flag_matrix.py
 python3 platform/tools/mid_pvp_exp_sim.py
 python3 platform/tools/mid_pvp_economy_check.py
 python3 platform/tools/mid_pvp_pvp_maps_check.py
+python3 platform/tools/mid_pvp_qol_check.py
 ```

@@ -4526,7 +4526,8 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 					GetParty()->RequestSetMemberLevel(GetPlayerID(), GetLevel());
 				}
 #ifdef ENABLE_BATTLE_PASS
-			if (!v_counts.empty() && val >= 250)
+			// Mid-pvp MAX 99: count every level-up for type-1 missions (was gated at 250).
+			if (!v_counts.empty() && val >= 1)
 			{
 				for (int i = 0; i < missions_bp.size(); ++i)
 				{
@@ -4537,7 +4538,7 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 				}
 			}
 
-			if (!v_counts_premium.empty() && val >= 250)
+			if (!v_counts_premium.empty() && val >= 1)
 			{
 				for (int i = 0; i < missions_bp_premium.size(); ++i)
 				{

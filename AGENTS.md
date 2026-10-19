@@ -8,7 +8,7 @@ A Metin2 server + client fork, self-hosted for ~10 players. The main goal is pla
 
 `CALISMA_NOTLARI.md` (Turkish) is the running log: what was done, why, what is still open. Read it before touching the web build, the deployment or the VM; update it when you change any of them. It deliberately holds no passwords, only where they live. Map of the tree: `docs/ARCHITECTURE.md`.
 
-Game-design lock for the 1–99 mid-easy PvP line: `PVP_HEDEF.md` (numbers, economy, feature on/off). Implementation phases: `docs/ROADMAP_PVP.md`. **Faz 0+1 already done** — inventory and “do not redo” list: `docs/MID_PVP_FAZ0_1.md`. Next is Faz 2 (QoL wiring). Change numbers in `PVP_HEDEF.md` first, then code; update roadmap phase status when a phase exits.
+Game-design lock for the 1–99 mid-easy PvP line: `PVP_HEDEF.md` (numbers, economy, feature on/off). Implementation phases: `docs/ROADMAP_PVP.md`. **Faz 0–2 done** — `docs/MID_PVP_FAZ0_1.md`, `docs/MID_PVP_FAZ2.md` (do not redo). Next is Faz 3 (content/boss spine). Change numbers in `PVP_HEDEF.md` first, then code; update roadmap phase status when a phase exits.
 
 ## Layout that matters
 
