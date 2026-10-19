@@ -30,6 +30,7 @@ quest_tr/_guildsystems/guild_ranking.lua
 quest_tr/_guildsystems/guild_war_bet.quest
 quest_tr/_guildsystems/guild_war_join.quest
 quest_tr/_guildsystems/guild_war_observer.quest
+quest_tr/_guildsystems/mid_pvp_rewards.lua
 quest_tr/_guildsystems/priv_empire.quest
 quest_tr/_horsesystems/horse_exchange_ticket.quest
 quest_tr/_horsesystems/horse_guard.quest

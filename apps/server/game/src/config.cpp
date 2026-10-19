@@ -109,7 +109,7 @@ void		LoadValidCRCList();
 bool            g_protectNormalPlayer   = false;
 bool            g_noticeBattleZone      = false;
 
-int gPlayerMaxLevel = 120;
+int gPlayerMaxLevel = 99;
 #ifdef ENABLE_CONQUEROR_LEVEL
 int gPlayerConquerorMaxLevel = 30;
 #endif

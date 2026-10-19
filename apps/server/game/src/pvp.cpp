@@ -14,6 +14,7 @@
 #include "sectree_manager.h"
 #include "buffer_manager.h"
 #include "locale_service.h"
+#include "pvp_safe_maps.h"
 
 using namespace std;
 
@@ -388,14 +389,11 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	if (pkVictim->IsNPC() && pkChr->IsNPC() && !pkChr->IsGuardNPC())
 		return false;
 
-	if(pkVictim->IsPC() && pkChr->IsPC() && pkVictim->GetMapIndex() == 24 && pkChr->GetMapIndex() == 24)
+	// Mid-easy PvP: no PC–PC attacks on village / guild / OX / duel lobby / hubs.
+	if (pkVictim->IsPC() && pkChr->IsPC())
 	{
-		return false;
-	}
-
-	if(pkVictim->IsPC() && pkChr->IsPC() && pkVictim->GetMapIndex() == 44 && pkChr->GetMapIndex() == 44)
-	{
-		return false;
+		if (IsMidPvpSafeMap(pkVictim->GetMapIndex()) || IsMidPvpSafeMap(pkChr->GetMapIndex()))
+			return false;
 	}
 
 

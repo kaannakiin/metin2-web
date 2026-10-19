@@ -168,7 +168,7 @@ enum eCommonDefines {
 		#define ENABLE_TRACK_WINDOW          		// Zindan takibi için özel UI/pencere (track window) desteðini etkinleþtirir
 		#define ENABLE_ULTIMATE_REGEN        		// Geliþmiþ/alternatif "ultimate" regen algoritmasýný devreye alýr
 	#endif
-#define ENABLE_YOHARA_SYSTEM          				// Yohara kýtasý ve SungMa tabanlý sistemleri etkinleþtirir
+//#define ENABLE_YOHARA_SYSTEM          				// Yohara kýtasý ve SungMa tabanlý sistemleri etkinleþtirir
 	#ifdef ENABLE_YOHARA_SYSTEM
 		#define ENABLE_CONQUEROR_LEVEL				// Þampiyon seviyesi sistemini etkinleþtir;
 		#define ENABLE_CONQUEROR_LEVEL_UPDATE		// Þampiyon seviyesi anýnda yenilemeyi etkinleþtir;

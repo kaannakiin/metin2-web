@@ -170,7 +170,7 @@
 		#define USE_ITEMSHOP_RENEWED						// Oyun içi nesne market sistemi yenilemeyi etkinleþtirir;
 	#endif
 #define ENABLE_BIOLOGIST_SYSTEM								// Biyolog sistemini etkinleþtir
-#define ENABLE_YOHARA_SYSTEM          						// Yohara kýtasý ve SungMa tabanlý sistemleri etkinleþtirir
+//#define ENABLE_YOHARA_SYSTEM          						// Yohara kýtasý ve SungMa tabanlý sistemleri etkinleþtirir
 	#ifdef ENABLE_YOHARA_SYSTEM
 		#define ENABLE_CONQUEROR_LEVEL						// Þampiyon seviyesi sistemini etkinleþtir;
 		#define ENABLE_CONQUEROR_LEVEL_UPDATE				// Þampiyon seviyesi anýnda yenilemeyi etkinleþtir;

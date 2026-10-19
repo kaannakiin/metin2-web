@@ -1,8 +1,8 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
-Son güncelleme: 2026-10-18. Hobi amaçlı, ~10 kişilik sunucu. **Ana hedef: oyunun tarayıcıda (WebAssembly) oynanması.**
+Son güncelleme: 2026-10-19. Hobi amaçlı, ~10 kişilik sunucu. **Ana hedef: oyunun tarayıcıda (WebAssembly) oynanması.**
 
-Bu dosya, yapılanları ve kaldığımız yeri kaydeder. Şifreler burada YOK; nerede durdukları yazılı.
+Bu dosya, yapılanları ve kaldığımız yeri kaydeder. Şifreler burada YOK; nerede durdukları yazılı. 1–99 PvP tasarım/fazlar: `PVP_HEDEF.md` + `docs/ROADMAP_PVP.md`.
 
 ### Repo klasör düzeni (2026-10-18)
 
@@ -300,11 +300,13 @@ Granny 2.11 (sürüm 7) dosyaları animasyon eğrilerini sıkıştırılmış `c
 
 ## 7. Sıradaki adımlar
 
+**Oyun dengesi / 1–99 PvP** (web’den ayrı omurga): kilidi `PVP_HEDEF.md`, fazlar `docs/ROADMAP_PVP.md`, **Faz 0+1 yapılanlar (tekrar etme)** `docs/MID_PVP_FAZ0_1.md`. Sıradaki: Faz 2 QoL. Canlıya alma: `platform/deploy/VM_MID_PVP_APPLY.md`. Bu bölümde yalnızca web/VM işleri.
+
 1. ASan ile heap taşmasını bul ve düzelt (yukarıdaki "AÇIK SORUN").
 2. Normal kütüphaneleri yeniden derle + yayınla; `kaannakiin`/`numan` ile oyuna girip birkaç dakika stabil kaldığını doğrula.
 3. Fare/kara bant/DXT, ağaçlar, harita adı dili.
 4. GM şifresini değiştir (sohbette geçti).
-5. Oyun içi özellikleri adım adım test et (switchbot, wiki, pet, gaya, aura, kuşak…).
+5. Oyun içi QoL smoke (roadmap Faz 2): switchbot, oto av, offline pazar, biyolog, battle pass — güç veren aura/kuşak/simya 1. sürümde kapalı (`PVP_HEDEF` özellik seçimi).
 
 ### Bilinen eksikler (sonra)
 

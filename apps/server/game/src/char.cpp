@@ -4491,7 +4491,7 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 #ifdef ENABLE_ANNONUNCEMENT_LEVELUP
 			switch (val)
 			{
-				case 120:
+				case 99:
 					char szNoticeLevelUp[QUERY_MAX_LEN];
 					snprintf(szNoticeLevelUp, sizeof(szNoticeLevelUp), "<Bilgi> [CH%d]: [%s] isimli oyuncumuz [%u] seviye olmu?tur. Tebrikler!", g_bChannel, GetName(), GetLevel());
 					BroadcastNotice(szNoticeLevelUp);

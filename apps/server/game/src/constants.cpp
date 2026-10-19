@@ -257,19 +257,19 @@ const DWORD exp_table_common[PLAYER_EXP_TABLE_MAX + 1] =
 };
 
 // Mid-effort 1-99 PvP (PVP_HEDEF.md): ~8-12h active to 99 with same-level farm.
-// Values are percent (100 = 1x). Tuned from mob_proto median EXP + ~1500 kills/h sim.
-// 1-30 is mostly clamped by the 10%/kill cap; 70-99 needs high rates because the table spikes.
+// Values are percent (100 = 1x). Tuned via platform/tools/mid_pvp_exp_sim.py
+// (mob_proto median EXP + 1500 kills/h + nextExp/10 cap). Re-run after edits.
 int GetMidPvpMobExpRate(int level)
 {
 	if (level < 30)
-		return 5000;	// 50x  -> ~0.5-1.5h (travel/quest padded)
+		return 3500;	// 35x  -> ~1-1.5h with travel pad
 	if (level < 70)
-		return 8000;	// 80x  -> ~3.5h
+		return 3800;	// 38x  -> ~3.5h
 	if (level < 90)
-		return 45000;	// 450x -> ~2.8h
+		return 14000;	// 140x -> ~2.8h
 	if (level < 99)
-		return 75000;	// 750x -> ~2.5h
-	return 100;			// 99+: practically no push until MAX_LEVEL is locked to 99
+		return 22000;	// 220x -> ~2.5h
+	return 100;			// 99+: no push (MAX_LEVEL 99)
 }
 
 // Yang scarce: proto amount * this / 100. Boss bombs also hard-capped per kill.
