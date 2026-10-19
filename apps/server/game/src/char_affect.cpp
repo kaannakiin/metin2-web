@@ -18,14 +18,23 @@
 #include "DragonSoul.h"
 #include "../../common/service.h"
 
+#ifdef ENABLE_PASSIVE_SYSTEM
+#define IS_NO_SAVE_AFFECT(type) \
+	((type) == AFFECT_WAR_FLAG || \
+	 (type) == AFFECT_REVIVE_INVISIBLE || \
+	 ((type) >= AFFECT_PREMIUM_START && (type) <= AFFECT_PREMIUM_END) || \
+	 (type) == AFFECT_AUTO_HUNT_AFFECT || \
+	 (type) == AFFECT_PASSIVE_RELIC_STONE_DEF || \
+	 (type) == AFFECT_PASSIVE_RELIC_DISMOUNT_SPEED \
+	)
+#else
 #define IS_NO_SAVE_AFFECT(type) \
 	((type) == AFFECT_WAR_FLAG || \
 	 (type) == AFFECT_REVIVE_INVISIBLE || \
 	 ((type) >= AFFECT_PREMIUM_START && (type) <= AFFECT_PREMIUM_END) || \
 	 (type) == AFFECT_AUTO_HUNT_AFFECT \
-	 || (type) == AFFECT_PASSIVE_RELIC_STONE_DEF \
-	 || (type) == AFFECT_PASSIVE_RELIC_DISMOUNT_SPEED \
 	)
+#endif
 
 #define IS_NO_CLEAR_ON_DEATH_AFFECT(type) \
 	((type) == AFFECT_BLOCK_CHAT || \
