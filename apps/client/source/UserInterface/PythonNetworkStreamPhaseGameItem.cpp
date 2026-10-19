@@ -1124,7 +1124,7 @@ bool CPythonNetworkStream::RecvSpecialEffect()
 			break;
 #endif
 
-#ifdef ENABLE_GROWTH_PET_SYSTEM
+#if defined(ENABLE_GROWTH_PET_SYSTEM) && defined(ENABLE_PVP_BALANCE)
 		case SE_GYEONGGONG_BOOM:
 			effect = CInstanceBase::EFFECT_GYEONGGONG_BOOM;
 			bAttachEffect = false;
