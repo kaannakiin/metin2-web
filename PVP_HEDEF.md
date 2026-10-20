@@ -178,7 +178,7 @@ ilk girişte; mevcut karakterler yüzükleri yoksa sonraki girişte alır. Envan
 yüzük varsa ikinci kopya verilmez. Yer yoksa teslim sonraki girişe veya
 Satıcı (9003) üzerindeki teslim konuşmasına kalır. Başlangıç ekipmanı yeniden
 verilmez. Mevcut yüzüğün harita seçenekleri ve zindan giriş koşulları korunur.
-Zırhçı ve marketin yeni içerikleri `docs/NPC_MAGAZA_TASARIMI.md` içinde öneridir;
+Silahçı, zırhçı ve marketin yeni içerikleri `docs/NPC_MAGAZA_TASARIMI.md` içinde öneridir;
 bu araştırma sırasında shop SQL'i değiştirilmez.
 
 | Shop | Satılan                                             |

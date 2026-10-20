@@ -2,6 +2,13 @@
 
 ### NPC araştırması ve başlangıç yüzüğü — 2026-10-20
 
+- Kullanıcı eksik kapsamı belirtti: araştırma silahçı ve gövde zırhlarını da
+  kapsayacak şekilde tamamlandı. Canlı shop 1/6 stokları ve bütün ekipman
+  seviyeleri protodan doğrulandı. Belgede altı silah ailesi, dört sınıfın
+  18–61 zırh matrisi, kask/kalkan, takılar ve 40 hücre sınırı ayrı ele alındı.
+  Öneri tavanları normal silah 25, gövde 42, takı 33; henüz tasarım kilidine
+  uygulanmadı. Bu ek çalışma yalnız belge; mağaza SQL'i ve canlı stok aynı.
+
 - Zırhçı/market ayrı incelendi. Canlı 9002/shop2 19, 9003/shop3 9 satır;
   9008/shop7'de ek erken ekipman var. `docs/NPC_MAGAZA_TASARIMI.md` görsel
   referans, doğrudan PvP mağaza kaynakları ve ayrı içerik önerilerini toplar.

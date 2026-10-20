@@ -1,4 +1,4 @@
-# Zırhçı ve market — ayrı NPC tasarımı
+# Silahçı, zırhçı ve market — ayrı NPC tasarımı
 
 20 Ekim 2026. Hedef: klasik 1–99 orta-kolay; başlangıç rahat, üst ekipman farmda.
 **Mağaza tabloları öneridir; henüz shop SQL'ine veya canlı mağazalara uygulanmadı.**
@@ -23,7 +23,61 @@ görüntüsüdür; sunucunun bugünkü canlı stokunu kanıtlamaz.
 Arama sonucunda görünen bazı eski Harbi/Hard görselleri doğrudan açıldığında
 404 veya park sayfası döndü. Bunlar kullanılabilir görsel kanıt sayılmadı.
 
-## 1. Zırh Satıcısı — 9002 / shop 2
+## 1. Silah Satıcısı — 9001 / shop 1; 9007 / shop 6
+
+Canlı DB ile SQL eşleşiyor: ana silahçı **10 satır**, ikinci silahçı **9 satır**.
+İkinci NPC'nin ürünleri ana NPC'de görünmüyor. Aynı tüccara gidip sonraki
+silahı bulamama sorununun bir kısmı bu bölünmeden kaynaklanıyor.
+
+| Silah türü | Ana silahçıdaki +9                      | İkinci silahçıdaki +9              |
+| ---------- | --------------------------------------- | ---------------------------------- |
+| Tek el     | Bambu Kılıcı, 49 / seviye 15            | Geniş Kılıç, 59 / seviye 20        |
+| Hançer     | Kobra Hançeri, 1019 / seviye 10         | Makas Hançer, 1029 / seviye 20     |
+| Yay        | Harp Yayı, 2039 / seviye 15             | Atsırtı Uzun Yay, 2049 / seviye 20 |
+| Çift el    | Örümcek Mızrağı, 3039 / seviye 15       | Kargı, 3049 / seviye 20            |
+| Çan        | Gümüş Çan, 5019 / seviye 15             | Altın Çan, 5029 / seviye 20        |
+| Yelpaze    | Turna Kanadı, 7039 / seviye 15          | Tavuskuşu, 7049 / seviye 20        |
+| Ek kayıt   | Amija, 4009 / seviye 5; proto'da hançer | Yok                                |
+| Mühimmat   | Tahta/Bambu/Taş Ok ×50                  | Demir/Çelik/Gümüş Ok ×50           |
+
+“Ana silahçı yalnız 15 seviye” açıklaması da tam doğru değil: Kobra 10,
+Amija 5 seviye. Amija ayrı bir silah sınıfı değildir; yinelenen düşük kademe
+hançer olarak stoktan çıkarılması değerlendirilebilir.
+
+### PvP karşılaştırması ve öneri
+
+[Narnia'nın mağaza verisi](https://www.narniamt2.com/themes/default/js/market_data.js)
+silahları iki gruba ayırıyor: 43 satırlık ilk grup ve 41 satırlık 32–60 grubu.
+Normal silahları +9 satıyor; Dolunay ve Kırmızı Demir de ilk grupta.
+[MarkMt2 rehberi](https://wiki.markmt2.com/Detail/Npc/silah-saticisi/9001)
+aynı erken silah ailelerini +0 listeliyor.
+[Rohan2 rehberi](https://wiki.rohan2.global/Detail/Npc/silah-saticisi/9001)
+erken silahları ve 200'lük okları listeliyor; görünen adlarda +9 yazmasa da
+bağlantı VNUM'ları 49/69/5029 gibi +9 kayıtlarına gidiyor. Yalnız görünen ada
+bakarak geliştirme seviyesi çıkarmamak gerekiyor.
+
+**Önerim:** tek ana silahçıda başlangıç ve 20–25 kademe seçenekleri erişilebilir
+olsun. Ayrı konuşma/mağaza sayfaları: “Başlangıç”, “20–25 seviye”, “Oklar”.
+Mevcut altı silah ailesi korunur; yalnız kılıç ve çift el çalışılmaz.
+
+| Önerilen ek +9 silah | VNUM | Seviye |
+| -------------------- | ---- | ------ |
+| Gümüş Kılıç          | 69   | 25     |
+| Kısa Bıçak           | 4029 | 25     |
+| Atsırtı Savaş yayı   | 2059 | 25     |
+| Savaş Tırpanı        | 3059 | 25     |
+| Su Yelpazesi         | 7059 | 25     |
+
+Çanda bu protoda 25 seviye karşılık yok; Altın Çan 20'de kalır. Sırf tabloyu
+eşitlemek için yeni item veya seviye icat edilmez. Bütün ürünler efsunsuz +9;
+ortalama/beceri bonusu üretilmez. Okları 200'lük paketlere çıkarmayı öneriyorum.
+
+Dolunay, Kırmızı Demir, Siyah Yaprak, Antik Çan ve diğer 30 ortalamalı aileler
+farmda kalmalı. 65/70 silahlar ve Zehir dahil 75 ailesi de mevcut metin/boss
+ediniminde kalmalı. Bu, Narnia'nın daha geniş stokundan bilinçli ayrıldığımız
+tasarım önerisidir; diğer PvP'lerin ortak kuralı gibi sunulmamalı.
+
+## 2. Zırh Satıcısı — 9002 / shop 2
 
 Canlı DB, seed ve +9 güncelleme SQL'i karşılaştırıldı. **19 satır mevcut.**
 
@@ -42,10 +96,45 @@ Canlı DB, seed ve +9 güncelleme SQL'i karşılaştırıldı. **19 satır mevcu
 kalkanlar, Altın Bilezik, Gümüş/Altın Kolye ve Küpe +9 var. Önce bunu hesaba
 katalım; aynı stokları iki ayrı NPC'ye yaymak oyuncuya arama işi çıkarıyor.
 
-### Önerim: tek zırhçıda işe yarayan başlangıç takıları
+### Gövde zırhları — dört sınıfın tüm basamakları
 
-Mevcut gövde/kask/kalkan bandı korunabilir. İç item kısmını aşağıdaki hedef
-seçkiye çıkaralım. Tüm +9'lar **rastgele efsunsuz**, takma seviyeleri aynı olur.
+Önceki sürüm bu kısmı eksik bıraktı. “Mevcut gövde bandı korunsun” önerisi,
+oyuncuyu 18 seviye zırhta bıraktığı için yeniden değerlendirildi.
+**Yeni önerim: dört sınıfta 18, 26, 34 ve 42 seviye zırhlar efsunsuz +9
+satılsın; 48 ve sonrası farmda kalsın.** Böylece zırhçı gerçek yükseltme sunar,
+üst içerikteki zırh ödülleri de değerini korur.
+
+| Seviye | Savaşçı         | Ninja                  | Sura           | Şaman                 | Önerilen erişim   |
+| ------ | --------------- | ---------------------- | -------------- | --------------------- | ----------------- |
+| 18     | Kaplan Plaka    | Koyu Kırmızı Takım     | Kötü Şans      | Pembe Elbise          | NPC +9; zaten var |
+| 26     | Aslan Plaka     | Kırmızı Karınca Takım  | Hayalet Plaka  | Sevgi Elbisesi        | NPC +9; eklenecek |
+| 34     | Ölümcül Plaka   | Karınca Aslan Takımı   | Yin-Yang       | Sema Elbisesi         | NPC +9; eklenecek |
+| 42     | Ejderha Plaka   | Ninja Takımı           | Mistik Plaka   | Güneş Elbisesi        | NPC +9; eklenecek |
+| 48     | Mavi Taş        | Genç Ejderha Takımı    | Belirsiz Plaka | Manevi Elbise         | Farm              |
+| 54     | Altın Taş       | Öldürücü Rüzgâr Takımı | Hayalet Surat  | Turuncu Kedi Elbisesi | Farm              |
+| 61     | Ejderha Tanrısı | Küpeçiçeği Takım       | Ruh Plaka      | Soylu Kadın Elbisesi  | Farm              |
+
+Adlar ve seviyeler bizim protodan alındı. Eklenecek +9 VNUM'lar:
+26 için `11239 / 11439 / 11639 / 11839`; 34 için
+`11249 / 11449 / 11649 / 11849`; 42 için `11259 / 11459 / 11659 / 11859`.
+Üst 66 ailesi de dükkâna alınmaz; mevcut metin/boss ilerlemesi korunur.
+
+Alternatif daha kolay PvP düzeni, zırhları 61'e kadar +9 satmaktır. Narnia'nın
+tanıtım verisinde böyle geniş bir stok var. Bizde 48–61 ekipman avını önemli
+ölçüde azaltacağı için **ilk önerim 42 tavanı**; 61 satışı ayrı tasarım kararıdır.
+
+### Kask ve kalkan — gövdeden ayrı değerlendirme
+
+| Grup         | NPC önerisi                                                                                          | Farmda kalacak                             |
+| ------------ | ---------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Kask         | Dört sınıfın başlangıç ve 21 seviye kaskları +9; 21'likler shop 7'den ana zırhçıya erişilebilir olur | 41 ve üstü                                 |
+| Kalkan       | Savaş Kalkanı ve Beşgen Kalkan +9; Beşgen shop 7'de mevcut                                           | Siyah Yuvarlak 41, dört 61 kalkanı ve üstü |
+| Eski ek ürün | Shop 7'deki Parlak Kalkan ayrıca incelensin                                                          | Otomatik olarak yeni seçkiye taşınmasın    |
+
+### İç itemler — takı ve ayakkabı seçkisi
+
+Gövde/kask/kalkan yukarıdaki ayrı tablolara göre ele alınır. İç item kısmını
+aşağıdaki hedef seçkiye çıkaralım. Tüm +9'lar **rastgele efsunsuz**, takma seviyeleri aynı olur.
 Başlangıç hediyesindeki özel bonuslar dükkân ürünlerine taşınmaz.
 
 | Yuva     | Hedef stok                                             | Değişiklik                                                |
@@ -70,9 +159,10 @@ Uygulama adayı kimlikler sunucunun gerçek protosundan doğrulandı:
 | Yeşim Taşı Küpe +9       | 17089 | 28             |
 | Abanoz Küpe +9           | 17109 | 33             |
 
-Bu öneri mevcut “25+ yalnız drop” kilidinde **takılara özel 33 seviyeye kadar
-bir istisna** gerektirir. Karar verilince önce `PVP_HEDEF.md` güncellenmeli.
-Silah/gövde bandı genişlemez. Abanoz +9'u doğrudan satmak fazla rahat gelirse,
+Bu belge mevcut “25+ yalnız drop” kilidini değiştirecek öneriler içerir:
+normal silahlar 25, gövdeler 42, takılar 33 seviyeye kadar NPC erişimi.
+Karar verilince önce `PVP_HEDEF.md` güncellenmeli; henüz yürürlüğe girmedi.
+Abanoz +9'u doğrudan satmak fazla rahat gelirse,
 ikinci seçenek Abanoz/Yeşim'i +6 satıp +9 geliştirmesini oyuncuya bırakmaktır.
 Ben orta-kolay hedef için efsunsuz +9 seçeneğini öneriyorum.
 
@@ -91,7 +181,24 @@ alış/satış değerleri oyuncu ekonomisi için hazırlanmış bir mağaza tari
 sayılmaz. Mağaza uygulanırken geri satış hesabı, adet ve başlangıç Yang'ı
 birlikte kontrol edilmeli; rastgele “diğer PvP'de 1M” kopyalanmamalı.
 
-## 2. Satıcı / market — 9003 / shop 3
+### Mağazaya sığma ve oyuncunun erişimi
+
+Standart mağaza penceresi 40 hücre; eşyalar boyları kadar hücre kullanıyor.
+16 gövde zırhı 32 hücre kullanır ve tek pencereye sığar. Kask, kalkan ve
+takılar da aynı pencereye eklenince sınır aşılır; bütün önerileri bir SQL
+listesine doldurmak ürünlerin kaybolmasına yol açabilir.
+Ana zırhçıda ayrı konuşma/mağaza sayfaları öneriyorum:
+“Zırhlar”, “Kask ve kalkan”, “İç itemler”.
+Gerçek proto boylarıyla önerilen seçki: gövdeler 16 ürün / 32 hücre,
+kask-kalkan 10 ürün / 10 hücre, iç itemler 21 ürün / 21 hücre.
+Silahçının 20–25 seçkisi 11 ürün / 19 hücre kullanır.
+Her sayfa kurulmadan gerçek item boylarıyla yerleşimi hesaplanmalı.
+Mevcut istemciye yeni bir sekme sistemi gerekmeden NPC konuşmasından ayrı
+shop kimlikleri açılabilir; shop kimlikleri uygulamada çakışmasız seçilmeli.
+9008 ürünleri taşınacaksa önce yeni erişim tamamlanmalı, ardından eski stok
+kararı verilmeli. Bu araştırmada hiçbir mağaza veya NPC kaldırılmadı.
+
+## 3. Satıcı / market — 9003 / shop 3
 
 Canlıda **9 satır**: Şehre Dönüş, Geri Dönüş; küçük/orta/büyük kırmızı ve mavi
 iksirler; Paket. Her ürün bir adet satılıyor. Başlangıçta verilen hız iksirleri,
@@ -117,7 +224,7 @@ koymayalım. Bunlar G/P hızını ve az önce kurulan boss zincirini değiştiri
 Özellikle Kıvrık Anahtar, Küçülen Kafa, Kraliçe Zehri ve Kan Taşı için son
 belirlenen boss kaynakları korunmalı. Karar verilmeden markete eklenmedi.
 
-## 3. Işınlanma yüzüğü — uygulanan düzeltme
+## 4. Işınlanma yüzüğü — uygulanan düzeltme
 
 Eksik, yüzüğün kullanılmasında değildi: 40004 için `move_ring` görevi canlıda
 derlenmişti, ancak `welcome` hediyeleri arasında yüzük yoktu. Proto'daki
@@ -137,13 +244,15 @@ kuruldu. Altı servis süreci ve altı port sağlıklı; oyun testi kullanıcıd
 
 ## Ayrı çalışma sırası
 
-1. Zırhçı: Abanoz/Yeşim tavanı ve +9/+6 tercihini netleştir; hedef stok/fiyat
-   tablosu çıkar. 9008'de kalan ürünlerin rolünü açıkça belirle.
-2. Market: günlük paketler, kayıp araç yedekleri ve Yang giderlerini netleştir.
-3. Her NPC için yalnız ilgili shop satırlarını yedekle/güncelle; diğer
+1. Silahçı: altı silah ailesi, 20–25 normal silah tavanı ve 200'lük oklar.
+   Ortalamalı 30 silahların farmda kalmasını netleştir.
+2. Zırhçı: dört sınıf için 42 seviye gövde tavanı; kask/kalkan ve iç item
+   sayfalarını ayrı netleştir. 9008'in rolü ve gerçek hücre yerleşimi hesaplansın.
+3. Market: günlük paketler, kayıp araç yedekleri ve Yang giderlerini netleştir.
+4. Her NPC için yalnız ilgili shop satırlarını yedekle/güncelle; diğer
    tüccarları topluca seed SQL'i ile sıfırlama.
 
 Yerel dayanak: `seed_shop_refine_pet.sql`, `update_mid_pvp_shop_plus9.sql`,
 sunucu item protosu, `welcome.lua`, `move_ring.quest` ve canlı salt okunur
-`player.shop` / `shop_item` karşılaştırması. Bu belge ilk iki NPC için tasarım
+`player.shop` / `shop_item` karşılaştırması. Bu belge üç ana NPC için tasarım
 çalışmasıdır; Faz 3'ün tamamını bitmiş saymaz.
