@@ -1,5 +1,35 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### CANLI klasik zincirler ve loot v4 — 2026-10-20
+
+- Kullanıcı araştırmanın ardından doğrudan canlıya alınmasını istedi. Tasarım
+  önce `PVP_HEDEF.md`'ye işlendi: günlük kota yok; 13 boss sandığı garantili,
+  General/Komutan 3 Kıvrık, Lusifer 2 kafa, Kraliçe 1 zehir, normal örümceklerin
+  üretim malzemeleri %25, uygun kaynaklardan 1 Kan Taşı garantili. Bunlar mevcut
+  `Type limit` yoluyla seviye cezasından ayrıldı; diğer ekipman/metin politikası aynı.
+- `quest_tr/_midpvp` aktif kaynakları: kule tamamlama kaydı, 75 seviye Katakomb ve
+  tek kafa tüketimi, 50 seviye Uriel hazırlığı/%100 üretimi, Baron–Flüt–Barones,
+  atomik parti doğrulaması ve kişi başına tek giriş maliyeti. Dört ana zindanın
+  başarı cooldown'u 10 dakika. Mevcut katlar ve reentry kancaları korundu.
+- **20261020-153340 canlı:** VM'nin gerçek qc derleyicisiyle beş görev derlendi,
+  eski beş namespace temizlenerek yeni 102 derlenmiş dosya kuruldu. Aynı çıktılar
+  repoya byte olarak eşlendi; qc'nin token sonu boşlukları yalnız generated object
+  yolu için Git whitespace denetiminden ayrıldı. Host `/home/m2web/progression-20261020-153340`, VM
+  `/usr/metin2-progression-20261020-153340`.
+- **20261020-153638 canlı:** Kraliçe'nin grup 2019 doğuşu 15400 → 900 saniye,
+  Sürgün 2 Komutan doğuşu 1200 → 900 saniye. Yer/adet aynı; yalnız iki boss.txt.
+  Host/VM aynı `progression-20261020-153638` adını taşır.
+- Hazırlıkta canlı quest_list'in yalnız opsiyonel `mid_pvp_rewards.lua` kaydının
+  yokluğu ile repodan ayrıldığı görüldü. Bu seçim korundu, ilgisiz ödül açılmadı.
+  İlk hash koruması ve sonra qc'nin eski 644 izinli kopyası kurulum başlamadan
+  hazırlığı durdurdu; yalnız hazırlık qc kopyası 700 yapılıp derleme tamamlandı.
+- Her iki kurulumda VM/host `INSTALLED`, önceki dosyalar `previous.tar` içinde.
+  Dosya/hash eşleşmesi, altı süreç ve altı port sağlıklı. Oyun/regresyon testi
+  çalıştırılmadı; qc derlemesi gerekli yayın adımıydı. Engine, client ve corpus aynı.
+- Açıklamalar: `docs/MID_PVP_FAZ3_ZINCIR.md`, güncel `docs/DROP_REHBERI.md` v4.
+  Önceki wiki denetimi uygulama öncesi durum olarak işaretlendi. Faz 3'ün tüm
+  izleme/instance kabul maddeleri tamamlanmış sayılmadı; oyun kabulü kullanıcıda.
+
 ### Klasik ilerleme zinciri wiki denetimi — 2026-10-20
 
 - Kullanıcı bossları yalnız sandık içeriğiyle değil sonraki içeriği açan

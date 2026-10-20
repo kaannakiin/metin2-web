@@ -2,6 +2,11 @@
 
 20 Ekim 2026. Dosya inceleme tabanı: `a45daa62f`.
 
+**Uygulama durumu:** aşağıdaki bulgular uygulama öncesi dosya durumunu gösterir.
+Ana giriş/drop bağlantıları loot v4 ve aktif orta-kolay görev profiliyle canlıya
+alındı; ayrıntılar [Faz 3 zincir uygulamasında](MID_PVP_FAZ3_ZINCIR.md).
+Günlük kota eklenmedi. Biyolog ve at hakkındaki yan inceleme notları ayrı kapsamdır.
+
 Bossların ödül tablosunun olması, ilerleme zincirinin tamam olduğu anlamına gelmiyor.
 Oyuncunun elde edebildiği bir malzeme, onu kullanan bir görev veya NPC ve bu yolla
 ulaşılan bir sonraki içerik birlikte çalışmalı. Başlıca kopukluklar Lusifer–Katakomb

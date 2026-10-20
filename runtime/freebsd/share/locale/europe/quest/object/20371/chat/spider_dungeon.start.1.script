@@ -5,7 +5,7 @@ if d . select ( dungeonMapIndex ) then
 local dwLevel = d . getf_from_map_index ( "level" , dungeonMapIndex ) 
 local ticket = d . getf_from_map_index ( "ticket" , dungeonMapIndex ) 
 if get_global_time ( ) > pc . getf ( "spider_dungeon" , "time" ) then 
-say_new ( "[ENTER]Geri dönmek için 15 dakikaniz vardi! [ENTER]" ) 
+say_new ( "[ENTER]Geri donmek icin 15 dakikaniz vardi! [ENTER]" ) 
 pc . setf ( "spider_dungeon" , "map" , 0 ) 
 pc . setf ( "spider_dungeon" , "time" , 0 ) 
 pc . setf ( "spider_dungeon" , "channel" , 0 ) 
@@ -13,13 +13,13 @@ return
 end 
 pc . warp ( 881 * 100 , 6148 * 100 , dungeonMapIndex ) 
 else 
-say_new ( "Müsait degil, tekrar baslayabilirsiniz. [ENTER]" ) 
+say_new ( "Musait degil, tekrar baslayabilirsiniz. [ENTER]" ) 
 pc . setf ( "spider_dungeon" , "map" , 0 ) 
 pc . setf ( "spider_dungeon" , "time" , 0 ) 
 pc . setf ( "spider_dungeon" , "channel" , 0 ) 
 end 
 else 
-say_new ( "Zindan bu kanalda açilmadi! [ENTER]" ) 
-say_new ( string . format ( "Girmek için, %d kanalina gidin. [ENTER]" , dungeonChannel ) ) 
+say_new ( "Zindan bu kanalda acilmadi! [ENTER]" ) 
+say_new ( string . format ( "Girmek icin, %d kanalina gidin. [ENTER]" , dungeonChannel ) ) 
 return 
 end 

@@ -45,10 +45,12 @@ def groups(filename):
         body = match[2]
         mob = re.search(r'^\s*Mob\s+(\d+)\s*$', body, re.M)
         vnum = re.search(r'^\s*Vnum\s+(\d+)\s*$', body, re.M)
+        kind = re.search(r'^\s*Type\s+(\w+)\s*$', body, re.M)
         entries = [tuple(map(int, row)) for row in re.findall(
             r'^\s*\d+\s+(\d+)\s+(\d+)\s+(\d+)\s*$', body, re.M)]
         result.append({'name': match[1], 'mob': int(mob[1]) if mob else None,
-                       'vnum': int(vnum[1]) if vnum else None, 'entries': entries})
+                        'vnum': int(vnum[1]) if vnum else None, 'entries': entries,
+                        'type': kind[1] if kind else None})
     return result
 
 
@@ -86,11 +88,11 @@ def render():
     def pct(value):
         return ('%g' % value).replace('.', ',') + '%'
 
-    def table(entries, chest=False):
+    def table(entries, chest=False, scale=400):
         put('| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | ' + ('Sandık içi şans' if chest else 'Baz düşme şansı') + ' |')
         put('|---|---:|---:|---:|---:|')
         counts = Counter(entries)
-        total = sum(row[2] for row in entries) if chest else 400
+        total = sum(row[2] for row in entries) if chest else scale
         if not total:
             raise ValueError('Empty reward table')
         for (vnum, amount, chance), repeats in counts.items():
@@ -123,7 +125,7 @@ def render():
     put('- Diğer klasik boss sandıkları da artık silah ve zırh içerir; sadece tüketim malzemesi vermez.')
     put('- Önceki rehberde ayrı dengeleme bekleyen 10 klasik bossun tamamına özel loot eklendi. '
         'Azrail kendi sandığını verir; Barones/Cadı/Ağaç bossları/Kharoon doğrudan düşürür.')
-    put('- Haritalar ve doğma bölgeleri korunur; metin yoğunluğu başlangıcın 4 katı, yeniden doğma süreleri yarısıdır. Exp ve zindan mekaniği değiştirilmedi.')
+    put('- Haritalar ve doğma bölgeleri korunur; metin yoğunluğu başlangıcın 4 katı, yeniden doğma süreleri yarısıdır. Kraliçe/Komutan 15 dakikada doğar. Exp aynı; zindan zincirleri v4 profiliyle tamamlanır.')
     put()
     put('## 2. Oranlar nasıl okunur?')
     put()
@@ -131,6 +133,8 @@ def render():
         '**baz oranlardır**: dosyadaki 400 yaklaşık %100, 24 yaklaşık %6 eder. Seviye farkı, '
         'sunucu oranı, çift drop ve motor bonusları gerçek sonucu değiştirebilir. Her satır bağımsızdır; '
         'aynı kesimde birden fazla eşya düşebilir. BK satırları ayrı rastgele beceriler üretir.')
+    put('`Type limit` kullanan klasik boss sandıkları ve giriş/üretim malzemeleri bu seviye '
+        'cezasına girmez: bu gruplarda 100 doğrudan %100, 25 doğrudan %25 anlamındadır.')
     put()
     put('Sandık içi oranlar ise ağırlık/toplam hesabıdır. **Bir sandık yalnız bir sonuç satırı seçer**; '
         'o satırdaki adet kadar eşya verir. Silah/zırh satırında adet 1. 10 BK sonucu, aynı rastgele '
@@ -150,6 +154,8 @@ def render():
                 sources[vnum].append(label)
     for group in bosses:
         for chest, _, _ in group['entries']:
+            if chest not in special_by_id:
+                continue
             label = mob_name(group['mob']) + ' → ' + name(chest)
             for vnum, amount, chance in special_by_id[chest]['entries']:
                 if label not in sources[vnum]:
@@ -202,9 +208,22 @@ def render():
             + ' | ' + name(boss['chest']) + ' | ' + str(boss['chest']) + ' | ' + pct(weapons)
             + ' | ' + pct(armour) + ' | ' + pct(100-weapons-armour) + ' |')
     put()
-    put('Bu ' + str(len(policy['bosses'])) + ' boss için doğrudan 1 kendi sandığı satırı @400 vardır: standart yakın seviye bazında '
-        'yaklaşık %100. Aynı sandığı paylaşan iki boss (Şeytan Kral/Kibirli Şeytan Kral) aynı içeriği kullanır. '
+    put('Bu ' + str(len(policy['bosses'])) + ' boss için doğrudan 1 kendi sandığı satırı `Type limit`, `level_limit 0`, @100 vardır: '
+        'seviye cezasından bağımsız %100. Aynı sandığı paylaşan iki boss (Şeytan Kral/Kibirli Şeytan Kral) aynı içeriği kullanır. '
         'Sandık içindeki ekipman oranları yukarıda; aşağıdaki listelerde tek tek eşya oranları bulunur.')
+    put()
+    put('### Giriş ve üretim malzemeleri')
+    put()
+    put('Aşağıdaki kaynaklar `Type limit` kullanır; seviye farkı bu yüzdeleri düşürmez. '
+        'Günlük giriş kotası yoktur. Beran kişi başına 3 Kıvrık Anahtar; Katakomb geçişi kişi başına 1 Küçülen Kafa ister. '
+        'Uriel üretimi her malzemeden 1 adetle %100 başarılıdır.')
+    put()
+    put('| Yaratık | Eşya | VNUM | Adet | Şans |')
+    put('|---|---|---:|---:|---:|')
+    for mob, entries in policy.get('access_drops', {}).items():
+        for vnum, amount, chance in entries:
+            put('| ' + mob_name(int(mob)) + ' | ' + name(vnum) + ' | ' + str(vnum)
+                + ' | ' + str(amount) + ' | ' + pct(chance) + ' |')
     put()
     put('## 6. Klasik boss sandıklarının tam içerikleri')
     put()
@@ -235,7 +254,10 @@ def render():
         put('Grup: `' + group['name'] + '` · Proto seviye: ' + mobs[mob]['Level']
             + ' · Rütbe: `' + mobs[mob]['Rank'] + '`.')
         put()
-        table(group['entries'])
+        if group.get('type') == 'limit':
+            put('`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.')
+            put()
+        table(group['entries'], scale=100 if group.get('type') == 'limit' else 400)
     put('## 8. Klasik boss kapsaması — açık bırakılan loot yok')
     put()
     put('| İçerik | VNUM | Bu revizyonda statik özel loot durumu |')
@@ -250,8 +272,8 @@ def render():
     put()
     put('Önceki sürümde eksik olan Vahşi Yüzbaşı, Dev Hastalık Taşıyıcı, Güçlü Buz Cadısı, '
         'Barones, Dev Çöl Kaplumbağası, Kırmızı Ejderha, iki Ağaç bossu, Kharoon ve Azrail '
-        'artık tanımlıdır. Zindan kill handler’larına ek eşya verme kodu konmadı; motorun mevcut '
-        'mob_drop_item yolu kullanılır. Instance/reentry, boss izleme ve oyuncu kabulü ayrı '
+        'artık tanımlıdır. Sandık ve giriş malzemeleri motorun mob_drop_item yolunu kullanır; '
+        'Baronun Arachnida Flütü zindan kill handler’ında üretilir. Instance/reentry, boss izleme ve oyuncu kabulü ayrı '
         'konulardır; loot tamamlanması Faz 3’ün bütün mekaniklerinin bittiği anlamına gelmez.')
     put()
     put('## 9. Taş Kesesi (27999) açılınca ne çıkar?')

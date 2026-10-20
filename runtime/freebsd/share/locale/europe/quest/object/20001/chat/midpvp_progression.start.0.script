@@ -1,0 +1,4 @@
+say_title ( "Uriel" ) 
+say ( "Artik zehir ve orumcek malzemelerini getirerek anahtar uretebilirsin." ) 
+pc . setqf ( "barones_ready" , 1 ) 
+pc . setqf ( "barones_step" , 3 ) 

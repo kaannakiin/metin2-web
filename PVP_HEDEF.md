@@ -418,6 +418,26 @@ tekrar farm yapılabilecek şekilde dengelenir; Beran günde bir kesime sınırl
 Malzeme adedi, üretim/düşüş şansı ve bekleme süreleri bu hedefe göre seçilir.
 Mevcut zincirlerin kaynaklı denetimi: [Faz 3 klasik zincir denetimi](docs/FAZ3_KLASIK_ZINCIR_DENETIMI.md).
 
+Canlıya alınacak orta-kolay zincir profili:
+
+- 13 klasik bossun sandığı kesim başına 1 adet, seviye cezasından bağımsız.
+- Komutan/General 2491/2492/2494/2495 kesiminden 3 Kıvrık Anahtar garantili;
+  Beran giriş maliyeti kişi başına 3 anahtar kalır.
+- Lusifer 2 Küçülen Kafa, Kraliçe Örümcek 1 zehir garantili verir.
+- Mevcut yerindeki Kraliçe grubu 2019 ve Sürgün 2 Komutan 2491 doğma süresi
+  15 dakikadır; yeni doğma noktası eklenmez.
+- Normal örümceklerin kendi beş üretim malzemesi ayrı ayrı %25 düşer.
+  Uriel 50 seviyede bir defalık Yüzbaşı–Mezar Taşı–Uriel hazırlığından sonra
+  her malzemeden 1 adet ve 1 Kraliçe zehri ile %100 Arachnida Anahtarı üretir.
+- Buz Cadısı/Güçlü Buz Cadısı, iki General ve Beran 1 Kan Taşı garantili verir.
+- Bu sandık ve giriş/üretim malzemeleri mevcut `Type limit` drop yolu ile
+  seviye cezasından ayrılır. Metin ve diğer ekipman düşüşünün seviye politikası aynı.
+- Kule, Katakomb, Barones ve Beran başarılı kesim sonrası 10 dakika bekler;
+  günlük giriş kotası yoktur. Katakomb'da kule tamamlama kaydı gerekir, kafa
+  her katılımcıdan yalnız ikinci kattan üçüncü kata geçişte bir kez tüketilir.
+- Barones giriş seviyesi her yolda 50, kişi başına 1 Arachnida Anahtarıdır.
+  Zindanda Baron → Flüt → Barones sırası ve yumurta mekaniği korunur.
+
 | Özellik                               | Karar | Not                                    |
 | ------------------------------------- | ----- | -------------------------------------- |
 | Klasik haritalar + metin              | Açık  | küratörlü drop matrisi yukarıda        |

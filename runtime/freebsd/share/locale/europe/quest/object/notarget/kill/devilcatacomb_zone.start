@@ -1,4 +1,4 @@
-if pc . get_map_index ( ) == 216 then local j = number ( 1 , 80 ) 
+if pc . get_map_index ( ) == 216 then local j = number ( 1 , 10 ) 
 if j == 1 then 
 game . drop_item ( 30311 , 1 ) 
 end 

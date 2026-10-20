@@ -1,10 +1,11 @@
-quest_tr/_alldungeons/devilcatacomb_zone.lua
-quest_tr/_alldungeons/deviltower_zone.lua
-quest_tr/_alldungeons/dragonlair.lua
+quest_tr/_midpvp/devilcatacomb_zone.lua
+quest_tr/_midpvp/deviltower_zone.lua
+quest_tr/_midpvp/dragonlair.lua
 quest_tr/_alldungeons/flame_dungeon.lua
 quest_tr/_alldungeons/shipdefense.lua
 quest_tr/_alldungeons/snow_dungeon.lua
-quest_tr/_alldungeons/spider_dungeon.lua
+quest_tr/_midpvp/spider_dungeon.lua
+quest_tr/_midpvp/midpvp_progression.lua
 quest_tr/_eventsystems/boss_event.lua
 quest_tr/_eventsystems/cards_drop_event.lua
 quest_tr/_eventsystems/event_panel.lua
@@ -30,7 +31,6 @@ quest_tr/_guildsystems/guild_ranking.lua
 quest_tr/_guildsystems/guild_war_bet.quest
 quest_tr/_guildsystems/guild_war_join.quest
 quest_tr/_guildsystems/guild_war_observer.quest
-quest_tr/_guildsystems/mid_pvp_rewards.lua
 quest_tr/_guildsystems/priv_empire.quest
 quest_tr/_horsesystems/horse_exchange_ticket.quest
 quest_tr/_horsesystems/horse_guard.quest

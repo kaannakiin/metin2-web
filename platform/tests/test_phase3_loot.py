@@ -58,7 +58,10 @@ class Phase3LootTests(unittest.TestCase):
                  for g in groups('mob_drop_item.txt') if g[1].startswith('Phase3Boss_')}
         self.assertEqual(len(drops), 13)
         for boss in POLICY['bosses']:
-            self.assertEqual(drops[boss['mob']], [(1, boss['chest'], 1, 400)])
+            expected = [(1, boss['chest'], 1, 100)]
+            expected.extend((i + 2, *row) for i, row in enumerate(
+                POLICY.get('access_drops', {}).get(str(boss['mob']), [])))
+            self.assertEqual(drops[boss['mob']], expected)
             self.assertEqual(self.items[boss['chest']]['Type'], 'ITEM_GIFTBOX')
             body = boxes[boss['chest']]
             self.assertNotRegex(body, r'\bType\s+(pct|quest|special)')

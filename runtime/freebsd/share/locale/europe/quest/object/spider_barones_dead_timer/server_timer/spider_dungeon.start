@@ -4,7 +4,7 @@ if d . getf ( "DungeonBlock" ) == 1 then
 GetMissionInfo ( 1 , 60 ) 
 d . global_warp_all_to_base ( 68900 , 611100 , arg , 60 ) 
 d . notice ( arg , 673 , "" , false ) 
-d . setqf2 ( "spider_dungeon" , "cooldown" , get_global_time ( ) + 60 * 60 ) 
+d . setqf2 ( "spider_dungeon" , "cooldown" , get_global_time ( ) + 10 * 60 ) 
 d . track_update ( 2092 ) 
 d . setf ( "level" , 0 ) 
 d . setf ( "king_vid" , 0 ) 

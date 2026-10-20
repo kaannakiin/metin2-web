@@ -1,0 +1,19 @@
+say_title ( "Uriel" ) 
+say ( "Her malzemeden birer adet gerekir. Uretim basarisi yuzde 100." ) 
+say ( "Kralice zehri, zehir kesesi, ag, gozler, yumurta kesesi ve bacaklar." ) 
+if select ( "Uret" , "Vazgec" ) ~= 1 then return end 
+local materials = { 30326 , 30025 , 30056 , 30057 , 30058 , 30059 } 
+for i , vnum in ipairs ( materials ) begin 
+if pc . count_item ( vnum ) < 1 then 
+say ( "Eksik malzeme:" ) 
+say_item_vnum ( vnum , 1 ) 
+return 
+end 
+end 
+if not pc . enough_inventory ( 30324 ) then 
+say ( "Once envanterinde yer ac." ) 
+return 
+end 
+for i , vnum in ipairs ( materials ) begin pc . remove_item ( vnum , 1 ) end 
+pc . give_item2 ( 30324 , 1 ) 
+say ( "Arachnida Anahtarin hazir. Her giriste bir anahtar kullanilir." ) 

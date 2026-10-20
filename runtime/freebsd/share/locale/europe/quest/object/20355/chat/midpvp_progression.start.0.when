@@ -1,0 +1,1 @@
+return pc . get_level ( ) >= 50 and pc . getqf ( "barones_ready" ) == 0

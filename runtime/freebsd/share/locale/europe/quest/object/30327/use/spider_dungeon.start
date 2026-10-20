@@ -1,0 +1,19 @@
+if pc . get_map_index ( ) >= 2.17e+06 and pc . get_map_index ( ) <= 2.17999e+06 then if d . select ( pc . get_map_index ( ) ) and d . getf ( "baron_dead" ) == 1 and d . getf ( "barones_spawned" ) == 0 then 
+if pc . count_item ( 30327 ) < 1 then return end 
+d . setf ( "barones_spawned" , 1 ) 
+pc . remove_item ( 30327 , 1 ) 
+d . spawn_mob ( 2095 , 400 , 566 ) 
+d . spawn_mob ( 2095 , 400 , 594 ) 
+d . spawn_mob ( 2095 , 362 , 600 ) 
+d . spawn_mob ( 2095 , 337 , 599 ) 
+d . spawn_mob ( 2095 , 335 , 581 ) 
+d . spawn_mob ( 2095 , 344 , 562 ) 
+d . spawn_mob ( 2095 , 364 , 588 ) 
+d . spawn_mob ( 2095 , 379 , 562 ) 
+d . spawn_mob ( 2095 , 368 , 525 ) 
+local kingVid = d . spawn_mob ( 2092 , 367 , 588 ) 
+d . setf ( "king_vid" , kingVid ) 
+d . setf ( "remain_egg" , 9 ) 
+GetMissionInfo ( 2 , 20 * 60 ) 
+end 
+ return end 

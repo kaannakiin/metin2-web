@@ -1,9 +1,32 @@
-if pc . get_map_index ( ) >= 2.16e+06 and pc . get_map_index ( ) < 2.16999e+06 then if d . select ( pc . get_map_index ( ) ) then 
-if d . getf ( "level" ) == 2 then 
-if d . getf ( "tortoise_timer" ) == 1 then 
-server_timer ( "devilcatacomb_2" , 5 , d . get_map_index ( ) ) 
+if pc . get_map_index ( ) >= 2.16e+06 and pc . get_map_index ( ) <= 2.16999e+06 then if not d . select ( pc . get_map_index ( ) ) then return end 
+if d . getf ( "level" ) ~= 2 or d . getf ( "tortoise_timer" ) ~= 1 or d . getf ( "head_paid" ) == 1 then return end 
+local index = pc . get_map_index ( ) 
+local ready = true 
+if party . is_party ( ) then 
+local pids = { party . get_member_pids ( ) } 
+for i , pid in ipairs ( pids ) begin 
+q . begin_other_pc_block ( pid ) 
+if pc . get_map_index ( ) == index and pc . count_item ( 30319 ) < 1 then ready = false end 
+q . end_other_pc_block ( ) 
 end 
+if not ready then 
+say ( "Icerideki her uye icin bir Kuculen Kafa gerekli." ) 
+return 
+end 
+d . setf ( "head_paid" , 1 ) 
+for i , pid in ipairs ( pids ) begin 
+q . begin_other_pc_block ( pid ) 
+if pc . get_map_index ( ) == index then pc . remove_item ( 30319 , 1 ) end 
+q . end_other_pc_block ( ) 
+end 
+else 
+if pc . count_item ( 30319 ) < 1 then 
+say ( "Bir Kuculen Kafa gerekli." ) 
+return 
+end 
+d . setf ( "head_paid" , 1 ) 
+pc . remove_item ( 30319 , 1 ) 
+end 
+server_timer ( "devilcatacomb_2" , 5 , index ) 
 npc . purge ( ) 
-end 
-end 
  return end 

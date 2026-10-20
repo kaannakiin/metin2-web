@@ -1,0 +1,10 @@
+say_title ( "Yuzbasi" ) 
+say ( "Orumcek Zindani 3. kattaki mezar tasini incele, sonra Uriele git." ) 
+if pc . getqf ( "barones_step" ) == 0 then 
+if not pc . enough_inventory ( 71130 ) then 
+say ( "Once envanterinde yer ac." ) 
+return 
+end 
+pc . setqf ( "barones_step" , 1 ) 
+pc . give_item2 ( 71130 , 1 ) 
+end 

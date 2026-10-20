@@ -933,7 +933,6 @@ Group	IceWitch
 	17	17185	1	50
 	18	17205	1	50
 	19	70031	1	50
-	20	30190	1	400
 }
 
 Group	Refine_2311
@@ -1012,175 +1011,184 @@ Group	YonghanCaptain
 {
 	Mob	2491
 	Type	drop
-	1	30179	1	400
-	2	30196	1	1
+	1	30196	1	1
 }
 
 Group	YonghanGeneral
 {
 	Mob	2492
 	Type	drop
-	1	30179	2	100
-	2	30190	1	100
-	3	13063	1	100
-	4	14206	1	50
-	5	27987	1	100
-	6	13083	1	100
-	7	13103	1	100
-	8	15165	1	30
-	9	16203	1	50
-	10	17184	1	50
-	11	17203	1	30
-	12	13123	1	50
-	13	14143	1	30
-	14	15204	1	30
-	15	16184	1	50
+	1	13063	1	100
+	2	14206	1	50
+	3	27987	1	100
+	4	13083	1	100
+	5	13103	1	100
+	6	15165	1	30
+	7	16203	1	50
+	8	17184	1	50
+	9	17203	1	30
+	10	13123	1	50
+	11	14143	1	30
+	12	15204	1	30
+	13	16184	1	50
 }
 
 Group	BlueDragon
 {
 	Mob	2493
 	Type	drop
-	1	30190	2	50
-	2	12284	1	20
-	3	12404	1	20
-	4	12544	1	20
-	5	12684	1	20
-	6	15374	1	20
-	7	15394	1	20
-	8	15414	1	20
-	9	15434	1	20
-	10	27987	15	75
-	11	71123	1	5
-	12	71129	1	5
-	13	71083	1	1
-	14	25041	5	15
-	15	71084	250	40
+	1	12284	1	20
+	2	12404	1	20
+	3	12544	1	20
+	4	12684	1	20
+	5	15374	1	20
+	6	15394	1	20
+	7	15414	1	20
+	8	15434	1	20
+	9	27987	15	75
+	10	71123	1	5
+	11	71129	1	5
+	12	71083	1	1
+	13	25041	5	15
+	14	71084	250	40
+	15	50513	1	15
 	16	50513	1	15
-	17	50513	1	15
-	18	27992	1	20
-	19	27993	1	10
-	20	27994	1	5
-	21	70024	1	15
-	22	71085	5	40
+	17	27992	1	20
+	18	27993	1	10
+	19	27994	1	5
+	20	70024	1	15
+	21	71085	5	40
 }
 
 Group	HuashinCaptain
 {
 	Mob	2494
 	Type	drop
-	1	30179	1	400
+
 }
 
 Group	HuashinGeneral
 {
 	Mob	2495
 	Type	drop
-	1	30179	3	100
-	2	30190	1	100
-	3	11691	1	30
-	4	11491	1	30
-	5	11891	1	30
-	6	11291	1	30
-	7	13064	1	100
-	8	13084	1	30
-	9	13104	1	100
-	10	16204	1	50
-	11	17204	1	30
-	12	13124	1	100
-	13	15205	1	30
-	14	27987	1	100
+	1	11691	1	30
+	2	11491	1	30
+	3	11891	1	30
+	4	11291	1	30
+	5	13064	1	100
+	6	13084	1	30
+	7	13104	1	100
+	8	16204	1	50
+	9	17204	1	30
+	10	13124	1	100
+	11	15205	1	30
+	12	27987	1	100
 }
 
 Group	Phase3Boss_691
 {
 	Mob	691
-	Type	drop
-	1	50070	1	400
+	Type	limit
+	level_limit	0
+	1	50070	1	100
 }
 
 Group	Phase3Boss_791
 {
 	Mob	791
-	Type	drop
-	1	50071	1	400
+	Type	limit
+	level_limit	0
+	1	50071	1	100
 }
 
 Group	Phase3Boss_792
 {
 	Mob	792
-	Type	drop
-	1	50072	1	400
+	Type	limit
+	level_limit	0
+	1	50072	1	100
 }
 
 Group	Phase3Boss_2091
 {
 	Mob	2091
-	Type	drop
-	1	50073	1	400
+	Type	limit
+	level_limit	0
+	1	50073	1	100
+	2	30326	1	100
 }
 
 Group	Phase3Boss_1901
 {
 	Mob	1901
-	Type	drop
-	1	50077	1	400
+	Type	limit
+	level_limit	0
+	1	50077	1	100
 }
 
 Group	Phase3Boss_1304
 {
 	Mob	1304
-	Type	drop
-	1	50078	1	400
+	Type	limit
+	level_limit	0
+	1	50078	1	100
 }
 
 Group	Phase3Boss_2206
 {
 	Mob	2206
-	Type	drop
-	1	50079	1	400
+	Type	limit
+	level_limit	0
+	1	50079	1	100
 }
 
 Group	Phase3Boss_1091
 {
 	Mob	1091
-	Type	drop
-	1	50081	1	400
+	Type	limit
+	level_limit	0
+	1	50081	1	100
 }
 
 Group	Phase3Boss_1092
 {
 	Mob	1092
-	Type	drop
-	1	50081	1	400
+	Type	limit
+	level_limit	0
+	1	50081	1	100
 }
 
 Group	Phase3Boss_1093
 {
 	Mob	1093
-	Type	drop
-	1	50082	1	400
+	Type	limit
+	level_limit	0
+	1	50082	1	100
+	2	30319	2	100
 }
 
 Group	Phase3Boss_2191
 {
 	Mob	2191
-	Type	drop
-	1	50076	1	400
+	Type	limit
+	level_limit	0
+	1	50076	1	100
 }
 
 Group	Phase3Boss_2291
 {
 	Mob	2291
-	Type	drop
-	1	50080	1	400
+	Type	limit
+	level_limit	0
+	1	50080	1	100
 }
 
 Group	Phase3Boss_2598
 {
 	Mob	2598
-	Type	drop
-	1	50186	1	400
+	Type	limit
+	level_limit	0
+	1	50186	1	100
 }
 
 Group	Phase3Direct_591
@@ -1217,21 +1225,20 @@ Group	Phase3Direct_1192
 	9	17200	1	32
 	10	16200	1	32
 	11	50513	2	400
-	12	30190	1	160
-	13	28430	1	8
-	14	28431	1	8
-	15	28432	1	8
-	16	28433	1	8
-	17	28434	1	8
-	18	28435	1	8
-	19	28436	1	8
-	20	28437	1	8
-	21	28438	1	8
-	22	28439	1	8
-	23	28440	1	8
-	24	28441	1	8
-	25	28442	1	8
-	26	28443	1	8
+	12	28430	1	8
+	13	28431	1	8
+	14	28432	1	8
+	15	28433	1	8
+	16	28434	1	8
+	17	28435	1	8
+	18	28436	1	8
+	19	28437	1	8
+	20	28438	1	8
+	21	28439	1	8
+	22	28440	1	8
+	23	28441	1	8
+	24	28442	1	8
+	25	28443	1	8
 }
 
 Group	Phase3Direct_2092
@@ -1283,5 +1290,143 @@ Group	Phase3Direct_2597
 	4	27993	1	32
 	5	27994	1	16
 	6	50513	2	400
+}
+
+Group	Phase3Access_1191
+{
+	Mob	1191
+	Type	limit
+	level_limit	0
+	1	30190	1	100
+}
+
+Group	Phase3Access_1192
+{
+	Mob	1192
+	Type	limit
+	level_limit	0
+	1	30190	1	100
+}
+
+Group	Phase3Access_2001
+{
+	Mob	2001
+	Type	limit
+	level_limit	0
+	1	30057	1	25
+}
+
+Group	Phase3Access_2002
+{
+	Mob	2002
+	Type	limit
+	level_limit	0
+	1	30056	1	25
+}
+
+Group	Phase3Access_2003
+{
+	Mob	2003
+	Type	limit
+	level_limit	0
+	1	30025	1	25
+}
+
+Group	Phase3Access_2004
+{
+	Mob	2004
+	Type	limit
+	level_limit	0
+	1	30058	1	25
+}
+
+Group	Phase3Access_2005
+{
+	Mob	2005
+	Type	limit
+	level_limit	0
+	1	30059	1	25
+}
+
+Group	Phase3Access_2051
+{
+	Mob	2051
+	Type	limit
+	level_limit	0
+	1	30057	1	25
+}
+
+Group	Phase3Access_2052
+{
+	Mob	2052
+	Type	limit
+	level_limit	0
+	1	30056	1	25
+}
+
+Group	Phase3Access_2053
+{
+	Mob	2053
+	Type	limit
+	level_limit	0
+	1	30025	1	25
+}
+
+Group	Phase3Access_2054
+{
+	Mob	2054
+	Type	limit
+	level_limit	0
+	1	30058	1	25
+}
+
+Group	Phase3Access_2055
+{
+	Mob	2055
+	Type	limit
+	level_limit	0
+	1	30059	1	25
+}
+
+Group	Phase3Access_2491
+{
+	Mob	2491
+	Type	limit
+	level_limit	0
+	1	30179	3	100
+}
+
+Group	Phase3Access_2492
+{
+	Mob	2492
+	Type	limit
+	level_limit	0
+	1	30179	3	100
+	2	30190	1	100
+}
+
+Group	Phase3Access_2493
+{
+	Mob	2493
+	Type	limit
+	level_limit	0
+	1	30190	1	100
+}
+
+Group	Phase3Access_2494
+{
+	Mob	2494
+	Type	limit
+	level_limit	0
+	1	30179	3	100
+}
+
+Group	Phase3Access_2495
+{
+	Mob	2495
+	Type	limit
+	level_limit	0
+	1	30179	3	100
+	2	30190	1	100
 }
 

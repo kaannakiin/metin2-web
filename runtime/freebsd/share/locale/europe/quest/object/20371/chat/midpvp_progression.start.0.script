@@ -1,0 +1,3 @@
+say_title ( "Mezar Tasi" ) 
+say ( "Izleri inceledin. Uriel sana Arachnida Anahtarini ogretebilir." ) 
+pc . setqf ( "barones_step" , 2 ) 

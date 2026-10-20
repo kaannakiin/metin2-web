@@ -125,6 +125,13 @@ Lusifer'in Küçülen Kafa kaynağı, Katakomb tüketim tutarlılığı, Uriel/A
 üretimi ve Baron–Flüt aşaması açık. General–Kıvrık Anahtar–Beran bağlantısı mevcut.
 Wiki'nin günlük kota/EP bileti modeli kopyalanmaz; hedef tekrarlanabilir orta-kolay farm.
 
+Zincir uygulaması **20261020-153340**, Kraliçe/Komutan 15 dakikalık doğuşları
+**20261020-153638** ile canlıda: seviye cezasından bağımsız giriş malzemeleri ve
+boss sandıkları, Uriel üretimi, Baron–Flüt aşaması, tek kafa tüketimi ve dört
+zindanda 10 dakikalık başarılı kesim cooldown'u. Ayrıntılar
+[MID_PVP_FAZ3_ZINCIR.md](MID_PVP_FAZ3_ZINCIR.md). Oyun kabulü kullanıcıda;
+boss izleme ve tüm instance/reentry uç durumları faz çıkışı için hâlâ açık.
+
 1. Level akışı: 1–20 köy → 2. köy → Seungryong → Hwang → Yongbi/Örümcek → Sohan/Doyyum → Kızıl Orman → Sürgün 1–2 → opsiyonel 1 end map.
 2. Metin: band drop (küratörlü gear) + yüksek level’ın düşük farm tekeline engel.
 3. Açık dünya boss havuzu (ör. Vahşi Yüzbaşı → General): respawn 15–120 dk, sandık önizleme, hasar/notice; her boss loot’u mid/end veya malzeme sink’ine bağlı.

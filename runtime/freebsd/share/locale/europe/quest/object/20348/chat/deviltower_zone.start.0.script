@@ -10,7 +10,7 @@ if not pc . is_gm ( ) and pc . getf ( "deviltower_zone" , "cooldown" ) > get_glo
 local r_cooldown = pc . getf ( "deviltower_zone" , "cooldown" ) - get_global_time ( ) 
 say_title ( mob_name ( 20348 ) ) 
 say_new ( "" ) 
-say_new ( r_cooldown .. " saniye kaldi tekrar girmek için! [ENTER]" ) 
+say_new ( r_cooldown .. " saniye kaldi tekrar girmek icin! [ENTER]" ) 
 return 
 end 
 d . new_jump ( 66 , 2174 * 100 , 7040 * 100 ) 
@@ -31,7 +31,7 @@ return
 end 
 if party . get_near_count ( ) < 2 then 
 say_title ( mob_name ( 20348 ) ) 
-say_new ( "[ENTER]Bir grup üyesi müsait degil! [ENTER]" ) 
+say_new ( "[ENTER]Bir grup uyesi musait degil! [ENTER]" ) 
 return 
 end 
 local user_fail_level = { } 
@@ -53,7 +53,7 @@ end
 q . end_other_pc_block ( ) 
 end 
 if LevelCheck == false then 
-say_new ( "Oyuncunun seviyesi çok düsük: [ENTER]" ) 
+say_new ( "Oyuncunun seviyesi cok dusuk: [ENTER]" ) 
 local a = 1 
 for i , name in next , user_fail_level , nil begin 
 say_new ( string . format ( "%d. %s" , a , name ) ) 

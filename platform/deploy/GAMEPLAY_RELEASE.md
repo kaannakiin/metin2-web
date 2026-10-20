@@ -1,5 +1,22 @@
 # Oyun paketi doğrulaması — 2026-10-20
 
+## Canlı klasik zincirler ve loot v4
+
+**20261020-153340**: beş gerçek qc görev derlemesi ve loot v4 kuruldu.
+**20261020-153638**: yalnız iki erişim bossunun doğma süresi 15 dakikaya indirildi.
+Günlük kota yok; başarılı zindan kesiminde 10 dakika cooldown. Oranlar ve oyuncu
+akışı [MID_PVP_FAZ3_ZINCIR.md](../../docs/MID_PVP_FAZ3_ZINCIR.md) içinde.
+
+Kurucu `progression_release.py --install` kaynak/drop paketi, gerçek VM qc
+derlemesi, kapsamlı önceki dosya arşivi ve hash koruması kullanır. Bu v4 geçişinin
+baseline'ı `8ae9aadb3` olup canlıda bulunmayan opsiyonel ödül kaydı korunur.
+`--spawns-only --install` yalnız Kraliçe ve Komutan boss.txt dosyalarını kurar.
+Eski sürümü rastgele yeniden kurmak yerine yeni sürüm için baseline güncellenir.
+
+Oyun/regresyon testi çalıştırılmadı. Kurulumlar altı süreç/altı port ve dosya
+eşleşmeleriyle tamamlandı. VM `previous.tar` arşivleri ve `INSTALLED` kayıtları
+aynı sürüm dizinlerindedir. İstemci/engine/corpus değişmedi.
+
 ## Varsayılan dört envanter sayfası
 
 **Canlı sürüm: `20261020-142312`.** Mevcut beş karakter ve yeni karakter

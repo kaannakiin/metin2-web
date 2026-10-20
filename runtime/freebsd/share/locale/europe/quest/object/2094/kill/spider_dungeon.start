@@ -1,0 +1,6 @@
+if pc . get_map_index ( ) >= 2.17e+06 and pc . get_map_index ( ) <= 2.17999e+06 then if d . select ( pc . get_map_index ( ) ) and d . getf ( "baron_dead" ) == 0 then 
+d . setf ( "baron_dead" , 1 ) 
+game . drop_item_with_ownership ( 30327 , 1 ) 
+chat ( "Arachnida Flutu ile Baronesi cagir." ) 
+end 
+ return end 

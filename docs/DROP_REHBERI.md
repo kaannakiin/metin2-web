@@ -1,6 +1,6 @@
 # Metin ve Boss Drop Rehberi — Anka2
 
-Tarih: **20 Ekim 2026** · Loot politikası: **v3**
+Tarih: **20 Ekim 2026** · Loot politikası: **v4**
 
 **Durum:** Bu rehber repodaki güncel loot verisini anlatır; tek başına canlı kurulum kanıtı değildir. Önceki malzeme ağırlıklı sandık özeti geçersizdir. Yayın adayının durumu [kurulum belgesinde](../platform/deploy/GAMEPLAY_RELEASE.md) takip edilir.
 
@@ -12,11 +12,12 @@ Tarih: **20 Ekim 2026** · Loot politikası: **v3**
 - Havalı Çelik Yay **2170**; Geyik Boynuzu Yay **2150** ve 30 seviyedir. ID ve seviye ayrımı gerçek item_proto üzerinden denetlendi.
 - Diğer klasik boss sandıkları da artık silah ve zırh içerir; sadece tüketim malzemesi vermez.
 - Önceki rehberde ayrı dengeleme bekleyen 10 klasik bossun tamamına özel loot eklendi. Azrail kendi sandığını verir; Barones/Cadı/Ağaç bossları/Kharoon doğrudan düşürür.
-- Haritalar ve doğma bölgeleri korunur; metin yoğunluğu başlangıcın 4 katı, yeniden doğma süreleri yarısıdır. Exp ve zindan mekaniği değiştirilmedi.
+- Haritalar ve doğma bölgeleri korunur; metin yoğunluğu başlangıcın 4 katı, yeniden doğma süreleri yarısıdır. Kraliçe/Komutan 15 dakikada doğar. Exp aynı; zindan zincirleri v4 profiliyle tamamlanır.
 
 ## 2. Oranlar nasıl okunur?
 
 Metin ve doğrudan boss tablolarındaki oranlar, yakın seviyede standart item-drop ayarındaki **baz oranlardır**: dosyadaki 400 yaklaşık %100, 24 yaklaşık %6 eder. Seviye farkı, sunucu oranı, çift drop ve motor bonusları gerçek sonucu değiştirebilir. Her satır bağımsızdır; aynı kesimde birden fazla eşya düşebilir. BK satırları ayrı rastgele beceriler üretir.
+`Type limit` kullanan klasik boss sandıkları ve giriş/üretim malzemeleri bu seviye cezasına girmez: bu gruplarda 100 doğrudan %100, 25 doğrudan %25 anlamındadır.
 
 Sandık içi oranlar ise ağırlık/toplam hesabıdır. **Bir sandık yalnız bir sonuç satırı seçer**; o satırdaki adet kadar eşya verir. Silah/zırh satırında adet 1. 10 BK sonucu, aynı rastgele becerinin 10 kitaplık yığınıdır. Sandıktaki oranlar seviye drop cezasıyla tekrar çarpılmaz.
 
@@ -378,7 +379,35 @@ Yang bu statik eşya tablosundan ayrıdır. Sıfır gold tanımlı metin için k
 | Kırmızı Ejderha | 2291 / 75 | Kırmızı Ejderha Sandığı | 50080 | 28% | 12% | 60% |
 | Azrail | 2598 / 91 | Azrail'in Sandığı | 50186 | 25% | 49% | 26% |
 
-Bu 13 boss için doğrudan 1 kendi sandığı satırı @400 vardır: standart yakın seviye bazında yaklaşık %100. Aynı sandığı paylaşan iki boss (Şeytan Kral/Kibirli Şeytan Kral) aynı içeriği kullanır. Sandık içindeki ekipman oranları yukarıda; aşağıdaki listelerde tek tek eşya oranları bulunur.
+Bu 13 boss için doğrudan 1 kendi sandığı satırı `Type limit`, `level_limit 0`, @100 vardır: seviye cezasından bağımsız %100. Aynı sandığı paylaşan iki boss (Şeytan Kral/Kibirli Şeytan Kral) aynı içeriği kullanır. Sandık içindeki ekipman oranları yukarıda; aşağıdaki listelerde tek tek eşya oranları bulunur.
+
+### Giriş ve üretim malzemeleri
+
+Aşağıdaki kaynaklar `Type limit` kullanır; seviye farkı bu yüzdeleri düşürmez. Günlük giriş kotası yoktur. Beran kişi başına 3 Kıvrık Anahtar; Katakomb geçişi kişi başına 1 Küçülen Kafa ister. Uriel üretimi her malzemeden 1 adetle %100 başarılıdır.
+
+| Yaratık | Eşya | VNUM | Adet | Şans |
+|---|---|---:|---:|---:|
+| Lusifer | Küçülen Kafa | 30319 | 2 | 100% |
+| Buz Cadı | Kan Taşı | 30190 | 1 | 100% |
+| Güçlü Buz Cadısı | Kan Taşı | 30190 | 1 | 100% |
+| Yavru Örümcek | Örümcek Gözleri | 30057 | 1 | 25% |
+| Zehirli Örümcek | Örümcek Ağı | 30056 | 1 | 25% |
+| Kırmızı Zehirli Örümcek | Örümceğin Zehir Kesesi | 30025 | 1 | 25% |
+| Pençe Örümceği | Örümcek Yumurta Kesesi | 30058 | 1 | 25% |
+| Asker Örümcek | Örümcek Bacakları | 30059 | 1 | 25% |
+| Huysuz Z. Yavru Örümcek | Örümcek Gözleri | 30057 | 1 | 25% |
+| Huysuz Ölmcl. Z. Örümcek | Örümcek Ağı | 30056 | 1 | 25% |
+| Huys.Kırm.Öl.Zeh.Örümcek | Örümceğin Zehir Kesesi | 30025 | 1 | 25% |
+| Huys.Zeh. Pençe Örümceği | Örümcek Yumurta Kesesi | 30058 | 1 | 25% |
+| Huysuz Z. Asker Örümcek | Örümcek Bacakları | 30059 | 1 | 25% |
+| Kraliçe Örümcek | Kraliçe Örümcek Zehri | 30326 | 1 | 100% |
+| Komutan | Kıvrık Anahtar | 30179 | 3 | 100% |
+| General | Kıvrık Anahtar | 30179 | 3 | 100% |
+| General | Kan Taşı | 30190 | 1 | 100% |
+| Beran-Setaou | Kan Taşı | 30190 | 1 | 100% |
+| General | Kıvrık Anahtar | 30179 | 3 | 100% |
+| General | Kıvrık Anahtar | 30179 | 3 | 100% |
+| General | Kan Taşı | 30190 | 1 | 100% |
 
 ## 6. Klasik boss sandıklarının tam içerikleri
 
@@ -887,7 +916,6 @@ Grup: `IceWitch` · Proto seviye: 74 · Rütbe: `BOSS`.
 | Ametist Küpe+5 | 17185 | 50 | 1 | 12,5% |
 | Cennetin Gözyaşı Küpe+5 | 17205 | 54 | 1 | 12,5% |
 | Eskrim Broşürü | 70031 | — | 1 | 12,5% |
-| Kan Taşı | 30190 | — | 1 | 100% |
 
 ### Kırmızı Hayalet Ağaç — 2311
 
@@ -977,7 +1005,6 @@ Grup: `YonghanCaptain` · Proto seviye: 93 · Rütbe: `S_KNIGHT`.
 
 | Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
 |---|---:|---:|---:|---:|
-| Kıvrık Anahtar | 30179 | — | 1 | 100% |
 | Şeytan Külü | 30196 | — | 1 | 0,25% |
 
 ### General — 2492
@@ -986,8 +1013,6 @@ Grup: `YonghanGeneral` · Proto seviye: 95 · Rütbe: `BOSS`.
 
 | Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
 |---|---:|---:|---:|---:|
-| Kıvrık Anahtar | 30179 | — | 2 | 25% |
-| Kan Taşı | 30190 | — | 1 | 25% |
 | Şahin Kalkanı+3 | 13063 | 61 | 1 | 25% |
 | Cennetin Gözy. Bilezik+6 | 14206 | 54 | 1 | 12,5% |
 | İstiridye | 27987 | — | 1 | 25% |
@@ -1008,7 +1033,6 @@ Grup: `BlueDragon` · Proto seviye: 97 · Rütbe: `KING`.
 
 | Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
 |---|---:|---:|---:|---:|
-| Kan Taşı | 30190 | — | 2 | 12,5% |
 | Usta Savaşçı Kaskı +4 | 12284 | 80 | 1 | 5% |
 | Örümcek Kapşon +4 | 12404 | 80 | 1 | 5% |
 | Büyülü Kask +4 | 12544 | 80 | 1 | 5% |
@@ -1036,7 +1060,6 @@ Grup: `HuashinCaptain` · Proto seviye: 88 · Rütbe: `S_KNIGHT`.
 
 | Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
 |---|---:|---:|---:|---:|
-| Kıvrık Anahtar | 30179 | — | 1 | 100% |
 
 ### General — 2495
 
@@ -1044,8 +1067,6 @@ Grup: `HuashinGeneral` · Proto seviye: 90 · Rütbe: `BOSS`.
 
 | Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
 |---|---:|---:|---:|---:|
-| Kıvrık Anahtar | 30179 | — | 3 | 25% |
-| Kan Taşı | 30190 | — | 1 | 25% |
 | Kara Büyü Zırh+1 | 11691 | 66 | 1 | 7,5% |
 | Siyah Rüzgar Takımı+1 | 11491 | 66 | 1 | 7,5% |
 | Siyah Elbise+1 | 11891 | 66 | 1 | 7,5% |
@@ -1097,7 +1118,6 @@ Grup: `Phase3Direct_1192` · Proto seviye: 89 · Rütbe: `BOSS`.
 | Cennetin Gözyaşı Küpe+0 | 17200 | 54 | 1 | 8% |
 | Cennetin Gözyaşı Kolye+0 | 16200 | 54 | 1 | 8% |
 | Ruh Taşı | 50513 | — | 2 | 100% |
-| Kan Taşı | 30190 | — | 1 | 40% |
 | Kavrama Taşı+4 | 28430 | — | 1 | 2% |
 | Öldürücü Darbe Taşı+4 | 28431 | — | 1 | 2% |
 | Soğutma Taşı+4 | 28432 | — | 1 | 2% |
@@ -1168,6 +1188,178 @@ Grup: `Phase3Direct_2597` · Proto seviye: 91 · Rütbe: `KING`.
 | Kankırmızı İnci | 27994 | — | 1 | 4% |
 | Ruh Taşı | 50513 | — | 2 | 100% |
 
+### Buz Cadı — 1191
+
+Grup: `Phase3Access_1191` · Proto seviye: 74 · Rütbe: `BOSS`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Kan Taşı | 30190 | — | 1 | 100% |
+
+### Güçlü Buz Cadısı — 1192
+
+Grup: `Phase3Access_1192` · Proto seviye: 89 · Rütbe: `BOSS`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Kan Taşı | 30190 | — | 1 | 100% |
+
+### Yavru Örümcek — 2001
+
+Grup: `Phase3Access_2001` · Proto seviye: 43 · Rütbe: `PAWN`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Örümcek Gözleri | 30057 | — | 1 | 25% |
+
+### Zehirli Örümcek — 2002
+
+Grup: `Phase3Access_2002` · Proto seviye: 45 · Rütbe: `PAWN`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Örümcek Ağı | 30056 | — | 1 | 25% |
+
+### Kırmızı Zehirli Örümcek — 2003
+
+Grup: `Phase3Access_2003` · Proto seviye: 48 · Rütbe: `S_PAWN`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Örümceğin Zehir Kesesi | 30025 | — | 1 | 25% |
+
+### Pençe Örümceği — 2004
+
+Grup: `Phase3Access_2004` · Proto seviye: 50 · Rütbe: `S_PAWN`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Örümcek Yumurta Kesesi | 30058 | — | 1 | 25% |
+
+### Asker Örümcek — 2005
+
+Grup: `Phase3Access_2005` · Proto seviye: 52 · Rütbe: `S_PAWN`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Örümcek Bacakları | 30059 | — | 1 | 25% |
+
+### Huysuz Z. Yavru Örümcek — 2051
+
+Grup: `Phase3Access_2051` · Proto seviye: 43 · Rütbe: `PAWN`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Örümcek Gözleri | 30057 | — | 1 | 25% |
+
+### Huysuz Ölmcl. Z. Örümcek — 2052
+
+Grup: `Phase3Access_2052` · Proto seviye: 45 · Rütbe: `PAWN`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Örümcek Ağı | 30056 | — | 1 | 25% |
+
+### Huys.Kırm.Öl.Zeh.Örümcek — 2053
+
+Grup: `Phase3Access_2053` · Proto seviye: 48 · Rütbe: `S_PAWN`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Örümceğin Zehir Kesesi | 30025 | — | 1 | 25% |
+
+### Huys.Zeh. Pençe Örümceği — 2054
+
+Grup: `Phase3Access_2054` · Proto seviye: 50 · Rütbe: `S_PAWN`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Örümcek Yumurta Kesesi | 30058 | — | 1 | 25% |
+
+### Huysuz Z. Asker Örümcek — 2055
+
+Grup: `Phase3Access_2055` · Proto seviye: 52 · Rütbe: `S_PAWN`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Örümcek Bacakları | 30059 | — | 1 | 25% |
+
+### Komutan — 2491
+
+Grup: `Phase3Access_2491` · Proto seviye: 93 · Rütbe: `S_KNIGHT`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Kıvrık Anahtar | 30179 | — | 3 | 100% |
+
+### General — 2492
+
+Grup: `Phase3Access_2492` · Proto seviye: 95 · Rütbe: `BOSS`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Kıvrık Anahtar | 30179 | — | 3 | 100% |
+| Kan Taşı | 30190 | — | 1 | 100% |
+
+### Beran-Setaou — 2493
+
+Grup: `Phase3Access_2493` · Proto seviye: 97 · Rütbe: `KING`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Kan Taşı | 30190 | — | 1 | 100% |
+
+### General — 2494
+
+Grup: `Phase3Access_2494` · Proto seviye: 88 · Rütbe: `S_KNIGHT`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Kıvrık Anahtar | 30179 | — | 3 | 100% |
+
+### General — 2495
+
+Grup: `Phase3Access_2495` · Proto seviye: 90 · Rütbe: `BOSS`.
+
+`Type limit`: aşağıdaki yüzdeler seviye cezasından bağımsızdır.
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Kıvrık Anahtar | 30179 | — | 3 | 100% |
+| Kan Taşı | 30190 | — | 1 | 100% |
+
 ## 8. Klasik boss kapsaması — açık bırakılan loot yok
 
 | İçerik | VNUM | Bu revizyonda statik özel loot durumu |
@@ -1193,7 +1385,7 @@ Grup: `Phase3Direct_2597` · Proto seviye: 91 · Rütbe: `KING`.
 | Kharoon | 2597 | Doğrudan eşya/ruh taşı tablosu |
 | Azrail | 2598 | Kendi sandığı: Azrail'in Sandığı |
 
-Önceki sürümde eksik olan Vahşi Yüzbaşı, Dev Hastalık Taşıyıcı, Güçlü Buz Cadısı, Barones, Dev Çöl Kaplumbağası, Kırmızı Ejderha, iki Ağaç bossu, Kharoon ve Azrail artık tanımlıdır. Zindan kill handler’larına ek eşya verme kodu konmadı; motorun mevcut mob_drop_item yolu kullanılır. Instance/reentry, boss izleme ve oyuncu kabulü ayrı konulardır; loot tamamlanması Faz 3’ün bütün mekaniklerinin bittiği anlamına gelmez.
+Önceki sürümde eksik olan Vahşi Yüzbaşı, Dev Hastalık Taşıyıcı, Güçlü Buz Cadısı, Barones, Dev Çöl Kaplumbağası, Kırmızı Ejderha, iki Ağaç bossu, Kharoon ve Azrail artık tanımlıdır. Sandık ve giriş malzemeleri motorun mob_drop_item yolunu kullanır; Baronun Arachnida Flütü zindan kill handler’ında üretilir. Instance/reentry, boss izleme ve oyuncu kabulü ayrı konulardır; loot tamamlanması Faz 3’ün bütün mekaniklerinin bittiği anlamına gelmez.
 
 ## 9. Taş Kesesi (27999) açılınca ne çıkar?
 
@@ -1274,11 +1466,10 @@ Bu belge `python3 platform/tools/drop_catalogue.py` çıktısıdır. `python3 pl
 
 | Dosya | SHA-256 |
 |---|---|
-| `platform/gameplay/phase3_loot.json` | `08c8ca6a0f952153a1c6b8b85695cd75c9264c71626a808c6a5fb83ecc0a1e4e` |
-| `runtime/freebsd/share/locale/europe/mob_drop_item.txt` | `d02e1a60a3df125f7c293e5c8a3e16c162926deaffad6d666b3467ca91ee1103` |
+| `platform/gameplay/phase3_loot.json` | `2d6a657618bb3459649f0b4c60eca8c0ad8eaee517785c1f173574962c0ee1a9` |
+| `runtime/freebsd/share/locale/europe/mob_drop_item.txt` | `706a97a529576ed20cf9f1a16c39cddce767e21867567fc8358bf91083b890f5` |
 | `runtime/freebsd/share/locale/europe/special_item_group.txt` | `af4371b9ca4c88b5993e10d569848a228002c5ed55738dc868de2adeb7ffa288` |
 | `runtime/freebsd/share/conf/item_proto.txt` | `bc6ea5af8df343a71e518cd89bada151c3703d0924d135b3f46542649f7e5270` |
 | `runtime/freebsd/share/conf/mob_proto.txt` | `b66a8c263ce7c7d3426ff415d9563292c3fa8830f47d5973b4f16581a8387718` |
 
 Kontroller: bütün ödül VNUM’ları gerçek proto’da bulunmalı; sandık ağırlıkları 100 olmalı; gerçek 75 silah ailesi eksiksiz ve doğru seviyede olmalı; Havalı Çelik yanlışlıkla 2150 olmamalı; 75 silahlar metin havuzuna geri sızmamalı. Oyun içi drop/ortalama-beceri üretimi, sandık açma ve envanter davranışı bakım kurulumu ardından oynanarak doğrulanır.
-
