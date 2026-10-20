@@ -283,6 +283,14 @@ Bu revizyonda taşınan iki 75 silah dışında küratörlü base satırları ve
 adı Mob vnum'u ile benzersiz olmalı; aynı seviyedeki farklı taşların grupları
 aynı adı paylaşmaz.
 
+#### Varsayılan envanter — 2026-10-20
+
+Her oyuncuda standart envanterin **4 sayfası (180 hücre)** ücretsiz açık olur.
+Mevcut karakterler de kapsanır; envanter genişletme anahtarı gerekmez.
+Mevcut dört sayfalık düzen ve eşya hücre numaraları korunur. Bunun veri karşılığı
+`player.player.inventory_0 = 18` (iki ek sayfadaki 18 satır); yeni karakterlerde
+kolon varsayılanı da 18'dir. Özel envanterlerin kilitleri değişmez.
+
 #### Açık dünya metin yoğunluğu — 2026-10-20
 
 Kullanıcı kararı: başlangıca göre **4 kat metin**, yeniden doğma süreleri

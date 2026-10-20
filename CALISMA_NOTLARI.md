@@ -1,5 +1,34 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### Her oyuncuya dört envanter sayfası — 2026-10-20
+
+- Kullanıcı mevcut ve yeni tüm karakterlerde dört standart envanter sayfası
+  istedi. Sunucu/istemci zaten 4 sayfa / 180 hücre destekliyor; son iki sayfa
+  `inventory_0` açılmış satır sayısı ile kilitli. Tam açılım değeri 18.
+- Canlı salt okunur inceleme: beş karakterin tamamı 0; kolon varsayılanı 0.
+  Yeni karakter INSERT'i bu kolonu belirtmediğinden DB varsayılanı uygulanır.
+- Tasarım kilidi ve `player.sql` varsayılanı güncellendi. Migration mevcut
+  karakterlere 18 verir ve varsayılanı 18 yapar. Özel envanter alanları aynı.
+- Bakım: `python3 platform/deploy/inventory_defaults_release.py`; game/db
+  durduktan sonra mevcut değerler yedeklenir, migration uygulanır ve servisler
+  açılır. Dosya hash'i ve süreç/port koşulları kontrol edilir. Engine/protokol
+  değişikliği, client build ve oyun/regresyon testi yok.
+- **Canlı:** `20261020-142312` kuruldu. Beş mevcut karakterin tamamında
+  `inventory_0 = 18`, kolon varsayılanı 18. Altı süreç ve altı port sağlıklı.
+  Host `/home/m2web/inventory-20261020-142312`, VM/yedekler
+  `/usr/metin2-inventory-20261020-142312` (`rollback.sql`,
+  `previous-default.txt`). İki uçta `INSTALLED`. Oyun testi kullanıcıda.
+- Hazırlık sırasında iki bakım sorunu düzeltildi: `bash -s` içindeki SSH
+  stdin'i tüketebildiğinden iç SSH çağrıları `-n` kullanıyor; başarı ayrıca VM
+  `INSTALLED` kaydıyla doğrulanıyor. İlk deneme (`20261020-141958`) yalnız boş
+  sürüm dizinleri oluşturdu, DB/servis değişmedi. Sonraki deneme
+  (`20261020-142058`) kalan süreç kontrolünde DB'ye dokunmadan geri döndü.
+- Canlı rc durdurucunun regex'i `./auth (game)` ve `./game99 (game)` adlarını
+  kaçırıyor. Bu kurucu yalnız metin2 kullanıcısının bu altı sürecine TERM gönderip
+  oyun süreçlerinin kapanmasını ve kayıtlarını yazmasını bekler, sonra DB'yi
+  durdurur. Canlı rc dosyası değiştirilmedi; diğer bakım kurucuları için bu
+  eski durdurucuyu kullanmadan önce aynı süreç adı ayrıntısı dikkate alınmalı.
+
 ### Metin yoğunluğu 4× / yarım süre — 2026-10-20
 
 - Kullanıcı 2× sayıyı az buldu; başlangıca göre 4× metin ve daha kısa yeniden

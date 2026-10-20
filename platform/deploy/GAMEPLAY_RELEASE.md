@@ -1,5 +1,23 @@
 # Oyun paketi doğrulaması — 2026-10-20
 
+## Varsayılan dört envanter sayfası
+
+**Canlı sürüm: `20261020-142312`.** Mevcut beş karakter ve yeni karakter
+varsayılanı 4 sayfa / 180 hücre; servis süreç/port koşulları tamamlandı.
+
+`python3 platform/deploy/inventory_defaults_release.py` standart envanteri tüm
+mevcut ve yeni karakterler için 4 sayfa / 180 hücre açar. İstemci/sunucu zaten
+bu kapasiteyi destekler; sadece `player.player.inventory_0` varsayılanı ve
+mevcut değerleri 18 yapılır. Özel envanterler değişmez.
+
+Kurucu önce Metin2 game/db servislerini durdurur, eski karakter değerlerini
+`rollback.sql` ve eski varsayılanı `previous-default.txt` olarak VM sürüm
+dizinine yazar. SQL migration sonrası servisleri başlatır; hatada eski değerleri
+geri yükler. İç SSH çağrıları `-n` kullanır; başarı VM `INSTALLED` kaydıyla
+doğrulanmadan host başarı yazmaz. Derleme veya oyun/regresyon testi gerekmez.
+
+Canlı durum ve sürüm/yedek yolları `CALISMA_NOTLARI.md` içinde.
+
 ## Metin yoğunluğu 4× / yarım süre
 
 **Canlı sürüm: `20261020-140835`.** Güncel politika `platform/gameplay/metin_density.json` v2: 13 haritada ilk
