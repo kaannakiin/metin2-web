@@ -102,7 +102,7 @@ def main():
     # `exception.Abort()` -> `sys.exit()` -> dangling window handles
     # -> a crash. The game scripts (`scripts3`) are from the user's client, so
     # the window descriptions have to be from there too: one version, not a mix.
-    CLIENT_UISCRIPT = os.path.join(workspace.GAME_FILES, 'uiscript')
+    CLIENT_UISCRIPT = os.environ.get('M2W_UISCRIPT_SOURCE') or os.path.join(workspace.GAME_FILES, 'uiscript')
     if not os.path.isdir(CLIENT_UISCRIPT):
         print('no %s - run: python tools/build_corpus.py --unpack-only' % CLIENT_UISCRIPT)
         return 1

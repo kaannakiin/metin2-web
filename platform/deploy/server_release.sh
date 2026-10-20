@@ -2,12 +2,16 @@
 # Runs on the host as root, from /root/metin2-release (filled by release_upload.sh).
 #   stage    copy the server sources to the VM (/usr/metin2-next) and list what differs
 #   build    compile there; binaries go to /usr/metin2-next/out, the live ones are untouched
-#   install  maintenance window: swap binaries, add TRUSTED_PROXY_IP, restart, then the bridge
+#   install  maintenance window: swap binaries, add TRUSTED_PROXY_IP, restart game, restart bridge
 #   rollback previous binaries and a bridge without the PROXY line
+#
+# Env:
+#   APPLY_WEBCLIENT_TOML=y   skip the interactive webclient.toml prompt (answer yes)
 set -euo pipefail
 
 RELEASE=/root/metin2-release
-VM="ssh -o BatchMode=yes -i /root/.ssh/metin2_vm root@192.168.122.10"
+# stage pipes tar on stdin — do not use ssh -n there.
+VM="ssh -o BatchMode=yes -o ConnectTimeout=30 -i /root/.ssh/metin2_vm root@192.168.122.10"
 KIT=/home/m2web/kit
 TRUSTED_PROXY_IP=192.168.122.1
 
@@ -47,7 +51,12 @@ build() {
 install_kit() {
     echo "--- webclient.toml changes:"
     diff -u "$KIT/webclient.toml" "$RELEASE/platform/web-kit/webclient.toml" || true
-    read -r -p "Apply this webclient.toml? [y/N] " answer
+    if [ "${APPLY_WEBCLIENT_TOML:-}" = y ]; then
+        answer=y
+        echo "APPLY_WEBCLIENT_TOML=y → applying"
+    else
+        read -r -p "Apply this webclient.toml? [y/N] " answer
+    fi
     [ "$answer" = y ] || { echo "stopped before touching the host kit" >&2; exit 1; }
 
     cp -a "$RELEASE/platform/web-kit/bridge/src/." "$KIT/bridge/src/"
@@ -62,6 +71,23 @@ install_kit() {
         { echo "bridge-site.json has no proxyProtocol: true" >&2; exit 1; }
 }
 
+# Server install only needs a bridge restart with the new bridge-site.json.
+# Full deploy.sh also runs publish.sh → CDN wrangler (minutes) and is for
+# client package publishes, not game binary swaps.
+restart_bridge() {
+    echo "--- restarting bridge (no CDN publish)"
+    rm -rf /home/m2web/bridge && mkdir -p /home/m2web/bridge
+    cp -a /home/m2web/kit/bridge/package.json /home/m2web/kit/bridge/package-lock.json /home/m2web/kit/bridge/src /home/m2web/bridge/
+    cp /home/m2web/kit/build/port/private/bridge-site.json /home/m2web/bridge/
+    docker run --rm -v /home/m2web/bridge:/app -w /app node:20-alpine npm ci --omit=dev --ignore-scripts
+    chown -R 1000:1000 /home/m2web/bridge && chmod 640 /home/m2web/bridge/bridge-site.json
+
+    docker rm -f m2web-bridge >/dev/null 2>&1 || true
+    docker run -d --name m2web-bridge --restart unless-stopped --network host --user 1000:1000 --read-only \
+        --memory 512m --pids-limit 200 --cap-drop ALL --security-opt no-new-privileges \
+        -v /home/m2web/bridge:/app:ro -w /app node:20-alpine node src/index.js bridge-site.json
+}
+
 install() {
     $VM 'test -x /usr/metin2-next/out/game && test -x /usr/metin2-next/out/db' ||
         { echo "no built binaries on the VM; run build first" >&2; exit 1; }
@@ -69,6 +95,8 @@ install() {
     # Before the restart: a mistake here must not leave the server down.
     install_kit
 
+    # Redirect service stdio to /dev/null so game daemons do not inherit the
+    # ssh pipes — otherwise ssh never exits after "binaries replaced".
     $VM "
         set -e
         ts=\$(date +%Y%m%d-%H%M%S)
@@ -78,21 +106,26 @@ install() {
         for f in \$(find /usr/home/main -name CONFIG); do
             grep -q '^TRUSTED_PROXY_IP:' \$f || printf '\nTRUSTED_PROXY_IP: $TRUSTED_PROXY_IP\n' >> \$f
         done
-        service metin2 stop || true
+        service metin2 stop </dev/null >/dev/null 2>&1 || true
         owner=\$(stat -f %u:%g game.bak-\$ts)
         cp /usr/metin2-next/out/game game
         cp /usr/metin2-next/out/db db
         chown \$owner game db
         chmod 755 game db
-        service metin2 start
+        if ! service metin2 start </dev/null >/tmp/metin2-install-start.log 2>&1; then
+            echo 'service metin2 start failed:' >&2
+            cat /tmp/metin2-install-start.log >&2
+            exit 1
+        fi
         mv /usr/metin2 /usr/metin2-prev-\$ts
         mv /usr/metin2-next /usr/metin2
         echo binaries replaced, backups: game.bak-\$ts db.bak-\$ts"
 
-    /home/m2web/deploy.sh
-    sleep 5
+    restart_bridge
+    sleep 2
     docker logs --tail 20 m2web-bridge
-    echo "Log in from the browser now. Bridge log lines should carry real player addresses."
+    echo "Done. Log in from the browser; bridge log lines should carry real player addresses."
+    echo "Client/CDN publish is separate: /home/m2web/publish.sh (not part of server install)."
 }
 
 rollback() {
@@ -101,10 +134,14 @@ rollback() {
         cd /usr/home/share/bin
         game=$(ls -t game.bak-* | head -1)
         db=$(ls -t db.bak-* | head -1)
-        service metin2 stop || true
+        service metin2 stop </dev/null >/dev/null 2>&1 || true
         cp -p "$game" game
         cp -p "$db" db
-        service metin2 start
+        if ! service metin2 start </dev/null >/tmp/metin2-rollback-start.log 2>&1; then
+            echo "service metin2 start failed:" >&2
+            cat /tmp/metin2-rollback-start.log >&2
+            exit 1
+        fi
         echo "restored $game $db"'
     sed -i 's/"proxyProtocol": true/"proxyProtocol": false/' /home/m2web/bridge/bridge-site.json
     sed -i 's/^proxy_protocol = true$/proxy_protocol = false/' "$KIT/webclient.toml"
@@ -121,5 +158,7 @@ case "${1:-}" in
     build) build ;;
     install) install ;;
     rollback) rollback ;;
-    *) echo "usage: $0 stage|build|install|rollback" >&2; exit 2 ;;
+    *) echo "usage: $0 stage|build|install|rollback" >&2
+       echo "       APPLY_WEBCLIENT_TOML=y $0 install   # non-interactive kit prompt" >&2
+       exit 2 ;;
 esac

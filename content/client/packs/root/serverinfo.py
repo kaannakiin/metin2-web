@@ -166,7 +166,9 @@ SERVER1_CHANNEL_DICT = {
 		"ip" : SRV1["host"],
 		"tcp_port" : SRV1["ch1"],
 		"udp_port" : SRV1["ch1"],
-		"state" : STATE_NONE,
+		# Prefer "recommended" until STATE_CHECKER answers; default OFFLINE
+		# reads as "Kapalı" on TR and looks like the channel is shut.
+		"state" : STATE_DICT[1],
 	},
 }
 

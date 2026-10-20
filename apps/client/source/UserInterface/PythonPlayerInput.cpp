@@ -781,16 +781,8 @@ bool CPythonPlayer::__CanAttack()
 	if (!pkInstMain)
 		return false;
 
-	// Fix me
-#ifdef ENABLE_CONQUEROR_LEVEL
-	if (pkInstMain->IsMountingHorse() && pkInstMain->IsNewMount() && (GetSkillGrade(107) < 1 && GetSkillLevel(107) < 11))
-#else
-	if (pkInstMain->IsMountingHorse() && (GetSkillGrade(109) < 1 && GetSkillLevel(109) < 20))
-#endif
-	{
-		return false;
-	}
-
+	// Mount eligibility is shared with mouse attacks in CInstanceBase::CanAttack.
+	// Item mounts do not require the classic horse skill (107/109).
 	return pkInstMain->CanAttack();
 }
 

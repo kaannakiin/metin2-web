@@ -99,7 +99,22 @@ Offline: beş `mid_pvp_*.py` yeşil. **Karşılandı (repo).** Canlı: VM_MID_PV
 ## Faz 3 — İçerik omurgası (harita / metin / boss / zindan) — **sıradaki**
 
 **Süre tahmini:** 2–3 hafta  
-**Durum:** sıradaki iş
+**Durum:** sürüyor (2026-10-20). Önceki drop / başlangıç / dedektör / 2× yoğunluk
+paketi canlıda. Yeni revizyon: klavye toplama ve binek saldırısı düzeltmesi;
+6/10/12/14 BK, okuma malzemeleri, kademeli ruh taşı ve klasik boss sandıkları.
+`platform/gameplay/phase3_loot.json` sayıların makine tarafından doğrulanan kopyası;
+asıl tasarım kilidi `PVP_HEDEF.md`. Mevcut harita, spawn ve respawn akışı korunur.
+Loot v3 ve web tuş düzeltmeleri **20261020-134850 ile canlıya kuruldu**.
+Kullanıcı oyun kabulünü üstlendi; bu tur yeni test çalıştırılmadı. Kayıt ve yedekler
+`platform/deploy/GAMEPLAY_RELEASE.md` içinde. Boss notice/izleme ve zindan
+instance/reentry omurgası tamamlanmadı; faz çıkış kriteri henüz sağlanmadı.
+
+Silah revizyonu (loot v2): Lusifer sandığı 6 gerçek 75 silahı içerir; diğer klasik
+sandıklara 65 silah/54–61 zırh eklendi. Zehir/Orkide 85/90 metinlerden taşındı.
+Loot v3 ile Lusifer'in 70 silahları da eklendi; önceki rehberde eksik olan 10
+klasik boss tamamlandı (Barones, Azrail ve diğerleri). Tam envanter
+`docs/DROP_REHBERI.md` içinde. Önceki v1/v2 adaylar kullanılmaz; güncel v3
+kuruludur. Instance/reentry ve canlı oyuncu kabulü faz çıkışı için hâlâ açık.
 
 1. Level akışı: 1–20 köy → 2. köy → Seungryong → Hwang → Yongbi/Örümcek → Sohan/Doyyum → Kızıl Orman → Sürgün 1–2 → opsiyonel 1 end map.
 2. Metin: band drop (küratörlü gear) + yüksek level’ın düşük farm tekeline engel.

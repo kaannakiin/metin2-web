@@ -393,6 +393,7 @@ bool NewPlayerTable(TPlayerTable * table, const char * name, BYTE race, BYTE sha
 	table->x = CREATE_START_X(bEmpire) + number(-300, 300);
 	table->y = CREATE_START_Y(bEmpire) + number(-300, 300);
 	table->z = 0;
+	table->lMapIndex = EMPIRE_START_MAP(bEmpire);
 	table->dir = 0;
 	table->playtime = 0;
 	table->gold = 0;

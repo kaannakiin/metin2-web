@@ -323,6 +323,25 @@ PATCHES_SCRIPTS += [
      'an unreadable switchbot file counts as no configurations'),
 ]
 
+MID_PVP_DETECTOR_PATCHES = [
+    ('uiToolTip.py',
+     '\t\t\tif 27989 == itemVnum or 76006 == itemVnum:\n',
+     '\t\t\tif 27989 == itemVnum:\n'
+     '\t\t\t\tself.AppendSpace(5)\n'
+     '\t\t\t\tself.AppendTextLine(localeInfo.TOOLTIP_REST_USABLE_COUNT.replace("%d", "%s") % localeInfo.TOOLTIP_POTION_UNLIMITED.rsplit(":", 1)[-1].strip(), self.NORMAL_COLOR)\n'
+     '\t\t\telif 76006 == itemVnum:\n',
+     'ordinary Metin detector is unlimited; the alternate detector keeps its charge count'),
+    ('uiToolTip.py',
+     '\t\titemDesc = item.GetItemDescription()\n\t\titemSummary = item.GetItemSummary()\n',
+     '\t\titemDesc = item.GetItemDescription()\n'
+     '\t\tif itemVnum == 27989:\n'
+     '\t\t\titemDesc = itemDesc.replace("6", localeInfo.TOOLTIP_POTION_UNLIMITED.rsplit(":", 1)[-1].strip())\n'
+     '\t\titemSummary = item.GetItemSummary()\n',
+     'remove the obsolete six-use description after decoding legacy locale text'),
+]
+if os.environ.get('M2W_LEGACY_DETECTOR') != '1':
+    PATCHES_SCRIPTS += MID_PVP_DETECTOR_PATCHES
+
 # The PATCHES_SCRIPTS table describes places; these rules describe NAMES. Only
 # replacements that are unambiguous in the whole language and need no reading
 # of the context belong here - otherwise they would go into the table.

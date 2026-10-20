@@ -30,6 +30,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 import workspace                                     # input paths, emsdk
+from incremental_compile import ObjectCache
 STAGE = os.path.join(ROOT, 'build', 'port', 'stage')
 EXTERN = workspace.EXTERN_INCLUDE
 COMPAT = workspace.COMPAT
@@ -320,7 +321,7 @@ def tool_name(name):
     raise SystemExit(f'{name} not found - add emsdk to PATH')
 
 
-def main():
+def build():
     """Stages the tree, compiles every library of LIBRARIES plus the compat
     layer to objects (in parallel), then collects the undefined symbols and
     writes the contract (build/port/gamelib_contract.md).
@@ -331,6 +332,7 @@ def main():
     empp = tool_name('em++')
     nm = tool_name('llvm-nm')
     cxxfilt = tool_name('llvm-cxxfilt')
+    compiler = ObjectCache(empp, clean='--clean' in sys.argv)
 
     def compile_all(lib, required):
         """Compiles all the library's `.cpp` files. `required` says whether an error
@@ -347,7 +349,7 @@ def main():
 
         def one_step(f):
             """Compiles one file. Separately, because the compilations run IN PARALLEL."""
-            return f, subprocess.run(
+            return f, compiler.run(
                 [empp, '-std=c++17', '-c', OPT_LEVEL, '-w',
                  '-I' + COMPAT, '-I' + STAGE, '-I' + EXTERN,
                  # `eterBase` on the path, because `UserInterface/MarkImage.cpp`
@@ -378,19 +380,8 @@ def main():
                 print(f'  {f}: {e}')
         return ok, errors_found
 
-    # OBJECTS ARE COUNTED FROM SCRATCH, and that is not caution but a fix of a
-    # measurement error. Symbols are collected by `os.walk` over the whole `OBJDIR`,
-    # so a `.o` file from a PREVIOUS run kept counting - also
-    # when its source had just gone to the replaced files.
-    # It was detected on `ProcessScanner.cpp`: after listing it as dead
-    # the contract did not move by a single symbol, because the old object lay in place
-    # and kept supplying what it supplied.
-    #
-    # Without this deletion every EXCLUSION of a file is invisible in the count,
-    # and that is exactly the shape of failure the internal check
-    # below is about: the number looks credible and is untrue.
-    if os.path.isdir(OBJDIR):
-        shutil.rmtree(OBJDIR)
+    # Retain valid objects. compiler.prune below removes excluded/deleted files
+    # before collecting symbols, so old objects cannot falsify the contract.
     os.makedirs(OBJDIR, exist_ok=True)
 
     print()
@@ -412,8 +403,6 @@ def main():
     # --- symbole ------------------------------------------------------------
     objs = []
     compat_errors = []
-    for root, _d, files in os.walk(OBJDIR):
-        objs += [os.path.join(root, f) for f in files if f.endswith('.o')]
     libs = [os.path.join(LIBDIR, f) for f in os.listdir(LIBDIR)] if os.path.isdir(LIBDIR) else []
 
     def symbol_list(file_list):
@@ -441,7 +430,7 @@ def main():
     # `CopyFileA`, `CharNextExA` and the critical-section functions would look
     # missing, although they are written.
     compat_o = os.path.join(OBJDIR, 'win32_compat.o')
-    r = subprocess.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w', '-I' + COMPAT,
+    r = compiler.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w', '-I' + COMPAT,
                     os.path.join(COMPAT, 'win32_compat.cpp'), '-o', compat_o],
                    capture_output=True, text=True)
     # THE RESULT MUST SHOUT - see the note at the main list.
@@ -458,7 +447,7 @@ def main():
     # answer in the browser is "there is no such thing". It belongs to the objects,
     # because it is WRITTEN, not to the contract.
     none_o = os.path.join(OBJDIR, 'platform_none.o')
-    r = subprocess.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w', '-I' + COMPAT,
+    r = compiler.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w', '-I' + COMPAT,
                     os.path.join(COMPAT, 'platform_none.cpp'), '-o', none_o],
                    capture_output=True, text=True)
     # THE RESULT MUST SHOUT - see the note at the main list.
@@ -473,7 +462,7 @@ def main():
 
     # Crash handling - replaces `EterBase/error.cpp`, which is based on SEH.
     crash_o = os.path.join(OBJDIR, 'platform_crash.o')
-    r = subprocess.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w', '-I' + COMPAT,
+    r = compiler.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w', '-I' + COMPAT,
                     os.path.join(COMPAT, 'platform_crash.cpp'), '-o', crash_o],
                    capture_output=True, text=True)
     # THE RESULT MUST SHOUT - see the note at the main list.
@@ -488,7 +477,7 @@ def main():
 
     # Drawing text through a 2D canvas.
     text_o = os.path.join(OBJDIR, 'platform_text.o')
-    r = subprocess.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w', '-I' + COMPAT,
+    r = compiler.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w', '-I' + COMPAT,
                     os.path.join(COMPAT, 'platform_text.cpp'), '-o', text_o],
                    capture_output=True, text=True)
     # THE RESULT MUST SHOUT - see the note at the main list.
@@ -503,7 +492,7 @@ def main():
 
     # Converting bytes to wide characters.
     codec_o = os.path.join(OBJDIR, 'platform_codec.o')
-    r = subprocess.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w', '-I' + COMPAT,
+    r = compiler.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w', '-I' + COMPAT,
                     os.path.join(COMPAT, 'platform_codec.cpp'), '-o', codec_o],
                    capture_output=True, text=True)
     # THE RESULT MUST SHOUT - see the note at the main list.
@@ -521,7 +510,7 @@ def main():
     # it implements `CSoundManager`, so it must see its header, the game's pack
     # and the clock.
     sound_o = os.path.join(OBJDIR, 'sound_web.o')
-    r = subprocess.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w',
+    r = compiler.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w',
                     '-I' + COMPAT, '-I' + STAGE, '-I' + EXTERN,
                     '-I' + os.path.join(STAGE, 'eterBase'),
                     os.path.join(COMPAT, 'sound_web.cpp'), '-o', sound_o],
@@ -538,7 +527,7 @@ def main():
 
     # A text field without IMM32 - replaces `eterLib/IME.cpp`.
     ime_o = os.path.join(OBJDIR, 'ime_web.o')
-    r = subprocess.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w',
+    r = compiler.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w',
                     '-I' + COMPAT, '-I' + STAGE, '-I' + EXTERN,
                     '-I' + os.path.join(STAGE, 'eterBase'),
                     os.path.join(COMPAT, 'ime_web.cpp'), '-o', ime_o],
@@ -557,12 +546,17 @@ def main():
     # plus the mouse and characters as window messages.
     for name in ('webbrowser_web', 'movie_web', 'input_web', 'events_web',
                   'network_web'):
+        if name == 'movie_web' and not os.path.isfile(os.path.join(STAGE, 'UserInterface', 'MovieMan.h')):
+            print('SKIP movie_web: this client fork has no MovieMan.h')
+            continue
         o = os.path.join(OBJDIR, name + '.o')
-        subprocess.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w',
+        r = compiler.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w',
                         '-I' + COMPAT, '-I' + STAGE, '-I' + EXTERN,
                         '-I' + os.path.join(STAGE, 'eterBase'),
                         os.path.join(COMPAT, name + '.cpp'), '-o', o],
                        capture_output=True, text=True)
+        if r.returncode != 0:
+            compat_errors.append(name)
         if os.path.exists(o):
             objs.append(o)
 
@@ -626,7 +620,7 @@ def main():
         # only at link time: without this flag emscripten does not
         # expose the port's headers and `#include <jpeglib.h>`
         # in `d3d8_image.cpp` has nothing to find.
-        r = subprocess.run([empp, '-std=c++17', '-c',
+        r = compiler.run([empp, '-std=c++17', '-c',
                             '-O2', '-w',
                             '-sUSE_LIBJPEG=1',
                             '-sUSE_LIBPNG=1',
@@ -668,7 +662,7 @@ def main():
     # it lies in `compat/` (webfs.h/.cpp), because it is our layer and goes into
     # publication.
     o = os.path.join(OBJDIR, 'webfs.o')
-    r = subprocess.run([empp, '-std=c++17', '-c', '-O2', '-w',
+    r = compiler.run([empp, '-std=c++17', '-c', '-O2', '-w',
                     os.path.join(COMPAT, 'webfs.cpp'),
                     '-o', o],
                    capture_output=True, text=True)
@@ -688,13 +682,18 @@ def main():
     # `marshal.c` from Python 2 (see NOT_COMPILED).
     for name in ('python2_bridge', 'python_marshal_web'):
         o = os.path.join(OBJDIR, name + '.o')
-        subprocess.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w', '-I' + COMPAT,
+        r = compiler.run([empp, '-std=c++17', '-c', OPT_LEVEL, '-w', '-I' + COMPAT,
                         '-I' + PYTHON_INC,
                         os.path.join(COMPAT, name + '.cpp'), '-o', o],
                        capture_output=True, text=True)
+        if r.returncode != 0:
+            compat_errors.append(name)
         if os.path.exists(o):
             objs.append(o)
 
+    if compat_errors:
+        raise SystemExit('THE COMPATIBILITY LAYER DID NOT BUILD: ' + ', '.join(compat_errors))
+    objs = compiler.prune(OBJDIR)
     u_gl, d_gl = symbol_list(objs)
     _, d_lib = symbol_list(libs) if libs else (set(), set())
 
@@ -825,8 +824,7 @@ def main():
             'contract, because it would be untrue.')
 
     # (b0) No file LISTED AS REPLACED may have an object.
-    #      This is a check on the fix: if the deletion of `OBJDIR`
-    #      ever disappeared or stopped working, a stale `.o` would supply
+    #      This is a check on pruning: if an excluded object survived, it would supply
     #      the symbols of a file we deliberately do not compile - and the count
     #      would show it as done.
     for printed in NOT_COMPILED:
@@ -915,6 +913,23 @@ def main():
           f'runtime {len(runtime)} | our decisions {len(decisions)}')
     print(f'written: {os.path.relpath(CONTRACT, ROOT)}')
     return 0
+
+
+def main():
+    # Staging replaces a shared tree. Two engine builds must not run together.
+    os.makedirs(os.path.dirname(CONTRACT), exist_ok=True)
+    with open(CONTRACT + '.lock', 'a+b') as lock:
+        if os.name == 'nt':
+            import msvcrt
+            if os.path.getsize(lock.name) == 0:
+                lock.write(b'0')
+                lock.flush()
+            lock.seek(0)
+            msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return build()
 
 
 if __name__ == '__main__':

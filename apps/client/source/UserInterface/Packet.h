@@ -4433,7 +4433,9 @@ typedef struct SPacketGCRespData
 	uint32_t x;
 	uint32_t y;
 	uint32_t time;
-	time_t nextRespTime;
+	// The FreeBSD i386 / Win32 protocol carries a signed 32-bit timestamp.
+	// Emscripten time_t is 64-bit and must never determine this wire layout.
+	int32_t nextRespTime;
 } TPacketGCRespData;
 
 typedef struct SPacketGCRespGold
@@ -4462,10 +4464,12 @@ typedef struct SPacketGCRespRefresh
 {
 	size_t	id;
 	uint32_t	vnum;
-	time_t	nextRespTime;
+	int32_t	nextRespTime;
 	uint32_t	x;
 	uint32_t	y;
 } TPacketGCRespRefresh;
+static_assert(sizeof(TPacketGCRespData) == 20, "RESP data wire layout must be 20 bytes");
+static_assert(sizeof(TPacketGCRespRefresh) == 20, "RESP refresh wire layout must be 20 bytes");
 #endif
 
 #ifdef ENABLE_COLLECT_WINDOW

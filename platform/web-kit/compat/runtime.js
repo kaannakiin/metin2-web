@@ -856,15 +856,21 @@ m2w.dikStart = function () {
         NumpadEnter:156, ControlRight:157, NumpadDivide:181, AltRight:184,
         Home:199, ArrowUp:200, PageUp:201, ArrowLeft:203, ArrowRight:205,
         End:207, ArrowDown:208, PageDown:209, Insert:210, Delete:211,
-        MetaLeft:219, MetaRight:220, ContextMenu:221
+        MetaLeft:219, MetaRight:220, ContextMenu:221,
+        IntlBackslash:41
     };
 
     var state = new Uint8Array(256);
     m2w.dik = state;
+    // Keep the selected binding until release: Shift can be released before
+    // the quote key, changing e.key while the physical key is still held.
+    var held = Object.create(null);
 
     document.addEventListener('keydown', function (e) {
-        var d = map[e.code];
+        var d = held[e.code];
+        if (d === undefined) d = e.key === '"' ? 41 : map[e.code];
         if (d !== undefined) {
+            held[e.code] = d;
             state[d] = 1;
             // Game keys must not scroll or leave the page. F5 and F12 are
             // not blocked - they belong to the user, not to the game.
@@ -874,14 +880,22 @@ m2w.dikStart = function () {
     }, true);
 
     document.addEventListener('keyup', function (e) {
-        var d = map[e.code];
-        if (d !== undefined) state[d] = 0;
+        var d = held[e.code];
+        delete held[e.code];
+        if (d !== undefined) {
+            // Two physical keys can map to pickup; releasing one must not
+            // release the other key while it is still held.
+            state[d] = Object.keys(held).some(function (key) {
+                return held[key] === d;
+            }) ? 1 : 0;
+        }
     }, true);
 
     // Focus loss releases EVERYTHING. Otherwise a key held while switching
     // tabs stays down forever - the character runs by itself and nobody
     // knows why.
     globalThis.addEventListener('blur', function () {
+        held = Object.create(null);
         state.fill(0);
     });
 };

@@ -722,7 +722,14 @@ void CPythonBackground::Warp(DWORD dwX, DWORD dwY)
 	if (!LoadMap(rMapInfo.m_strName, float(dwX - rMapInfo.m_dwBaseX), float(dwY - rMapInfo.m_dwBaseY), 0))
 	{
 		// LOAD_MAP_ERROR_HANDLING
+#ifdef __EMSCRIPTEN__
+		// Web: do not kill the tab (PostQuitMessage -> portal). Drop to login so the
+		// player can retry; missing/failed map assets still TraceError above.
+		TraceError("LoadMap failed for %s at %u,%u - returning to login", rMapInfo.m_strName.c_str(), dwX, dwY);
+		CPythonNetworkStream::Instance().SetLoginPhase();
+#else
 		PostQuitMessage(0);
+#endif
 		// END_OF_LOAD_MAP_ERROR_HANDLING
 		return;
 	}

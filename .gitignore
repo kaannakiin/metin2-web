@@ -123,3 +123,6 @@ Client/pack/**
 # Client/
 
 .playwright-mcp
+
+# Local WebSocket bridge dependencies
+/platform/web-kit/bridge/node_modules/

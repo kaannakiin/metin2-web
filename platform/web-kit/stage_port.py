@@ -88,6 +88,49 @@ REASON_SELECT = (
 
 PATCHES = [
     (
+        'UserInterface/PythonNetworkStream.cpp',
+        '#include "Packet.h"\n',
+        '#include "Packet.h"\n#include "resp_wire.h"\n',
+        'PORT: validate RESP framing before reading variable payloads',
+    ),
+    (
+        'UserInterface/PythonNetworkStream.cpp',
+        '\t\tif (!Peek(DynamicSizePacketHeader.size))\n',
+        '#ifdef ENABLE_RESP_SYSTEM\n'
+        '\t\tif (header == HEADER_GC_RESP)\n'
+        '\t\t{\n'
+        '\t\t\tunsigned char prefix[6] = {};\n'
+        '\t\t\tconst int available = GetRecvBufferSize() < 6 ? GetRecvBufferSize() : 6;\n'
+        '\t\t\tif (!Peek(available, prefix)) return false;\n'
+        '\t\t\tconst auto status = m2w::ValidateRespPrefix(prefix, available);\n'
+        '\t\t\tif (status == m2w::RespPrefixStatus::NeedMore) return false;\n'
+        '\t\t\tif (status == m2w::RespPrefixStatus::Invalid)\n'
+        '\t\t\t{\n'
+        '\t\t\t\tTraceError("Invalid RESP frame length: %u", (unsigned)DynamicSizePacketHeader.size);\n'
+        '\t\t\t\tClearRecvBuffer(); OnRemoteDisconnect(); Disconnect();\n'
+        '\t\t\t\treturn false;\n'
+        '\t\t\t}\n'
+        '\t\t}\n'
+        '#endif\n'
+        '\t\tif (!Peek(DynamicSizePacketHeader.size))\n',
+        'PORT: fragmented RESP prefixes wait; malformed lengths cannot consume the next packet',
+    ),
+    (
+        'UserInterface/PythonNetworkStream.cpp',
+        '\tCNetworkPacketHeaderMap::TPacketType PacketType;\n',
+        '\t// PORT: bounded login diagnostics; packet contents and keys are never logged.\n'
+        '\tif (m_strPhase == "Login" || m_strPhase == "HandShake")\n'
+        '\t{\n'
+        '\t\tstatic int previousHeader = -1, previousSize = -1;\n'
+        '\t\tint available = GetRecvBufferSize();\n'
+        '\t\tif (previousHeader != header || previousSize != available)\n'
+        '\t\t\tfprintf(stderr, "m2w login: phase=%s header=%u buffered=%d\\n", m_strPhase.c_str(), (unsigned)header, available);\n'
+        '\t\tpreviousHeader = header; previousSize = available;\n'
+        '\t}\n'
+        '\tCNetworkPacketHeaderMap::TPacketType PacketType;\n',
+        'PORT: diagnose a stalled login using only packet headers and byte counts',
+    ),
+    (
         'EterLib/Camera.cpp',
         'void CCamera::BeginDrag(int nMouseX, int nMouseY)\n{\n\tif (IsLock())\n\t\treturn;\n\n\tm_bDrag = true;\n',
         'extern "C" void M2W_CameraDrag(int bOn);  // PORT, compat/events_web.cpp\n\n'
@@ -976,6 +1019,9 @@ _LISTINGS = {}
 
 
 def _listing(path):
+    # Directory aliases share one cache entry. Otherwise creating an include
+    # alias through eterBase leaves EterBase's listing stale (and vice versa).
+    path = os.path.realpath(path)
     if path not in _LISTINGS:
         try:
             _LISTINGS[path] = os.listdir(path)
@@ -1035,13 +1081,13 @@ def _make_alias(stage, path, target):
                 os.symlink(twins[0], following)
             else:
                 os.mkdir(following)
-            _LISTINGS.pop(current, None)
+            _LISTINGS.pop(os.path.realpath(current), None)
             created += 1
         current = following
     if parts[-1] in _listing(current):
         return created
     os.symlink(os.path.relpath(target, current), os.path.join(current, parts[-1]))
-    _LISTINGS.pop(current, None)
+    _LISTINGS.pop(os.path.realpath(current), None)
     return created + 1
 
 
@@ -1131,6 +1177,12 @@ def main():
 
     print('point patches:')
     apply_patches(stage)
+
+    profile = os.environ.get('M2W_DEV_PROTOCOL')
+    if profile:
+        import dev_protocol
+        dev_protocol.apply(stage, profile)
+        print('private preview protocol: ' + profile)
 
     print('letter-case aliases:')
     print(f'  {align_case(stage):4d} entries')

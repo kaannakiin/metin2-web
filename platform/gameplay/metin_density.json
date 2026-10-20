@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "multiplier": 2,
+  "base_release": "20261019-213727",
+  "maps": [
+    {
+      "path": "map/metin2_map_a1/stone.txt",
+      "baseline_sha256": "53c2e4293179f9e6e01419cb64c62cd686a3c114ca5490ef74e7e314167beb6b",
+      "base_capacity": 12,
+      "added_records": 12
+    },
+    {
+      "path": "map/metin2_map_b1/stone.txt",
+      "baseline_sha256": "64b4e20e737e5274eeb96c0246cf88883c26514b174f3ead6b136b105f37d4db",
+      "base_capacity": 12,
+      "added_records": 12
+    },
+    {
+      "path": "map/metin2_map_c1/stone.txt",
+      "baseline_sha256": "52da993a0b7493548f0f5925b756bf2c411bc613829089deea9c4506aa0a8811",
+      "base_capacity": 12,
+      "added_records": 12
+    },
+    {
+      "path": "map/metin2_map_a3/stone.txt",
+      "baseline_sha256": "ba38ef1883c3b50878b607490506b4ebcab48f1a52e1a56da77e00edad427d75",
+      "base_capacity": 10,
+      "added_records": 10
+    },
+    {
+      "path": "map/metin2_map_b3/stone.txt",
+      "baseline_sha256": "5709db9a14e4391ab47257f04129059ed8ebdb74dc9be4f307b0aee9e02deaaf",
+      "base_capacity": 9,
+      "added_records": 9
+    },
+    {
+      "path": "map/metin2_map_c3/stone.txt",
+      "baseline_sha256": "dc13d7f30ecbd0d4c51548983db3133119978773103a8bf75328965882b23da9",
+      "base_capacity": 10,
+      "added_records": 10
+    },
+    {
+      "path": "map/map_n_threeway/stone.txt",
+      "baseline_sha256": "e1049af09c32cbd6d0f682341ba754d77669d5a1d2e03cb94c873cc91fafccd4",
+      "base_capacity": 3,
+      "added_records": 3
+    },
+    {
+      "path": "map/metin2_map_n_desert_01/stone.txt",
+      "baseline_sha256": "15fcb9dc875f06ed2d437d1d70fe71d0267a515bed960ba94fef9200256b5329",
+      "base_capacity": 10,
+      "added_records": 10
+    },
+    {
+      "path": "map/map_n_snowm_01/stone.txt",
+      "baseline_sha256": "cf4dcb4773720579a4cca9b7816a0cfc48262fb660b98793adb06aed6f71c479",
+      "base_capacity": 5,
+      "added_records": 5
+    },
+    {
+      "path": "map/metin2_map_n_flame_01/stone.txt",
+      "baseline_sha256": "28bf47843df4d0a51247663bd0113eaf7bcfbbd5543cd16dca2196d456e5e8fe",
+      "base_capacity": 4,
+      "added_records": 4
+    },
+    {
+      "path": "map/metin2_map_trent/stone.txt",
+      "baseline_sha256": "dbb774586af4d894d64adc093e4d4c02185d8f9efc1118c61430e29c162f7c2b",
+      "base_capacity": 4,
+      "added_records": 4
+    },
+    {
+      "path": "map/metin2_map_trent02/stone.txt",
+      "baseline_sha256": "a00b23affaf73272c99aee3cac94a261324555b01d6b1e456df19561ef0e9ce5",
+      "base_capacity": 4,
+      "added_records": 4
+    },
+    {
+      "path": "map/metin2_map_nusluck01/stone.txt",
+      "baseline_sha256": "527ea2a7eb602ffead434fc50f3fe2b94928d36c023ca2a5fbec874bbf9894a2",
+      "base_capacity": 2,
+      "added_records": 2
+    }
+  ]
+}

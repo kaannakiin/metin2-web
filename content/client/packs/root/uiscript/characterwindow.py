@@ -1481,6 +1481,37 @@ else:
 		),
 	}
 
+# Leadership and passive controls are used independently of conqueror levels.
+if not app.ENABLE_CONQUEROR_LEVEL:
+	_pages = window["children"][0]["children"]
+	_skill_page = next(page for page in _pages if page["name"] == "Skill_Page")
+	_skill_page["children"] = list(_skill_page["children"])
+	_skill_page["children"].append({
+		"name": "leader_board", "type": "board", "style": ("attach",),
+		"x": 85, "y": 140, "width": 141, "height": 30,
+		"children": [
+			{
+				"name": "Leader" + name, "type": "button", "x": x, "y": 7,
+				"default_image": ROOT_PATH + "party_state_" + image + "_01.sub",
+				"over_image": ROOT_PATH + "party_state_" + image + "_02.sub",
+				"down_image": ROOT_PATH + "party_state_" + image + "_03.sub",
+			}
+			for name, image, x in (
+				("Attacker", "attacker", 7), ("Berserker", "berserker", 30),
+				("Tanker", "tanker", 50), ("Defender", "defender", 70),
+				("Buffer", "buffer", 90), ("SkillMaster", "skill_master", 110))
+		],
+	})
+	if app.ENABLE_PASSIVE_SYSTEM:
+		_character_page = next(page for page in _pages if page["name"] == "Character_Page")
+		_character_page["children"] = list(_character_page["children"])
+		_character_page["children"].append({
+			"name": "passive_expanded_btn", "type": "button", "x": 166, "y": 107,
+			"default_image": ROOT_PATH + "passive_expanded_button_01.sub",
+			"over_image": ROOT_PATH + "passive_expanded_button_02.sub",
+			"down_image": ROOT_PATH + "passive_expanded_button_03.sub",
+		})
+
 if app.ENABLE_RENEWAL_QUEST:
 	window["children"][0]["children"] = window["children"][0]["children"] + [
 	{
@@ -1862,6 +1893,8 @@ else:
 	},]
 
 if app.ENABLE_TITLE_SYSTEM:
+	# Both character layouts support title controls; the classic layout uses a tuple.
+	window["children"][0]["children"][4]["children"] = list(window["children"][0]["children"][4]["children"])
 	# ??? ??
 	window["children"][0]["children"][4]["children"].append(
 		{	

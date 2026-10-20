@@ -1,6 +1,6 @@
 # Anka2 – 1–99 Orta-Kolay PvP Hedefi
 
-Son güncelleme: 2026-10-19. ~10 kişilik hobi sunucu. Bu dosya **tasarım kilidi** (sayılar, ekonomi, özellik Açık/Kapalı); sayılar değişirse burayı güncelle, sonra koda geç.
+Son güncelleme: 2026-10-20. ~10 kişilik hobi sunucu. Bu dosya **tasarım kilidi** (sayılar, ekonomi, özellik Açık/Kapalı); sayılar değişirse burayı güncelle, sonra koda geç.
 
 Fazlar ve çıkış kriterleri: [`docs/ROADMAP_PVP.md`](docs/ROADMAP_PVP.md). Web/VM log: [`CALISMA_NOTLARI.md`](CALISMA_NOTLARI.md).
 
@@ -125,7 +125,7 @@ Dosyalar: `content/server/sql/seed_shop_refine_pet.sql`, `content/server/sql/upd
 | Late-early     | shop6/7 **+9** lv≤22                                             | FMS yok                                                                  |
 | Bridge 25–35   | metin                                                            | Silver / **FMS 290** / Hornbow / Lion plate / jade aks                   |
 | Mid 50–70      | metin                                                            | Flying Wizard, Rib, Unicorn… + Scale/Fog body **+0**                     |
-| Soft end 75–90 | metin                                                            | Nymph, Exorcism, Lightning Knife… + Dragon God body; 85+ Poison/Siamese… |
+| Soft end 75–90 | metin + Lusifer sandığı                                           | metinde 65/70 silah ve 61/66 zırh; gerçek 75 silah ailesi Lusifer sandığında |
 | Flex           | stall / boss                                                     | spirit, sash, poly                                                       |
 
 ### Başlangıç seti (`welcome` quest)
@@ -135,10 +135,39 @@ Kaynak: `quest_tr/_npc_talk_mission/welcome.lua` → `object/notarget/login/welc
 | Job      | Silah (+9)                        | Body / Helm  |
 | -------- | --------------------------------- | ------------ |
 | Warrior  | 19, 3009                          | 11209, 12209 |
-| Assassin | 1009, 2009, 8009                  | 11409, 12349 |
+| Assassin | 1009, 2009; normal ok 8000 ×200   | 11409, 12349 |
 | Sura     | 19                                | 11609, 12489 |
-| Shaman   | 7009                              | 11809, 12629 |
+| Shaman   | 5009, 7009                        | 11809, 12629 |
 | Hepsi    | aks 13009…17009 + mount/pet/iksir |              |
+
+#### Başlangıç bonusları ve dedektör — 2026-10-20 revizyonu
+
+Kullanıcı kararı: sınıfa uygun oynanış bonusları; sınıflara karşı güç bonusu değil.
+Başlangıçta ölümsüz/şeytan/esoterik gibi ileri alan bonusları verilmez. Ölümsüz
+bonusu 50+ içerik/efsun arayışına bırakılır. Silahlar artık boş bonuslu verilmez.
+
+| Sınıf | Silah bonusları (her başlangıç silahında) |
+|---|---|
+| Savaşçı | STR +8, saldırı hızı +5, kritik %5, delici %5, canavar %10 |
+| Ninja | DEX +8, saldırı hızı +5, kritik %5, delici %5, canavar %10 |
+| Sura | INT +8, büyü hızı +10, kritik %5, delici %5, canavar %10 |
+| Şaman | INT +8, büyü hızı +20, kritik %5, delici %5, canavar %10 |
+
+Zırh: HP +1000, büyü hızı +10, kılıç savunması %10, çift el savunması %10.
+Kask: HP yenileme %20, SP yenileme %20, hayvan %10, zehir direnci %8.
+Kalkan: sınıf statı +8, blok %5, hayvan %10.
+Bilezik: HP +1000, delici %5, hayvan %10. Kolye: HP +1000, kritik %5, delici %5.
+Ayakkabı: HP +1000, kritik %5, hareket hızı +10. Küpe: sınıf statı +8, hareket hızı +10, hayvan %10.
+Bonus/slot izinleri canlı `item_attr` tablosuyla doğrulanır; zorla geçersiz
+sersemletme/bağışıklık kombinasyonları üretilmez.
+Var olan +9 base'ler ve zırh taşı korunur; güç farkı mid/end ekipman ve geliştirmede kalır.
+Ninja oku mühimmattır: 8000 ×200 verilir, efsun uygulanmaz. Şamana yelpaze ve çan
+birlikte verilir; iki oynanış için de başlangıç seçeneği bulunur.
+
+Her yeni karaktere **1 × Metin Taşı Dedektörü (27989), sınırsız kullanım**.
+Normal dedektörün kullanım sayacı 0'da tutulur; altı kullanımlık yok edilme koşuluna
+ulaşmaz. 76006 numaralı diğer dedektörün davranışı değişmez. İlk-login quest'i
+tamamlanmış mevcut karakterlerin eşyaları otomatik yeniden yazılmaz.
 
 ### NPC (trim)
 
@@ -152,16 +181,133 @@ Kaynak: `quest_tr/_npc_talk_mission/welcome.lua` → `object/notarget/login/welc
 
 SQL: `seed_shop_refine_pet.sql` + `update_mid_pvp_shop_plus9.sql`.
 
-### Metin consumable (400 ≈ %100)
+### Metin bereketi — 2026-10-20 (400 ≈ %100)
 
-| Item                    | Erken (≤20) | Mid (≤70) | Yüksek (75+) |
-| ----------------------- | ----------- | --------- | ------------ |
-| Beceri kitabı `50300`   | 280 (~%70)  | 400       | 400          |
-| Ruh taşı kesesi `27999` | 100 (~%25)  | 100       | 100          |
-| Efsun nesnesi `71084`   | 5× @90      | 12× @100  | 16× @100     |
-| Arttırma kağıdı `71085` | 3× @75      | 8× @80    | 10× @80      |
+**Son revizyon — loot v3:** Kullanıcı Lusifer'e 70 silahları da ve eksik klasik
+bossların loot'unu istedi. Lusifer'de 6 gerçek 75 silah × %5 = %30; 5 mevcut
+70 silah (170/250/1120/3150/7150) × %3 = %15; 7 klasik 65 silah × %1 = %7;
+4 sınıfın 66 zırhı × %3 = %12. Kalan %36: 8 ruh taşı %16, 2 beyaz inci %6,
+mavi inci %4, kırmızı inci %2, 25 kutsama %8. Aşağıdaki v2 oranları tarihsel
+açıklamadır; v3 bunların yerini alır. Güncel eksiksiz sayı kaynağı
+`platform/gameplay/phase3_loot.json`, dökümü `docs/DROP_REHBERI.md`.
 
-Dosya: `home/share/locale/europe/mob_drop_item.txt` — +1/+2 çöp zırh ve maymun map gear drop’ları temizlendi.
+Eksik 10 klasik boss da tamamlanır: Vahşi Yüzbaşı 36 silah/zırh + kutsama + tali
+ruh taşı; Dev Hastalık Taşıyıcı ruh taşı/malzeme; Güçlü Buz Cadısı 66 zırh,
+61 kalkan, cennetin gözü takı, +4 soket taşları, kan taşı ve ruh taşı; Barones
+doğrudan 75 silah (her biri %3), 66 zırh (%6), 61 kalkan (%4), kristal takı
+(%4), 2 ruh taşı @400. Dev Çöl Kaplumbağası kendi sandığı 50076 (65 silah/61
+zırh), Kırmızı Ejderha kendi sandığı 50080 (yüksek boss havuzu), Azrail kendi
+sandığı 50186 (70 silah/66 zırh/60 kask/81 Titan kalkan/takı). Azrail sandığı
+silah %25, zırh/kask/kalkan/takı %49 ve malzeme %26; tek sonuç seçilir.
+Ağaç bosslarında 2/3 ruh taşı; Kharoon'da ruh kristali takı ve mavi/kırmızı inci
+ile ruh taşı. Tam adet ve oranlar makine politikasındadır. Wiki'nin yeni 100+
+ödülleri ve pet kitapları otomatik taşınmaz; gear +0 base/refine ekonomisi korunur.
+Harita/regen/respawn ve dungeon mekanikleri değişmez. Kullanıcı bu revizyon için
+oyun testini üstlendi; yeni test çalıştırmadan, mevcut derlenmiş istemci ve
+kurulum hash/servis kontrolleriyle yayın yapılır.
+
+Yakın seviyeli standart drop ölçeğinde 400 yaklaşık %100'dür. Seviye farkı,
+etkinlik ve drop bonusları motorun mevcut kurallarına tabidir; yüksek seviyenin
+düşük metin tekeline yönelik cezası kaldırılmaz. BK'lar aynı becerinin tek bir
+yığını olarak değil, **bağımsız 1 adetlik satırlar** halinde oluşturulur.
+
+| Metin seviyesi | BK `50300` | Ruh taşı kesesi `27999` | Kutsama `25040` | Efsun `71084` | Arttırma `71085` | Ruh taşı `50513` |
+|---|---|---|---|---|---|---|
+| 5–20 | 6 ayrı ×1 @400 | 1 @400 | 1 @200 | 10 @200 | 5 @200 | yok |
+| 25–45 | 10 ayrı ×1 @400 | 2 @400 | 1 @400 | 15 @240 | 8 @240 | 40/45: 1 @20 |
+| 50–70 | 12 ayrı ×1 @400 | 2 @400 | 1 @400 | 15 @240 | 8 @240 | 50/55: @60, 60: @120, 65: @160, 70: @200 |
+| 75–90 | 14 ayrı ×1 @400 | 3 @400 | 2 @400 | 20 @300 | 10 @300 | 75/80: @240, 85: @280, 90: @320 |
+
+**Faz 3 revizyonu:** Harita, metin yerleşimi, respawn ve seviye akışı değiştirilmez.
+Amaç, oyuncunun 65–70 bandına kadar Master yaptığı ana becerilerini metin farmıyla
+G yapabilmesi; bütün becerileri o seviyede Master yapabilmesi anlamına gelmez.
+Bu fork `LearnSkillByBook` içinde kademe başına tek başarılı okuma kullanır:
+M1→G1 için 10 başarı, yalın okumada %35 başarı. Klasik 55 kitap hesabı uygulanmaz.
+Unutma kağıdı `71001` ve münzevi tavsiyesi `71094` her metinden aynı miktarda
+gelir: 5–20'de 2'şer, 25–45'te 4'er, 50–70'te 5'er, 75–90'da 6'şar @400.
+Mevcut hızlı BK okuma sistemi bu malzemeleri tüketir; skiller doğrudan verilmez.
+Kitap becerileri mevcut rastgele havuzdan seçilir; oyuncular arası takas anlamlıdır.
+Bu hedef farm tercihine bağlıdır; sadece seviye almak G garantisi değildir.
+
+Ruh taşı normal kaynaklarında kalır: 40/45 metinlerde tali (%5), 50/55'te %15,
+60'ta %30, 65'te %40, 70'te %50, 75/80'de %60, 85'te %70, 90'da %80 baz şans.
+Kızıl Orman sonu 90 metin (`8027`) ayrıca her sınıfın **66 taban zırhını +0**
+%6 bağımsız şansla verir (`11290/11490/11690/11890`); piyasada “70'lik” diye
+anılan bu aile proto'da +0 için 66 seviyedir. Önceki 61 zırh satırları korunur.
+Bu son ekleme talep edilen PvP ödülüdür; resmî dropla birebir aynı olduğu iddia edilmez.
+
+Klasik boss→kendi sandığı: Ork Reisi `691→50070`, Karanlık Lider `791→50071`,
+Karanlık Hayalet Lider `792→50072`, Kraliçe Örümcek `2091→50073`,
+Dokuz Kuyruk `1901→50077`, Sarı Kaplan `1304→50078`, Alev Kral `2206→50079`,
+Şeytan Kral / Kibirli Şeytan Kral `1091/1092→50081`, Lusifer `1093→50082`.
+Her biri yakın seviye bazında bir sandık @400; içinden tek ağırlıklı ödül çıkar.
+**Silah ödülü revizyonu — 2026-10-20:** Önceki malzeme ağırlıklı sandık taslağı
+yerine klasik ekipman omurgası uygulanır. Erken/orta/yüksek sandıkta toplam
+%28 silah (7 farklı 65 taban silahın her biri %4), %12 zırh (4 sınıfın her biri
+%3) ve %60 malzeme vardır. Ork/Karanlık Lider ve Hayalet Lider zırhı 54;
+Kraliçe Örümcek ve yüksek boss zırhı 61 tabandır. Tüm ekipman +0'dır.
+Bu silah aileleri resmî sandık listelerinden seçilir; yüzdeler bize aittir.
+
+Lusifer sandığı: gerçek 75 silah ailesi toplam %30 (Zehir `180`, Aslan `190`,
+Şeytan Kanadı `1130`, Havalı Çelik `2170`, Kin `3160`, Orkide `5120`: her biri %5);
+65 silah ailesi toplam %14 (7 silah × %2); 66 zırh toplam %16 (4 × %4);
+8 ruh taşı %20, 2 beyaz inci %6, 1 mavi inci %4, 1 kırmızı inci %2,
+25 kutsama %8. Tek açılış tek sonuçtur. Aynı 75 silah her sandıkta garanti
+değildir: Zehir için ortalama 20 sandık, yaklaşık %95 en az bir Zehir şansı
+için 59 sandık gerekir; ticaret bu süreyi kısaltabilir.
+
+75 silahların ana ilerleme yeri Lusifer'dir: 85/90 metinlerden Zehir `180`
+ve Orkide `5120` kaldırılır. Siam `1120`, Şeytani Pala `250`, Yarı-İnsan `3150`
+ve Mutluluk `7150` proto'da 70 seviyedir; metinlerde kalır. Havalı Çelik Yay
+`2170`'dir; `2150` 30 seviye Geyik Boynuzu Yay'dır, birbirine karıştırılmaz.
+Sandık ağırlıkları toplam 100; mevcut diğer boss dropları korunur. Boss canı,
+spawn yeri/süresi, zindan girişleri ve mekaniği bu revizyonda değiştirilmez.
+Tam sayılar: `platform/gameplay/phase3_loot.json`.
+
+Araştırma dayanağı: [resmî metin listesi](https://en-wiki.metin2.gameforge.com/index.php/Metin:List)
+ve [Kızıl Orman 90 metin](https://en-wiki.metin2.gameforge.com/index.php/Metin_Jeon-Un)
+mevcut harita/ödül bağını doğrular. [Resmî BK açıklaması](https://fr-wiki.metin2.gameforge.com/index.php/Livre_de_comp%C3%A9tence)
+55 başarı ister; bu fork'un 10 başarı davranışı ayrı incelendi.
+[PvP tanıtım örneği](https://www.elitepvpers.com/forum/metin2-pserver-advertising/4221546-turkish-pvp-server.html)
+3–5 BK ve 45+ metinlerde seviye ile artan ruh taşı yaklaşımını anlatır;
+[Lova2](https://lovamt2.com/tanitim.html?source=pvpserverci) klasik haritalı metin
+ödül döngüsü için ikinci karşılaştırmadır. Bunlar dağıtılabilir server kaynakları
+veya yayımlanmış kesin yüzdeler değildir; buradaki sayılar 10 kişilik orta-kolay
+hedef için bize ait ayarlardır. 48 eşit olasılıklı beceri ve 12 BK/metin varsayımıyla,
+münzevi destekli tek bir M1 becerinin 60 yakın-seviye metinde G olma olasılığı
+yaklaşık %93'tür; 80 metinde %99'un üstündedir. Münzevisiz aynı hedef belirgin
+uzar. Seviye-zaman kabulü gerçek oynanışla ölçülecek; matematik tek başına
+“70 olunca kesin G” kanıtı sayılmaz.
+
+Bu revizyonda taşınan iki 75 silah dışında küratörlü base satırları ve yang politikası korunur. Her metin grubunun
+adı Mob vnum'u ile benzersiz olmalı; aynı seviyedeki farklı taşların grupları
+aynı adı paylaşmaz.
+
+#### Açık dünya metin yoğunluğu — 2026-10-20
+
+Kullanıcı kararı: mevcut bölgelerde yaklaşık **2 kat metin**. Mevcut doğma
+bölgeleri ve yeniden doğma süreleri korunur. Her mevcut metin kaydının bir
+bağımsız kopyası eklenir; kayıt başına `max_count=1` kalır. Böylece RESP
+takibinde iki taş aynı regen kimliğini paylaşmaz. Aynı bölge içinde motor
+her taş için ayrı rastgele konum seçer; arazi engelleri gerçek sayıyı etkileyebilir.
+
+| Harita | Mevcut metin kapasitesi | Yeni kapasite |
+| --- | ---: | ---: |
+| Shinsoo / Chunjo / Jinno 1. köy (1 / 21 / 41) | 12 / 12 / 12 | 24 / 24 / 24 |
+| Shinsoo / Chunjo / Jinno 2. köy (3 / 23 / 43) | 10 / 9 / 10 | 20 / 18 / 20 |
+| Seungryong (64) | 3 | 6 |
+| Yongbi Çölü (63) | 10 | 20 |
+| Sohan (61) | 5 | 10 |
+| Doyyum (62) | 4 | 8 |
+| Hayalet Orman / Kızıl Orman (67 / 68) | 4 / 4 | 8 / 8 |
+| `metin2_map_nusluck01` (70) | 2 | 4 |
+| **Toplam — 13 harita** | **97** | **194** |
+
+Yalnız bu haritalardaki 8001–8027 metin kayıtları değiştirilir. Madenler,
+normal yaratıklar, bosslar, zindan/etkinlik kayıtları ve 100+ haritalar aynı kalır.
+Bu yoğunluk artışı loot artışından bağımsızdır; yeniden doğma süresi kısaltılmaz.
+
+Dosya: `runtime/freebsd/share/locale/europe/mob_drop_item.txt` — +1/+2 çöp zırh ve maymun map gear drop’ları temizlendi.
 
 **Küratörlü gear pct:** silah ~10–12, zırh ~8.
 

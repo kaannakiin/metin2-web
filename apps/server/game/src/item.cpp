@@ -14,6 +14,7 @@
 #include "item_addon.h"
 #include "locale_service.h"
 #include "item.h"
+#include "mid_pvp_detector.h"
 #include "item_manager.h"
 #include "affect.h"
 #include "DragonSoul.h"
@@ -1508,6 +1509,7 @@ void CItem::SetSockets(const long * c_al)
 void CItem::SetSocket(int i, long v, bool bLog)
 {
 	assert(i < ITEM_SOCKET_MAX_NUM);
+	v = MidPvpDetectorSocketValue(GetOriginalVnum(), i, v);
 	m_alSockets[i] = v;
 	UpdatePacket();
 	Save();

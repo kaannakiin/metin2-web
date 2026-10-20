@@ -12,9 +12,9 @@ char g_nation_name[4][32] =
 long g_start_map[4] =
 {
 	0,	// reserved
-	90,	// Kýrmýzý Ýmparatorluk
-	21,	// Sarý Ýmparatorluk
-	91	// Mavi Ýmparatorluk
+	1,	// Shinsoo (metin2_map_a1)
+	21,	// Chunjo (metin2_map_b1)
+	41	// Jinno (metin2_map_c1)
 };
 
 DWORD g_start_position[4][2] =

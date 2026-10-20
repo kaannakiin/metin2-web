@@ -42,7 +42,7 @@ function clientAddress(req, config) {
 }
 
 /// The WebSocket server: checks the Origin, the connection limits (all and per address) and the target (allowlist) of every request, then bridges it; returns { listen, close, activeCount }.
-function createProxyServer(config, { logger = () => {} } = {}) {
+function createProxyServer(config, { logger = () => {}, addressOf = clientAddress } = {}) {
   const resolver = createTargetResolver(config);
   const sessions = new Set();
   const perAddress = new Map();   // player address -> open sessions
@@ -72,7 +72,7 @@ function createProxyServer(config, { logger = () => {} } = {}) {
   });
 
   wss.on('connection', (ws, req) => {
-    const address = clientAddress(req, config);
+    const address = addressOf(req, config);
     if (sessions.size >= config.maxConnections) {
       logger('connection_rejected', { reason: 'limit', active: sessions.size, address });
       ws.close(CLOSE_CODES.CONNECTION_LIMIT, 'too many connections');
@@ -204,4 +204,4 @@ function createProxyServer(config, { logger = () => {} } = {}) {
   };
 }
 
-module.exports = { createProxyServer, clientAddress };
+module.exports = { createProxyServer, clientAddress, isNonPublic };

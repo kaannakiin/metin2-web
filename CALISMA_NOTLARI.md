@@ -1,5 +1,320 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### CANLI — loot v3, wiki boss omurgası ve web tuşları (2026-10-20)
+
+Kullanıcı bu tur açıkça “hepsini canlıya al, main'e commit et, test etme; ben
+test edeceğim” dedi. Ardından deploy'dan önce Lusifer'e 70 silahlarını da ve
+rehberde eksik kalan klasik bosslara ortalama wiki tabanlı loot istedi.
+Son sürüm **20261020-134850** canlıya kuruldu; önceki adaylar kullanılmaz.
+
+- Lusifer: 75 aile %30, 70 aile %15, 65 aile %7, 66 zırh %12. Tam tablolar
+  `phase3_loot.json` v3 ve `docs/DROP_REHBERI.md` içinde.
+- Önceki rehberde eksik 10 bossun hepsi tamamlandı: Vahşi Yüzbaşı, Dev Hastalık
+  Taşıyıcı, Güçlü Buz Cadısı, Barones, Dev Çöl Kaplumbağası, Kırmızı Ejderha,
+  iki ağaç bossu, Kharoon ve Azrail. 13 boss / 12 kendi sandığı, 7 doğrudan
+  boss tablosu; metin grupları 23. Kaynaklar rehberde; yüzdeler bizim orta-kolay
+  ayarımız, eşya aileleri wiki/proto tabanlı. 100+ ekipman taşınmadı.
+- İstemci 20261020-125412 dondurulmuş derlemesinden alındı. Yeni engine build,
+  unit/regresyon veya oyun testi çalıştırılmadı. Kurulum hash/dosya eşleşmesi ve
+  servis süreç/port koşulları tamamlandı. Corpus değişmedi, CDN upload yok.
+- Kurulum VM loot'unu başarıyla yükledi ancak başlatılan servislerin devraldığı
+  stdout SSH kanalını açık tuttu. Oyun tekrar başlatılmadan, INSTALLED ve canlı
+  tablolar doğrulanıp yalnız eşleşen eski kurulum kabuğu/bekleyen SSH istemcisi
+  `phase3_finish_host.sh` ile kapatıldı; web yayını tamamlandı, komut exit 0.
+  Gelecek kurulumlar için servis stdout/stderr dosyaya, stdin /dev/null'a alındı.
+- Host `/home/m2web/phase3-20261020-134850`, VM
+  `/usr/metin2-phase3-20261020-134850`; `INSTALLED` mevcut. Site yedeği
+  `/home/m2web/backups/phase3-finish-FO7RZ482/site`, VM eski tablolar `previous/`.
+- Main'e ilgili birikmiş istemci/sunucu/runtime/deploy/rehber değişiklikleri
+  birlikte kaydedilir; yerel bridge node_modules dışarıda tutulur. Kullanıcı
+  sayfayı yenileyip kabul testini kendi yapacak. Faz 3 loot omurgası ilerledi;
+  instance/reentry ve canlı oyuncu kabulü ayrıca izlenecek, faz bütünü kapatılmadı.
+
+### Loot v2 — eksik boss silahları ve tam drop rehberi (2026-10-20)
+
+Kullanıcı önceki sandıkların sadece malzemeye yaslandığını düzeltti; gerçek 75
+silahların Lusifer sandığında olmasını ve metin/bossların tam dökümünü istedi.
+Resmî Lusifer/Ork/Hayalet Lider/Kraliçe Örümcek/Dokuz Kuyruk/Kaplan/Alev/Şeytan
+Kral sandık listeleri ve PvP ilerleme rehberleri karşılaştırıldı. Kaynaklar ve
+kararların sınırları `docs/DROP_REHBERI.md` içinde; yayımlanmayan resmî yüzdeler
+taklit edilmedi. Bu projedeki yüzdeler kendi orta-kolay denge ayarıdır.
+
+- `PVP_HEDEF.md` önce güncellendi; `phase3_loot.json` v2 ve gerçek iki loot tablosu
+  eşlendi. Diğer sandıklarda %28 65 silah + %12 zırh; Hayalet Lider 54, Kraliçe
+  Örümcek 61 zırh ailesini kullanır. Lusifer'de %30 75 silah, %14 65 silah,
+  %16 66 zırh; malzemeler kalan ağırlığı paylaşır.
+- Gerçek 75 ailesi: Zehir 180, Aslan 190, Şeytan Kanadı 1130, Havalı Çelik 2170,
+  Kin 3160, Orkide 5120. Her biri +0, %5. Havalı Çelik ID'si 2150 değildir;
+  2150 Geyik Boynuzu Yay (30) olduğundan ayrı regresyonla korunur.
+- 85/90 metinlerden Zehir ve Orkide Lusifer sandığına taşındı. Siam, Şeytani Pala,
+  Yarı-İnsan ve Mutluluk 70 seviyedir; metinde kaldı. Harita/regen/respawn, binek
+  tuş düzeltmesi, BK/ruh taşı ayarı ve sunucu protokolü bu revizyonda değişmedi.
+- `platform/tools/drop_catalogue.py` yalnız stdout'a rehber üretir; `--check`
+  kayıtlı belgenin tablolar ve protolarla eşleşmesini denetler. Türkçe isimleri
+  UTF-8/cp1254 okur; seviye gerçek proto'dan gelir. `docs/DROP_REHBERI.md` tüm
+  23 metin grubunu, 9 sandığı, değişmeyen diğer mob/boss gruplarını, taş kesesini,
+  ters eşya-kaynak indeksini, koşullu motor kancalarını ve eksik loot'ları listeler.
+- Yeni testler tüm 6 silahın seviye 75 ve AddonType=-1 olduğunu, yanlış yay ID'si
+  kullanılmadığını, metinlere 75 silah geri sızmadığını ve her sandığın silah/zırh
+  içerdiğini denetler. Yerel 42 Python testi geçti; rehber eşleşme kontrolü eklendi.
+- Canlı dosya/servis değiştirilmedi. `20261020-125412` / `20261020-125127` eski v1
+  adayları bu revizyonu kapsamaz, kurulmamalı; v2 için yeni paket gerekir.
+  Barones/Azrail'in özel statik loot'u hâlâ eksik; Faz 3 tamamlandı sayılmadı.
+
+### Faz 3 — klasik akışta loot ve tuş düzeltmeleri (2026-10-20)
+
+**Hazır aday: `20261020-125412`; henüz canlıya kurulmadı.** Host
+`/home/m2web/phase3-20261020-125412`, VM `/usr/metin2-phase3-20261020-125412`.
+`BUNDLE_READY` / `READY` doğrulandı; hazırlık canlı dosyaları ve servisleri değiştirmedi.
+Önceki hazırlık `20261020-125127` yerine bu son aday kullanılmalı.
+
+- Kullanıcı kilidi: haritalar ve metin/boss yerleşimleri klasik akışta kalacak.
+  Bu revizyon mevcut 2× metin yoğunluğunu, spawn sürelerini ve zindanları değiştirmez.
+- Tarayıcı DirectInput tablosu fiziksel `Backquote` dışında Türkçe `"` karakterini
+  de toplama koduna eşler. Tuş basılırken seçilen kod keyup'a kadar tutulur;
+  Shift önce bırakılırsa yanlış tuşun bırakılması/takılı kalması önlenir.
+- `PythonPlayerInput.cpp` içindeki ek 107/109 at becerisi engeli kaldırıldı.
+  Space ve mouse saldırısı mevcut `CInstanceBase::CanAttack` kararını paylaşır;
+  özel shop, observer ve emotion kontrolleri korunur. Bu dosya mevcut halinde
+  ASCII/LF idi; diğer cp1254/CRLF istemci kaynakları dönüştürülmedi. Dosya canlı
+  kitin kaynak kopyasına da eşlendi ve gerçek Emscripten build'inden geçti.
+- BK 6/10/12/14 bağımsız satır, unutma+münzevi malzemeleri, 40+ kademeli ruh
+  taşı; 90 metinde 66 taban zırh +0. Sayılar önce `PVP_HEDEF.md` içinde kilitlendi;
+  makine politikası `platform/gameplay/phase3_loot.json`. G hedefi, o seviyede
+  Master olmuş beceriler içindir; bütün skill'leri o seviyede Master yapma yok.
+- Fork'ta M1→G 10 başarılı okuma; münzevisiz %35. Resmî oyunun 55 kitap hesabı
+  buraya taşınmadı. 48 eşit beceri ve 12 BK/metin varsayımında destekli tek
+  skill'in 60 metinde G olasılığı %93,2; 80'de %99,5. Bu, 65–70 seviye-zaman
+  kabul testinin yerine geçmez. Hesap: `build/phase3-progression.json`.
+- 10 klasik boss için kendi 9 sandığı tanımlandı. Eksik special_item_group
+  içerikleri tamamlandı; tek ağırlıklı ödül verir. Erken sandıkta aynı becerinin
+  10 BK'sı, orta/yüksek/Lusifer'de 3/5/8 ruh taşı seçeneği ve malzeme/66 zırh
+  ödülleri var. Başka bossların var olan dropları korunur.
+- Araştırma resmî metin/ruh taşı listeleri ile PvP tanıtım örneklerini karşılaştırdı.
+  Kamuya açık tanıtımlar kesin server drop yüzdeleri sayılmadı; kaynaklar ve
+  bize ait denge kararları `PVP_HEDEF.md` içinde ayrı belirtiliyor.
+- Doğrulama: 40 Python testi (veri/proto/sandık ve izole bakım/geri alma dahil),
+  3 JS klavye testi, 13/13 ekonomi. Gerçek web build: 80/80 patchcheck,
+  sıfır derleme hatası, source login 594, RESP 20/20 ve bozuk/parçalı paket
+  regresyonları geçti. Corpus değişmedi (1370 immutable chunk); CDN yüklemesi yok.
+- Bakım: `phase3_loot_host.sh install ... --operator-maintenance`, VM'de yalnız
+  iki loot tablosunu değiştirip servisleri başlatır ve eşleşen istemciyi kurar.
+  Dondurulmuş hash, canlı drift kontrolü, yedek, süreç/port sağlığı ve hata halinde
+  geri alma var. `AGENTS.md` otomatik VM restart yerine kullanıcı bakım adımı
+  istediği için kurulum çalıştırılmadı. Tam komut ve oyun kabul listesi:
+  `platform/deploy/GAMEPLAY_RELEASE.md`. Faz 3 tamamlandı sayılmadı.
+
+### Canlı kurulum ve karakter penceresi engeli (2026-10-20)
+
+- Kullanıcı bu dağıtım için Metin2 servislerinin durdurulup başlatılmasına
+  açıkça istisna verdi. `20261019-213727` game/db + source-profile 594 bayt login
+  istemcisi birlikte kuruldu. Drop, sınıfa uygun başlangıç quest'i, sınırsız
+  normal dedektör, MAX_LEVEL 99 ve 13 haritada 97 → 194 metin kapasitesi canlıda.
+  Aşağıdaki önceki "henüz canlı değil" kayıtları hazırlık anını anlatır.
+- Kurulum sonrası gerçek dosya SHA'ları, altı süreç ve altı oyun portu doğrulandı.
+  VM yedeği `/usr/metin2-gameplay-20261019-213727/previous`, site yedeği
+  `/home/m2web/backups/gameplay-d6P0bSAs`. Public WASM SHA'sı adayla eşleşti:
+  `8db82fe2e68ac06f548e14187cc0b9b8a3849135cee4e766cc80a67cad153d5d`.
+- Oyun kabul testinde `deneme` karakteri seçimden sonra giriş ekranına döndü.
+  Tarayıcıda doğrudan yeniden üretildi: `CharacterWindow.py` yüklenirken
+  `AttributeError: 'tuple' object has no attribute 'append'`. Yohara kapalı
+  klasik karakter sayfasının children alanı tuple; unvan sistemi liste bekliyor.
+  Pack kaynağında unvan kontrolleri eklenmeden önce listeye çevrildi.
+- `platform/tests/test_character_window.py` gerçek pencere dosyasını dört
+  özellik bayrağının 16 kombinasyonunda çalıştırır; unvan kontrollerinin yalnız
+  açıkken ve birer kez eklendiğini denetler. Yerel test geçti. Düzeltilmiş
+  paket ve tarayıcıda dünya girişinin kabul testi şu aşamada devam ediyor.
+- Yayın öncesi aynı test dönüştürülmüş `uiscript3/UIScript/CharacterWindow.py`
+  üzerinde çalıştırılınca eski dosyayı yakaladı ve yayını durdurdu. Dev UI akışı
+  `scripts` ağacını güncelliyor, pencere dönüştürücüsü ise eski corpus unpack
+  ağacını okuyordu. `M2W_UISCRIPT_SOURCE` ile UI modunda doğrudan güncel
+  `/work/dev/inputs/root/uiscript` kullanılır; araç da dev sync listesine eklendi.
+  Normal corpus tabanlı derlemenin varsayılan kaynağı değişmedi.
+- Güncel gerçek `uiscript3` dosyasında 16 kombinasyon geçti. Source login 594,
+  RESP 20 bayt ve detector UI kontrolleri geçti. `publish_character_window.sh`
+  ile yalnız istemci paketi yayınlandı; WASM byte olarak aynı, corpusun 1370
+  chunk'ı aynı. VM yeniden başlatılmadı. Yeni site yedeği:
+  `/home/m2web/backups/character-window-ZEKJZSIS`.
+- Canlı ikinci denemede tuple hatası kalktı; sonraki engel
+  `KeyError: leader_board` oldu. Klasik layout liderlik panelini ve pasif
+  butonunu hiç tanımlamıyordu, controller ise Yohara'dan bağımsız bağlıyordu.
+  Klasik pencereye aynı liderlik kontrolleri ve pasif butonu eklendi; özellik
+  bayrakları değiştirilmedi. Test artık 32 layout kombinasyonunu çalıştırır;
+  canlıda açık genişletilmiş emotion sayfasıyla controller'daki sabit GetChild
+  bağlarının tamamını da denetler. Emotion kapalı controller dalının ayrı
+  eksikleri bu kabul testinin kapsamına alınmadı.
+- Son paket `/home/m2web/backups/character-window-15Z0ltU0` site yedeğiyle
+  yayınlandı. 2026-10-20 11:50 UTC özel önizleme ve ardından 11:52 UTC civarı
+  gerçek `https://metin2.kaanakin.dev/client.html?lang=tr` üzerinde `deneme`
+  lv22 ile Pyungmoo'ya giriş ve C karakter penceresi açılışı doğrulandı.
+  Aynı anda eski tuple/KeyError/Abort/unknown-packet hataları görülmedi.
+  Oyun sekmesi kullanıcıya açık bırakıldı, geçici önizleme sekmesi ve SSH
+  tüneli kapatıldı. Bu kabul yalnız giriş/pencereyi kanıtlar; art arda metin
+  kesimi ve diğer oynanış senaryoları GAMEPLAY_RELEASE kabul tablosunda bekler.
+
+### Açık dünya metin yoğunluğu 2× (2026-10-20)
+
+- Kullanıcı mevcut bölgelerde yaklaşık iki kat metin istedi. Sayılar önce
+  `PVP_HEDEF.md`'ye yazıldı: 13 klasik açık dünya haritasında kapasite **97 → 194**.
+  Köy 1/2'ler, Seungryong, Yongbi, Sohan, Doyyum, iki orman ve map 70.
+- Düzenlemeden önce bu 13 `stone.txt` dosyasının canlı SHA'ları repo ile eşleşti.
+  Yalnız `m` türündeki 8001–8027 metin satırları birer kez kopyalandı; mevcut
+  satırlar, doğma bölgeleri ve süreleri byte olarak korundu. Aynı dosyalardaki
+  `r` türü maden grupları artırılmadı. Zindan/event/100+ haritalar değişmedi.
+- `max_count=2` yapılmadı: RESP takibi tek regen kimliğini kullandığından iki taş
+  aynı kimliği paylaşacaktı. Yeni bağımsız satırlarda `max_count=1`; sunucunun
+  gerçek `get_word/read_line` koduyla native fixture 194 farklı metin/RESP ID'sini
+  okudu. Bölge içi gerçek doğma konumunu ve araziye uygunluğu oyun motoru seçer.
+- Politika/baseline SHA'ları: `platform/gameplay/metin_density.json`.
+  Kontrol: `python3 platform/tools/metin_density.py` ve
+  `python3 platform/tools/metin_density_native.py`. Yeni veri ve bakım testleriyle
+  `platform/tests` toplam 31 test geçti; önceki dev/publish/bridge testleriyle 52.
+- Veri adayı mevcut `20261019-213727` paketine `gameplay_density_prepare.py` ile
+  eklendi; host ve VM'de `DENSITY_READY`, hostta yeniden `BUNDLE_READY` var.
+  Bu işlem game/db/istemciyi yeniden derlemedi veya yayınlamadı. Harita
+  kaynakları ve ilk canlı SHA'ları denetlenir; 13 canlı dosya da geri alma
+  kapsamına eklenir. Kurulum harita dosyalarını CONFIG olarak işleyemez.
+- Son `gameplay_verify_host.sh` geçti: yoğunluk ve paket hash'leri doğru,
+  canlı runtime ilk yedek SHA'larıyla aynı, altı süreç/port sağlıklı; public WASM
+  ve canlı game SHA'ları önceki sürümde. 13 haritada 123 satır eklendi, satır
+  silinmedi; yoğunluk dosyalarında whitespace kontrolü temiz.
+- **Henüz canlı harita veya servis değiştirilmedi.** Aynı operatör kurulum
+  komutu drop/başlangıç/dedektör ile 2× yoğunluğu birlikte kurar. Ayrıntılar:
+  `platform/deploy/GAMEPLAY_RELEASE.md`.
+
+### Metin kesiminde kopma ve oyun doğrulaması (2026-10-20)
+
+- Arc'ta seviye 21 `deneme`, seviye 20 Hırs Metini kesince login'e döndü.
+  Console: `RecvMountUpGrade invalid subHeader: 73`, ardından
+  `Unknown packet header: 246, last: 49 155`. Game süreci çökmedi.
+- Kök neden: RESP list/refresh içindeki `nextRespTime` wire üzerinde 32 bit;
+  FreeBSD i386 canlı ELF DWARF'ında kayıtlar 20 bayt. Emscripten `time_t`
+  64 bit olduğundan eski web istemcisi 24 bayt okuyup sonraki pakete taşıyordu.
+  Gerçek `Packet.h` alanları `int32_t` ve 20 bayt static assertion ile düzeltildi.
+- İlk düzeltme **yayında**, canlı Yohara protokolüne uygun 619 bayt login
+  korundu. Site yedeği: `/home/m2web/backups/client-login-6OJjljaT`.
+  Corpus değişmedi; VM servisi yeniden başlatılmadı. Yayından sonra gerçek
+  metin kesimi henüz doğrulanmadı; eski açık sekme yeniden yüklenmeli.
+- `resp_packet_layout.py` gerçek Emscripten ölçümü ve WASM fixture çalıştırır.
+  Refresh sonrası PING sınırı, signed timestamp, parçalı ve bozuk frame testleri
+  geçti. Frame korumalı ikinci engine de yayında; son site yedeği
+  `/home/m2web/backups/client-login-BwbaHNjW`. Patchcheck 80/80.
+- `python3 platform/deploy/packet_audit.py`: çalışan ELF SHA'sı + gerçek
+  staged client header'larından ABI raporu, `build/protocol/audit.json`.
+  İlk ölçüm: 165 ortak yapı boyutunda ve 146 GC header numarasında uyuşmazlık yok;
+  147 yapının alan offset'leri tam karşılaştırıldı; 18 yapı kısmi kaldı,
+  125 client kaydı ve 20 GC header eşleştirilemedi.
+  Bunlar tam protokol doğrulaması sayılmaz. Rapor semantik değer/signedness,
+  dinamik payload ve handler tüketimini kanıtlamaz; RESP ayrıca fixture ile sınanır.
+- Oyun tasarımı sayıları önce `PVP_HEDEF.md`'ye yazıldı. 23 metin grubuna
+  seviyeye göre 5/8/10 ayrı BK, taş torbası, kutsama ve efsun malzemeleri;
+  50+ ruh taşı eklendi. Harita yoğunluğu sonraki kullanıcı kararıyla üstteki
+  2× revizyonuna alındı; bu değişiklik de adayda, henüz canlıda değil.
+- Başlangıç quest'i: dört sınıfa STR/DEX/INT ve uygun saldırı/büyü hızı,
+  silahlarda beş efsun; başlangıç ölümsüz/şeytan/mistik bonusları kaldırıldı.
+  Ninja 8000 normal ok, şaman 5009 çan ve 7009 yelpaze alır.
+  Mevcut DB `item_attr` izinleri/tavanları salt okunur sorguyla kontrol edildi.
+- Normal dedektör 27989 her yeni karaktere bir adet; `CItem::SetSocket` yalnız
+  onun 0. socket sayacını sıfırda tutar. Alternatif 76006 ve diğer socket'ler
+  korunur. Web tooltip değişimi mevcut Python 2→3 semantic patch adımındadır;
+  karışık kodlamalı pack kaynakları dönüştürülmedi.
+- **Drop, quest ve sınırsız dedektör henüz canlıda değil.** İzole aday:
+  `/usr/metin2-gameplay-20261019-213727` (VM),
+  `/home/m2web/gameplay-20261019-213727` (host). `READY` ve `BUNDLE_READY` var:
+  game/db derlendi, gerçek `qc` + sunucu Lua ile 4 sınıf × 2 cinsiyet fixture'ı
+  ve FreeBSD'de 10.000 dedektör kullanımı geçti. Derlenen welcome handler'ı
+  repoya aynen alındı; COMPLETE state kimliği değişmedi.
+  Aday ABI: 164 ortak yapı boyutunda ve 145 GC header'da fark yok;
+  146 tam alan karşılaştırması, 18 kısmi, 125 eşleşmeyen kayıt, 20 eşleşmeyen header.
+  Game SHA: `258e81399200bb6c5186866464a66d64673a66ac09d5a4ae6af883a10bc533a3`.
+  Kurulum/kabul adımları: `platform/deploy/GAMEPLAY_RELEASE.md`.
+  Yeni kaynak sunucusu 594 bayt login kullanır; yalnız eşleşen source-profile
+  web istemcisiyle birlikte kurulabilir. AGENTS gereği VM servis restart'ı
+  operatör adımıdır. Eski `login_fix_vm.sh install` tek başına çalıştırılmamalı.
+- Yerel kontroller: 21 oyun/ABI/kurulum testi + 14 dev-tool testi + 4 publish testi +
+  3 bridge testi geçti; ekonomi kontrolü 13/13. Yeni loot mevcut gear satırlarını
+  ve metin dışındaki tüm grupları koruyor. `qc` çıktısı kendi trailing-space
+  biçimiyle saklandı; `git diff --check` yalnız bu üretilen satırları bildiriyor.
+- Bakım betikleri yedi izole dosya/sahte servis senaryosunda doğrulandı:
+  salt okunur hazırlık, kurulum+geri alma, değişen canlı dosyada durma,
+  başarısız start'ta geri alma, eksik yedekte dosyayı kesmeden açık hata,
+  eksik core ve eksik portta geri alma.
+  Gerçek VM restart/kurulum çalıştırılmadı. İstemci/sunucu adayları donduruldu;
+  geliştirme önizlemesi tekrar eski canlı `live-yohara` profiline döndürüldü.
+- Mevcut rc betiğinin `status`'ü süreç yokken dahi 0 dönüyor. Bakım script'i
+  bu sonucu sağlık kanıtı saymaz; db/auth/3 core/game99 süreç sayısını ve
+  15000/30001/30003/30101/30103/30105 portlarını ayrıca denetler. Bu salt okunur
+  kontrol gerçek VM'de geçti. FreeBSD `ps` auth/game99 için ` (game)` eki ekler;
+  yalnız bu bilinen kernel-name eki normalize edilir.
+
+### Hızlı web client geliştirme (2026-10-19)
+
+- Yeni giriş noktası: `python3 platform/deploy/dev_client.py cpp|ui|link|clean`.
+  Kullanım/kapsam: `platform/deploy/DEV_CLIENT.md`. C++ kaynakları web build
+  ağacına byte olarak eşitlenir; web'e özel `Locale_inc.h` korunur.
+- Engine `.o` klasörünü artık her build'de silmez. `tools/incremental_compile.py`
+  kaynak/header içeriklerini, derleyici/seçenekleri ve include dosya listesini
+  doğrular; değişmeyen object'leri kullanır, eski/başarısız object'leri temizler.
+  İlk çalışma cache'i doldurur. O2 korunur; `clean` zorla yeniden derler.
+- Stage case-alias dizin listeleri gerçek dizin yoluyla ortak cache kullanır;
+  aynı dizinin `eterBase`/`EterBase` yazımlarından alias eklerken ortaya çıkan
+  `FileExistsError` düzeltildi.
+- Önizleme `/home/m2web/dev/site/current` altında; `package`/`publish`/Cloudflare
+  adımları yok. Veri bir kez hazırlanır ve tek link yapılır; corpus tekrar
+  paketlenmez/yüklenmez. Eterbase/eterpack arşivleri `tools/dev_archive.py`
+  üzerinden gerçek `-MD` bağımlılıkları değişmedikçe tekrar kullanılır.
+- `python3 platform/deploy/dev_client.py tunnel` iki loopback portunu açar:
+  HTTP `18731`, ayrı geliştirme bridge'i `18732`. Tarayıcı adresi
+  `http://127.0.0.1:18731/client.html?lang=tr`. `stop` yalnız geliştirme süreçlerini kapatır.
+- Bu client önizlemesi **mevcut oyun sunucusuna/DB'ye bağlanır**; ayrı bir test
+  VM/DB değildir. VM servis restart'ı, Traefik/UFW değişikliği veya canlı yayın
+  yapılmaz. Geliştirme ve release build'i ortak kit ağacında eşzamanlı çalıştırılmaz.
+- Önizleme HTML/manifest için `no-store`, engine/data/diller için içerik hash'li
+  immutable URL kullanır; değişmeyen büyük `.data` paketi her build'de yeniden
+  indirilmez. Gzip hazır kopyaları HTTP tarafından desteklenir; eski asset
+  sürümüne istek `409` döner ve sayfanın yenilenmesi gerekir.
+- Doğrulama: 14 yerel Python testi ve 3 Node bridge testi; gerçek C++ compiler cache, snapshot/HTTP/gzip/
+  sürümleme, UI overlay silme ve stage alias regresyonu. Hostta `patchcheck`
+  77/77, link `UNEXPECTED: none`. İlk `cpp` 248,6 s (engine 205 s); cache'li,
+  kaynak değişikliği olmayan `cpp` 31,6 s (engine 15 s, 359 object ve iki arşiv
+  kullanıldı). `ui` 60,5 s; `link` 13,6 s. Tarayıcının ilk indirmesi bu sürelerde yok.
+- Snapshot corpus bağlantısı container `/work` ve host `/home/m2web` mount
+  farkı nedeniyle **göreli** olmalı; absolute symlink hostta 404 veriyordu.
+  Düzeltildi ve HTTP/yerel testle doğrulandı. Tarayıcıda Türkçe giriş ekranı
+  açıldı, CH1 çevrimiçi. İngilizce locale'deki mevcut eksik
+  `TOOLTIP_MALL_EXPBONUS_P_STATIC` anahtarı ayrı bir veri sorunu; kullanım URL'si
+  bu nedenle `?lang=tr`.
+- Hesapla giriş testi iki sorun buldu: SSH tünelindeki localhost PROXY kaynak
+  adresi sunucuda reddediliyordu; geliştirme bridge'i artık yalnız doğrulanmış
+  SSH peer genel IPv4 adresini kullanır. Üretim bridge'inin adres çözümü aynı.
+  İkinci sorun: çalışan `/usr/home/share/bin/game` binary'si eski Yohara açık
+  sürüm (`SSimplePlayer=105`, login=619 bayt; DWARF ve disassembly ile ölçüldü).
+  Güncel kaynaklardan probe 100/594; bu kaynaklar henüz çalışan binary değil.
+  594 bayt okuyan client sonraki paketi yanlış başlıktan okuyor ve login'de
+  bekliyordu. Sadece stage'de uygulanan `--protocol live-yohara` önizlemeyi eski
+  server'la eşler; başarılı seçim `dev/protocol` içinde saklanır. Kaynak/PvP
+  flag'leri değiştirilmez. Güncel server kurulunca `--protocol source` gerekir.
+  Her dev build'de Emscripten ile gerçek paket boyutu ölçülür ve profil doğrulanır.
+- Ayrı server derlemesi `/usr/metin2-login-fix-20261019-204458` altında tamamlandı (`READY`);
+  kaynak anlık görüntüsü çalışma ağacındaki server değişikliklerini içerir.
+  `login_fix_prepare.py` yalnız ayrı build hazırlar. `login_fix_vm.sh install`
+  game/db'yi birlikte yedekleyip değiştirir ve restart yapar; **operatör adımıdır**.
+  Otomatik kurulum/restart yapılmadı. Henüz prod client uyumu test edilmeden
+  bu server derlemesini kurma; eşleşen client release'iyle koordine edilmeli.
+- Giriş düzeltmesi **canlıda doğrulandı**: uyumlu 619 baytlık engine ile normal
+  `webclient.py package` (özel dosyasız public paket) hazırlandı. Yerel preview
+  bridge override'ı ve `loginInfo.xml` bulunmadığı doğrulandı. Canlı hesaptan
+  `numan`/`deneme` karakter seçim ekranı açıldı; sonra test sekmesi kapatıldı.
+  Bu test dünya/oyun içi stabilite testi değildir. `101 Switching Protocols`
+  ve açık WebSocket'in pending görünmesi normal; hatanın nedeni paket uyumsuzluğuydu.
+- `publish.sh --engine-only`: manifest/groups içerikleri ve 1370 chunk'ın
+  ad/boyut envanteri aynı değilse yayın reddedilir. Aynıysa CDN yüklemesi
+  yapılmadan engine/data/diller eşitlenir, HTML en son alınır; corpus ve ASan
+  korunur. Yardımcı `publish_engine_check.py` hostta publish.sh yanında olmalı.
+  Dört yayın koruması testi geçti; öncesinde site yedeği
+  `/home/m2web/backups/client-login-AVXsRkPs` alındı. Site/bridge/VM restart'ı,
+  Traefik değişikliği veya yeni Cloudflare deployment yapılmadı.
+
 Son güncelleme: 2026-10-19. Hobi amaçlı, ~10 kişilik sunucu. **Ana hedef: oyunun tarayıcıda (WebAssembly) oynanması.**
 
 Bu dosya, yapılanları ve kaldığımız yeri kaydeder. Şifreler burada YOK; nerede durdukları yazılı. 1–99 PvP tasarım/fazlar: `PVP_HEDEF.md` + `docs/ROADMAP_PVP.md`.
