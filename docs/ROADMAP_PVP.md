@@ -119,6 +119,12 @@ klasik boss tamamlandı (Barones, Azrail ve diğerleri). Tam envanter
 `docs/DROP_REHBERI.md` içinde. Önceki v1/v2 adaylar kullanılmaz; güncel v3
 kuruludur. Instance/reentry ve canlı oyuncu kabulü faz çıkışı için hâlâ açık.
 
+20 Ekim zincir araştırması: [Faz 3 klasik zincir denetimi](FAZ3_KLASIK_ZINCIR_DENETIMI.md).
+Ödül tablolarının varlığı giriş zincirinin tamamlandığı anlamına gelmiyor:
+Lusifer'in Küçülen Kafa kaynağı, Katakomb tüketim tutarlılığı, Uriel/Arachnida
+üretimi ve Baron–Flüt aşaması açık. General–Kıvrık Anahtar–Beran bağlantısı mevcut.
+Wiki'nin günlük kota/EP bileti modeli kopyalanmaz; hedef tekrarlanabilir orta-kolay farm.
+
 1. Level akışı: 1–20 köy → 2. köy → Seungryong → Hwang → Yongbi/Örümcek → Sohan/Doyyum → Kızıl Orman → Sürgün 1–2 → opsiyonel 1 end map.
 2. Metin: band drop (küratörlü gear) + yüksek level’ın düşük farm tekeline engel.
 3. Açık dünya boss havuzu (ör. Vahşi Yüzbaşı → General): respawn 15–120 dk, sandık önizleme, hasar/notice; her boss loot’u mid/end veya malzeme sink’ine bağlı.

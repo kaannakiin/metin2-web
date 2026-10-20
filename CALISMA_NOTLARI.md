@@ -1,5 +1,25 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### Klasik ilerleme zinciri wiki denetimi — 2026-10-20
+
+- Kullanıcı bossları yalnız sandık içeriğiyle değil sonraki içeriği açan
+  kaynaklarıyla ele almamızı istedi. Resmî wiki'nin eşya, görev, NPC ve zindan
+  sayfaları repo drop/proto/quest/üretim akışıyla karşılaştırıldı.
+- Sonuç: `docs/FAZ3_KLASIK_ZINCIR_DENETIMI.md`. General → Kıvrık → Beran hattı
+  mevcut; Lusifer kafası yok. Katakomb giriş yolları farklı tüketim yapıyor,
+  bazıları iki kafa istiyor. Barones anahtar üretimi ve Kraliçe zehri kaynağı yok;
+  normal örümceklerin malzeme proto bağları var ama `etc_drop_item.txt` boş.
+  Zindan doğrudan Barones çıkarıyor; Baron–Flüt aşaması yok.
+- Biyolog sistemi C++ içinde mevcut; quest listesinde dosyası olmaması yokluğu
+  anlamına gelmiyor. BK/G/P ve at hattı da rapordaki yan ilerleme kapsamına alındı.
+- Seviye cezası ayrı: normal item rate ve ek bonus yokken 99 oyuncunun 78 Lusifer
+  sandığı baz %100'den yaklaşık %1'e iner. Bossun ödülü ile zorunlu giriş
+  malzemesinin erişimi ayrı politika gerektiriyor.
+- Kullanıcı açıkça orta-kolay tekrarlı farm istedi: güncel wiki'nin günlük giriş
+  kotası/EP bileti kopyalanmaz. Bu karar `PVP_HEDEF.md`'ye yazıldı.
+- Bu tur yalnız araştırma/tasarım belgeleri değişti. Canlı drop, quest, cooldown
+  veya günlük hak güncellenmedi; servis yeniden başlatılmadı, oyun testi yok.
+
 ### Her oyuncuya dört envanter sayfası — 2026-10-20
 
 - Kullanıcı mevcut ve yeni tüm karakterlerde dört standart envanter sayfası

@@ -410,6 +410,14 @@ Kaynak bayraklar çoğunlukla `apps/server/common/service.h` (+ client `Locale_i
 
 ### Farm ve boss
 
+20 Ekim 2026 kullanıcı kararı: wiki, klasik kaynak → anahtar/malzeme → NPC →
+zindan bağlantısı için referanstır. Güncel resmî sürümün günlük giriş kotası,
+Nesne Market bileti ve uzun bekleme modeli kopyalanmaz. Orta-kolay sunucuda
+General → Kıvrık Anahtar → Beran ve Lusifer → Küçülen Kafa → Azrail hatları
+tekrar farm yapılabilecek şekilde dengelenir; Beran günde bir kesime sınırlandırılmaz.
+Malzeme adedi, üretim/düşüş şansı ve bekleme süreleri bu hedefe göre seçilir.
+Mevcut zincirlerin kaynaklı denetimi: [Faz 3 klasik zincir denetimi](docs/FAZ3_KLASIK_ZINCIR_DENETIMI.md).
+
 | Özellik                               | Karar | Not                                    |
 | ------------------------------------- | ----- | -------------------------------------- |
 | Klasik haritalar + metin              | Açık  | küratörlü drop matrisi yukarıda        |
