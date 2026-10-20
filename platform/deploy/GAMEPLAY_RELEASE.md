@@ -1,5 +1,20 @@
 # Oyun paketi doğrulaması — 2026-10-20
 
+## NPC / destek becerileri / kalıcı at / Yang / istemci — 20261020-172132
+
+`progression_release.py --npc-support` hazırlığı ve `npc_publish_host.sh
+20261020-172132` final yayını tamamlandı. SQL yalnız eski shop 1/2/3/6/7 ve
+iki global Yang flag'ini değiştirir; diğer NPC/oyuncu tabloları kapsam dışı.
+ShopEx 13 sekme; 30 silahların metin dropları yok. Görev gerçek VM qc ile derlendi.
+İstemci APPLY kimlik düzeltmesi derlendi; `publish.sh --engine-only`, 1370 aynı
+corpus chunk ile yayımlandı. Host ve VM aynı `progression-20261020-172132`
+adlı sürümü taşır. Geri dönüş: previous.tar + previous-database.sql ve host
+previous-client. Altı süreç/port ve site dosyaları doğrulandı; oyun testi yok.
+
+**20261020-172626:** `--support-only --install`, yalnız starter_support yeniden
+derlendi. Dolu envanterde kitap teslimi destek becerilerini engellemez.
+Önceki kaynak/nesneler previous.tar içinde; SQL/client değişmedi, servisler sağlıklı.
+
 ## Başlangıç yüzüğü — 20261020-165717
 
 `progression_release.py --starter-ring --install`: yalnız quest_list ve

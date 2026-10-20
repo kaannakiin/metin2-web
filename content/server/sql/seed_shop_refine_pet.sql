@@ -540,6 +540,13 @@ INSERT INTO shop_item (shop_vnum, item_vnum, `count`) VALUES
 
 -- shop 11: NPC 20406 Theowahdan — sashes intentionally empty (mid-pvp: costume sash = farm/event, not NPC)
 
+-- Active 2026-10-20 profile: these five NPCs use locale/shop_table_ex.txt.
+-- Keep fresh installs compatible; other shops and pet/refine data stay below.
+DELETE FROM shop_item WHERE shop_vnum IN (1,2,3,6,7);
+DELETE FROM shop WHERE vnum IN (1,2,3,6,7);
+REPLACE INTO quest (dwPID,szName,szState,lValue) VALUES
+(0,'mob_gold','',400),(0,'mob_gold_buyer','',400);
+
 -- growth_pet_skill_proto: skill ids/names/type/cooldown come from the client pet_skill.txt (en); point types and formulas are approximations
 DELETE FROM growth_pet_skill_proto WHERE dwPetVnum BETWEEN 55701 AND 55712;
 INSERT INTO growth_pet_skill_proto (dwPetVnum, dwSkillVnum, szName, bType, dwCooldown, setAffectFlag, szPointOn, szPointPoly1, szPointPoly2, szPointPoly3, szPointPoly4, szPointPoly5, szPointPoly6, szPointPoly7, szPointPoly8, szActivatePctPoly, szDurationPoly) VALUES

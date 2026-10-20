@@ -1,0 +1,28 @@
+starter_support={["start"]=0,apply= function ()if pc . getqf ( "horse_ready" ) == 0 then 
+if horse . get_level ( ) < 30 then 
+horse . set_level ( 30 ) 
+end 
+if horse . is_dead ( ) then 
+horse . revive ( ) 
+end 
+horse . feed ( ) 
+if pc . count_item ( 50053 ) == 0 and pc . get_empty_inventory_count ( ) > 0 then 
+pc . give_item2 ( 50053 , 1 ) 
+end 
+if pc . count_item ( 50053 ) > 0 then 
+pc . setqf ( "horse_ready" , 1 ) 
+syschat ( "Kalici askeri atin ve cagirma kitabin hazir." ) 
+end 
+end 
+if pc . get_skill_group ( ) == 0 then 
+return 
+end 
+local skills = { { 121 , 40 } , { 122 , 2 } , { 124 , 40 } , { 126 , 20 } , { 127 , 20 } , 
+{ 128 , 20 } , { 129 , 40 } , { 130 , 30 } , { 131 , 10 } , { 137 , 40 } , { 138 , 40 } , 
+{ 139 , 40 } , { 140 , 40 } } 
+for index = 1 , table . getn ( skills ) begin 
+if pc . get_skill_level ( skills [ index ] [ 1 ] ) < skills [ index ] [ 2 ] then 
+pc . set_skill_level ( skills [ index ] [ 1 ] , skills [ index ] [ 2 ] ) 
+end 
+end 
+end }

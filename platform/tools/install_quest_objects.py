@@ -17,10 +17,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('archive', type=Path)
     parser.add_argument('--starter-ring', action='store_true', help='Sync only the starter ring build')
+    parser.add_argument('--npc-support', action='store_true', help='Sync only the support skills and horse build')
     args = parser.parse_args()
     if args.starter_ring:
         NAMES.clear()
         NAMES.add('starter_ring')
+    if args.npc_support:
+        NAMES.clear()
+        NAMES.add('starter_support')
     outputs = {}
     with tarfile.open(args.archive) as archive:
         for member in archive.getmembers():

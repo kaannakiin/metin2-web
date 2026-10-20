@@ -22,6 +22,8 @@ def main():
     scope = parser.add_mutually_exclusive_group()
     scope.add_argument('--spawns-only', action='store_true', help='Install only the two access-boss spawn timers')
     scope.add_argument('--starter-ring', action='store_true', help='Install only the one-time starter ring quest')
+    scope.add_argument('--npc-support', action='store_true', help='Install shops, support skills, horse and Yang profile')
+    scope.add_argument('--support-only', action='store_true', help='Update only the support quest after the NPC release')
     args = parser.parse_args()
     release = datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')
     remote = '/home/m2web/progression-' + release
@@ -37,8 +39,22 @@ def main():
     if args.spawns_only:
         files = ['map/metin2_map_spiderdungeon/boss.txt', 'map/metin2_map_skipia_dungeon_02/boss.txt']
         existing = list(files)
+    if args.npc_support:
+        files = ['mob_drop_item.txt', 'quest/quest_list', 'shop_table_ex.txt',
+                 'quest/quest_tr/_midpvp/starter_support.lua']
+        existing = ['mob_drop_item.txt', 'quest/quest_list']
+        baseline = 'b05e59f48'
+    if args.support_only:
+        files = ['quest/quest_tr/_midpvp/starter_support.lua']
+        existing = []
     expected = []
+    if args.support_only:
+        expected = ['SHA256 (/usr/home/share/locale/europe/quest/quest_tr/_midpvp/starter_support.lua) = '
+                    'bc7654b6a2c5eeb66c573f599e59c74ca7e6871e28b7daf1985d6be9cf73af62\n']
+        existing = list(files)
     for name in existing:
+        if args.support_only:
+            continue
         previous = subprocess.check_output(['git', 'show', baseline + ':runtime/freebsd/share/locale/europe/' + name], cwd=ROOT)
         if name == 'quest/quest_list':
             # Read-only live comparison found this optional reward quest absent.
@@ -55,6 +71,12 @@ def main():
             metadata['data-only'] = 'access boss spawn timers\n'
         if args.starter_ring:
             metadata['starter-ring'] = 'one-time ring delivery\n'
+        if args.npc_support:
+            metadata['npc-support'] = 'ShopEx and support skills\n'
+            metadata['new-files.txt'] = 'shop_table_ex.txt\nquest/quest_tr/_midpvp/starter_support.lua\n'
+            metadata['database.sql'] = (ROOT / 'content/server/sql/migrations/20261020_npc_support.sql').read_text()
+        if args.support_only:
+            metadata['support-only'] = 'support skills independent of book inventory space\n'
         with tarfile.open(archive, 'w:gz') as output:
             for name in files:
                 output.add(LOCALE / name, arcname='input/' + name, recursive=False)

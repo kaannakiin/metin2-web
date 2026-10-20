@@ -118,6 +118,11 @@ def render():
         '(toplam %30), beş doğrulanmış 70 silahın her biri %3 (toplam %15), yedi 65 silah '
         'her biri %1 (toplam %7). Hepsi +0. Barones de 75 silahları doğrudan her biri %3 verir.')
     put('- 85/90 metinlerden Zehir ve Orkide kaldırıldı. Diğer 75 silahlar da bu metin havuzuna eklenmedi.')
+    put('- Dolunay, Siyah Yaprak, Geyik Boynuzu, Kırmızı Demir, Antik Çan ve Sonbahar '
+        'Yelpazesi +9 silahçıya taşındı. Bu altı 30 seviye ailenin +0…+9 sürümleri '
+        'metin gruplarından çıkarıldı; boss grupları bu değişiklikle silinmedi.')
+    put('- Yang miktarı tavan altında öncekinin 4 katı; normal/premium mob_gold 400. '
+        '400.000 kill tavanı ve düşme/seviye kuralları aynı.')
     put('- **Siam Bıçağı, Şeytani Pala, Yarı-İnsan Kılıç ve Mutluluk Yelpazesi 70 seviyedir.** '
         'Önceki özette 75 ailesiyle karıştırılmışlardı. Metinlerde kalırlar.')
     put('- Havalı Çelik Yay **2170**; Geyik Boynuzu Yay **2150** ve 30 seviyedir. '

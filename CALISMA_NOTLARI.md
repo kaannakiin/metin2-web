@@ -1,5 +1,47 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### NPC, kalıcı at/standart beceriler, Yang ve APPLY düzeltmesi — 2026-10-20
+
+- Kullanıcı araştırılan mağazaların uygulanıp bütün işlerin canlıya alınmasını
+  istedi. Kesin ek karar: 30 seviye altı klasik silah ailesi NPC +9, aynı
+  ailelerin +0…+9 sürümleri metinlerden çıkarılır. Ana beceriler BK/G/P olarak
+  kalır; yalnız standart/at becerileri maksimum. Kalıcı saldırabilen at da istenir.
+- `npc_profile.py` gerçek protodan 13 ShopEx sekmesi üretir: ana/ikinci köy
+  silahçı ve zırhçıları, ayrı market. Ekipman 2×, sarf en az 1,25× geri satış
+  bedeli; fiyat alt sınırları vardır. Eski NPC satışında ShopBuyPrice bölünmediği
+  için yalnız liste/proto satış fiyatına güvenmek satın al/sat döngüsü yaratabilir.
+  Her sekmenin yerleşimi 40 paket hücresi içinde hesaplandı. Diğer NPC'ler aynı.
+- `starter_support`: yeni/eski karaktere kalıcı seviye 30 askeri at ve 50053
+  çağırma kitabı; sınıf seçimi sonrası destek/at becerileri. Ana becerilere
+  dokunulmaz. Beş saniyelik kontrol sınıf sıfırlamasından sonra da eksikleri kapatır.
+- Yang: `mob_gold` ve `mob_gold_buyer` 400. Temel %50 ve 400.000 kill tavanı
+  aynı; tavan altında önceki miktarın 4 katı. Şans/seviye cezası ve proto'su
+  sıfır olan sıradan mob'lar aynı. Metin 30/50/70/90 ödeme tabanı
+  10.000/16.000/22.000/28.000; ±%20 ve diğer çarpanlar ayrı.
+- Dolunay görünümü: sunucu 119 PvM ortalaması, eski istemci 119 metin bonusu.
+  İstemci 92 sonrası APPLY değerleri sunucuyla hizalandı; aynı protokolde
+  121 ortak isimde numara farkı kalmadığı preprocessor üzerinden doğrulandı.
+  Paket/feature flag değiştirilmedi. Asıl metin bonusu sunucuda 112.
+  Mevcut PvM ortalama saldırı formülü veya oyuncu efsunları topluca değiştirilmedi.
+- **20261020-172132 canlı:** VM gerçek qc derlemesi, kaynak/nesne ve scoped SQL
+  kuruldu; ardından engine-only istemci yayını. Host/VM `INSTALLED`; altı süreç
+  ve altı port sağlıklı, site dosyaları paketle aynı. 1370 corpus chunk aynı,
+  CDN yükleme gerekmiyor. Host `/home/m2web/progression-20261020-172132`, VM
+  `/usr/metin2-progression-20261020-172132`; `previous.tar`, `previous-database.sql`
+  ve host `previous-client` yedekleri var. İlk 172047 hazırlığı FreeBSD sh iç içe
+  tırnak sözdiziminde canlı değişmeden durdu; düzeltilip yeni sürüm hazırlandı.
+- Efsun rehberi 59 normal satırın canlıyla tüm değer/izinlerinin eşleşmesine
+  dayanır; 39 rare satırı ayrı gösterir. Klasik dışı yuva izinleri ve normal
+  havuzdaki ortalama/beceri/sınıf bonusları ayrıca işaretlendi; toplu silme yok.
+  Belgeler: `EFSUN_REHBERI.md`, `NPC_CANLI_STOK.md`, güncel loot v5 rehberi.
+- **20261020-172626 canlı ek düzeltme:** yalnız starter_support namespace'i
+  tekrar derlendi/kuruldu. Envanter doluysa at kitabı teslimi bekleyebilir;
+  standart beceriler artık bu beklemeden bağımsız açılır. SQL ve istemci aynı.
+  Host/VM `progression-20261020-172626`; altı süreç/port sağlıklı.
+- Oyun testi yapılmadı. İstemci ve qc derlemesi, derlemenin protokol düzeni
+  denetimleri, statik veri/enum eşleştirmesi ve yayın dosyası/servis kontrolleri
+  yapıldı; oyun kabulü kullanıcıda.
+
 ### NPC araştırması ve başlangıç yüzüğü — 2026-10-20
 
 - Kullanıcı eksik kapsamı belirtti: araştırma silahçı ve gövde zırhlarını da

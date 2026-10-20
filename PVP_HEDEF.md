@@ -56,7 +56,7 @@ Toplam sim ≈ **10.9 saat** (hedef 8–12). `event_flag mob_exp` varsayılan 10
 
 | Kaynak         | Politika                                                         |
 | -------------- | ---------------------------------------------------------------- |
-| Yang           | Kıt. Upgrade, stall, book’un ana maliyeti. Mob’dan bol yang yok. |
+| Yang           | Orta-kolay farmı karşılar; miktar önceki sürümün 4 katı, kill tavanı korunur. |
 | Stone / refine | Early +9 NPC/starter. Mid/end base basınca +9 uğraş.             |
 | Market         | NPC fiyatları yüksek; oyuncu stall yaşasın.                      |
 | Cash shop      | Power item yok.                                                  |
@@ -72,7 +72,13 @@ Toplam sim ≈ **10.9 saat** (hedef 8–12). `event_flag mob_exp` varsayılan 10
 | Metin yang (proto 0 iken) | `500 + level×150` (±%20)                       | `GetMidPvpMetinYang` → `RewardGold`                |
 | Ruh taşı kesesi (27999)   | drop pct 50 → **75** (~%12.5 → ~%18.8 / metin) | `mob_drop_item.txt`                                |
 
-Farm mob’ların çoğu proto’da zaten 0 yang; asıl yang metin + (kaplı) boss. `mob_gold` event flag varsayılan 100 kalsın.
+Farm mob'ların çoğu proto'da zaten 0 Yang; asıl Yang metin + (tavanlı) boss.
+2026-10-20 kullanıcı revizyonu: `mob_gold=400`, `mob_gold_buyer=400`.
+Miktar, tavan altında öncekinin 4 katıdır. Normal/premium aynı miktar katsayısı;
+düşme ihtimali, seviye cezası ve 400.000 kill tavanı korunur. Temel %50
+fonksiyonu değişmez; toplam bonussuz miktar proto'nun %200'üdür.
+Metin ödeme tabanı seviye 10/30/50/70/90 için yaklaşık
+4.000/10.000/16.000/22.000/28.000 (±%20); ödeme gerçekleşmesi ayrı olasılıktır.
 
 ---
 
@@ -81,8 +87,8 @@ Farm mob’ların çoğu proto’da zaten 0 yang; asıl yang metin + (kaplı) bo
 | Katman   | Ne                             | Erişim                               |
 | -------- | ------------------------------ | ------------------------------------ |
 | Start    | **+9 başlangıç seti** (job)    | İlk login `welcome` quest — hemen VS |
-| Early    | Aynı early base’ler **NPC +9** | Shop 1/2/6/7 (lv≤22); yedek / alt    |
-| Bridge   | Daha iyi base (FMS vb.)        | Metin 25–35 drop                     |
+| Early    | NPC silah 30 / gövde 42 / takı 33 **+9** | ShopEx; ana ve ikinci köy tüccarları |
+| Bridge   | 30 seviye silahlar +9        | Silahçı; bu aileler metinlerden çıkarılır |
 | Mid      | Mid base + upgrade / avg       | Metin 55–70 + stall                  |
 | Soft end | End base +9 avg                | 70–99 asıl fark                      |
 | Flex     | Spirit / sash / poly           | Haftalık, şart değil                 |
@@ -116,14 +122,36 @@ Dosyalar: `content/server/sql/seed_shop_refine_pet.sql`, `content/server/sql/upd
 
 ### Shop / drop matrisi (orta-kolay, 2026-10-17)
 
-**Kilit kural:** Early **+9** (welcome + NPC). Gereksiz ara silah/zırh **silindi**. Lv25+ sadece **küratörlü** base’ler metinde. Consumable bol → hızlı cas.
+**2026-10-20 kullanıcı revizyonu:** NPC silahları normal 25 ve altı +
+altı klasik 30 silah ailesi **+9**; dört sınıfın 18/26/34/42 gövdeleri +9;
+takılarda Abanoz/Yeşim tavanı (33), kask/kalkan 21 tavanı. 48+ gövdeler,
+üst takılar ve 65/70/75 silah edinimi mevcut farm hattında kalır.
+30 aileleri: Dolunay, Siyah Yaprak, Geyik Boynuzu, Kırmızı Demir, Antik Çan,
+Sonbahar Yelpazesi. Bu ailelerin +0…+9 sürümleri metinlerden çıkarılır;
+boss tabloları bu istekle topluca silinmez. İsimsiz/hiçbir sınıfın kullanamadığı
+6010 ailesi mağazaya eklenmez. Ortalama/beceri zararı doğal üretim kuralıyla gelir.
+Mağaza eşyalarına elle başlangıç bonusu veya sabit yüksek ortalama eklenmez.
+
+ShopEx, ana/ikinci köy silahçı ve zırhçılarını ayrı NPC kimlikleriyle aynı
+seçkiye bağlar: silah 3, zırh 3 sekme, market 1. Her sekme ilk 40 hücreye
+sığar. Fiyatlar satın al/sat döngüsünden Yang üretmez: en az ürün geri satışının
+2 katı (ekipman), 1,25 katı (sarf), ayrıca seçilen taban fiyat.
+İlk ücretsiz yüzük/dedektör/at kitabından ayrı, markette ücretli yedekleri vardır.
+BK, Ruh Taşı ve zindan anahtarları markete konmaz.
+
+Standart/at becerileri: sınıf grubu seçilince liderlik/madencilik/dönüşüm 40,
+kombo 2, diller 20, at çağırma 10, dört at saldırı becerisi 40. Ana sınıf
+becerileri değiştirilmez; BK → G → P hedefi korunur. Mevcut karakterler ve
+aynı oturumda grup değişimi de kapsanır. Yeni/eski karaktere kalıcı seviye 30
+askeri (zırhlı, saldırabilen) at ve 50053 çağırma kitabı bir defa verilir.
+Süreli 52034 bineği ve süresi değişmez. Atın klasik bakım/ölüm davranışı korunur.
 
 | Band           | Erişim                                                           | Ne kalır                                                                 |
 | -------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | Start          | `welcome`                                                        | Job +9 set                                                               |
-| Early NPC      | shop1 = **yalnız lv15 +9** + ok; shop2 = lv18 body + aks/helm +9 | ara basamak yok                                                          |
-| Late-early     | shop6/7 **+9** lv≤22                                             | FMS yok                                                                  |
-| Bridge 25–35   | metin                                                            | Silver / **FMS 290** / Hornbow / Lion plate / jade aks                   |
+| Early NPC      | Silahçı başlangıç, 20–25 ve 30+ok; zırhçı 18–42 gövdeler +9 | Sekmeler gerçek hücre sınırında |
+| Late-early     | İkinci köy silahçı/zırhçı aynı seçki | Ayrı NPC kimliği korunur |
+| Bridge 25–35   | NPC normal silah/takı ve 30 ortalamalı aileler +9 | Altı 30 silah ailesi metinlerden çıkarılır |
 | Mid 50–70      | metin                                                            | Flying Wizard, Rib, Unicorn… + Scale/Fog body **+0**                     |
 | Soft end 75–90 | metin + Lusifer sandığı                                           | metinde 65/70 silah ve 61/66 zırh; gerçek 75 silah ailesi Lusifer sandığında |
 | Flex           | stall / boss                                                     | spirit, sash, poly                                                       |
@@ -178,18 +206,19 @@ ilk girişte; mevcut karakterler yüzükleri yoksa sonraki girişte alır. Envan
 yüzük varsa ikinci kopya verilmez. Yer yoksa teslim sonraki girişe veya
 Satıcı (9003) üzerindeki teslim konuşmasına kalır. Başlangıç ekipmanı yeniden
 verilmez. Mevcut yüzüğün harita seçenekleri ve zindan giriş koşulları korunur.
-Silahçı, zırhçı ve marketin yeni içerikleri `docs/NPC_MAGAZA_TASARIMI.md` içinde öneridir;
-bu araştırma sırasında shop SQL'i değiştirilmez.
+Silahçı, zırhçı ve marketin uygulanan içerikleri `docs/NPC_CANLI_STOK.md` içinde;
+araştırma geçmişi `docs/NPC_MAGAZA_TASARIMI.md` içinde tutulur.
 
 | Shop | Satılan                                             |
 | ---- | --------------------------------------------------- |
-| 1    | Bamboo/Battle/… **lv15 +9** + ok (lv0/5/10 silindi) |
-| 2    | **lv18 body +9** + early helm/shield/aks +9         |
-| 6    | Broad/Scissor/… **lv20 +9** + ok                    |
-| 7    | helm/kalkan/aks ~lv22 +9                            |
+| 101–103 / 111–113 | Ana/ikinci köy silahçıları; başlangıç, 20–25, 30+ok |
+| 201–203 / 211–213 | Ana/ikinci köy zırhçıları; gövde, kask-kalkan, iç item |
+| 301 | Market; günlük sarf ve yüzük/dedektör/at kitabı yedekleri |
 | 11   | boş                                                 |
 
-SQL: `seed_shop_refine_pet.sql` + `update_mid_pvp_shop_plus9.sql`.
+Güncel kaynak: `shop_table_ex.txt` ve `20261020_npc_support.sql`.
+Eski 1/2/3/6/7 standart shop kayıtları aynı NPC'de ShopEx ile çakışmaması için
+silinir; diğer mağazalar korunur. Tarihî seed sonrası güncel migration uygulanır.
 
 ### Metin bereketi — 2026-10-20 (400 ≈ %100)
 

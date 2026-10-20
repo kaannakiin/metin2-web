@@ -1,6 +1,6 @@
 # Metin ve Boss Drop Rehberi — Anka2
 
-Tarih: **20 Ekim 2026** · Loot politikası: **v4**
+Tarih: **20 Ekim 2026** · Loot politikası: **v5**
 
 **Durum:** Bu rehber repodaki güncel loot verisini anlatır; tek başına canlı kurulum kanıtı değildir. Önceki malzeme ağırlıklı sandık özeti geçersizdir. Yayın adayının durumu [kurulum belgesinde](../platform/deploy/GAMEPLAY_RELEASE.md) takip edilir.
 
@@ -8,6 +8,8 @@ Tarih: **20 Ekim 2026** · Loot politikası: **v4**
 
 - **Lusifer Sandığı 65 / 70 / 75 silah içerir.** Altı gerçek 75 silahın her biri %5 (toplam %30), beş doğrulanmış 70 silahın her biri %3 (toplam %15), yedi 65 silah her biri %1 (toplam %7). Hepsi +0. Barones de 75 silahları doğrudan her biri %3 verir.
 - 85/90 metinlerden Zehir ve Orkide kaldırıldı. Diğer 75 silahlar da bu metin havuzuna eklenmedi.
+- Dolunay, Siyah Yaprak, Geyik Boynuzu, Kırmızı Demir, Antik Çan ve Sonbahar Yelpazesi +9 silahçıya taşındı. Bu altı 30 seviye ailenin +0…+9 sürümleri metin gruplarından çıkarıldı; boss grupları bu değişiklikle silinmedi.
+- Yang miktarı tavan altında öncekinin 4 katı; normal/premium mob_gold 400. 400.000 kill tavanı ve düşme/seviye kuralları aynı.
 - **Siam Bıçağı, Şeytani Pala, Yarı-İnsan Kılıç ve Mutluluk Yelpazesi 70 seviyedir.** Önceki özette 75 ailesiyle karıştırılmışlardı. Metinlerde kalırlar.
 - Havalı Çelik Yay **2170**; Geyik Boynuzu Yay **2150** ve 30 seviyedir. ID ve seviye ayrımı gerçek item_proto üzerinden denetlendi.
 - Diğer klasik boss sandıkları da artık silah ve zırh içerir; sadece tüketim malzemesi vermez.
@@ -97,12 +99,6 @@ Taşlar: Karanlık Metin (`8006`).
 | Kutsama Kağıdı | 25040 | — | 1 | 100% |
 | Efsun Nesnesi | 71084 | — | 15 | 60% |
 | Arttırma Kağıdı | 71085 | — | 8 | 60% |
-| Dolunay Kılıcı+0 | 290 | 30 | 1 | 3% |
-| Siyah Yaprak Hançeri+0 | 1170 | 30 | 1 | 3% |
-| Geyik Boynuzu Yay+0 | 2150 | 30 | 1 | 3% |
-| Kırmızı Demir Pala+0 | 3210 | 30 | 1 | 3% |
-| Antik Çan+0 | 5110 | 30 | 1 | 3% |
-| Sonbahar Yelpazesi+0 | 7160 | 30 | 1 | 3% |
 | Aslan Plaka Zırh+0 | 11230 | 26 | 1 | 2% |
 | Kırmızı Karınca Takım+0 | 11430 | 26 | 1 | 2% |
 | Hayalet Plaka Zırh+0 | 11630 | 26 | 1 | 2% |
@@ -121,12 +117,6 @@ Taşlar: Kıskançlık Metini (`8007`).
 | Kutsama Kağıdı | 25040 | — | 1 | 100% |
 | Efsun Nesnesi | 71084 | — | 15 | 60% |
 | Arttırma Kağıdı | 71085 | — | 8 | 60% |
-| Dolunay Kılıcı+0 | 290 | 30 | 1 | 3% |
-| Siyah Yaprak Hançeri+0 | 1170 | 30 | 1 | 3% |
-| Geyik Boynuzu Yay+0 | 2150 | 30 | 1 | 3% |
-| Kırmızı Demir Pala+0 | 3210 | 30 | 1 | 3% |
-| Antik Çan+0 | 5110 | 30 | 1 | 3% |
-| Sonbahar Yelpazesi+0 | 7160 | 30 | 1 | 3% |
 | Aslan Plaka Zırh+0 | 11230 | 26 | 1 | 2% |
 | Kırmızı Karınca Takım+0 | 11430 | 26 | 1 | 2% |
 | Hayalet Plaka Zırh+0 | 11630 | 26 | 1 | 2% |
@@ -150,12 +140,6 @@ Taşlar: Ruh Metini (`8008`); Gölge Metini (`8009`).
 | Kutsama Kağıdı | 25040 | — | 1 | 100% |
 | Efsun Nesnesi | 71084 | — | 15 | 60% |
 | Arttırma Kağıdı | 71085 | — | 8 | 60% |
-| Dolunay Kılıcı+0 | 290 | 30 | 1 | 3% |
-| Siyah Yaprak Hançeri+0 | 1170 | 30 | 1 | 3% |
-| Geyik Boynuzu Yay+0 | 2150 | 30 | 1 | 3% |
-| Kırmızı Demir Pala+0 | 3210 | 30 | 1 | 3% |
-| Antik Çan+0 | 5110 | 30 | 1 | 3% |
-| Sonbahar Yelpazesi+0 | 7160 | 30 | 1 | 3% |
 | Aslan Plaka Zırh+0 | 11230 | 26 | 1 | 2% |
 | Kırmızı Karınca Takım+0 | 11430 | 26 | 1 | 2% |
 | Hayalet Plaka Zırh+0 | 11630 | 26 | 1 | 2% |
@@ -1466,8 +1450,8 @@ Bu belge `python3 platform/tools/drop_catalogue.py` çıktısıdır. `python3 pl
 
 | Dosya | SHA-256 |
 |---|---|
-| `platform/gameplay/phase3_loot.json` | `2d6a657618bb3459649f0b4c60eca8c0ad8eaee517785c1f173574962c0ee1a9` |
-| `runtime/freebsd/share/locale/europe/mob_drop_item.txt` | `706a97a529576ed20cf9f1a16c39cddce767e21867567fc8358bf91083b890f5` |
+| `platform/gameplay/phase3_loot.json` | `39f7b35778e5f766428263aef3d994ecb0c6369bbee2985e89cff58e06ae51c4` |
+| `runtime/freebsd/share/locale/europe/mob_drop_item.txt` | `602de1740c4ed790245fb2cc98a96a199747b787ae5c87338b1019789e126630` |
 | `runtime/freebsd/share/locale/europe/special_item_group.txt` | `af4371b9ca4c88b5993e10d569848a228002c5ed55738dc868de2adeb7ffa288` |
 | `runtime/freebsd/share/conf/item_proto.txt` | `bc6ea5af8df343a71e518cd89bada151c3703d0924d135b3f46542649f7e5270` |
 | `runtime/freebsd/share/conf/mob_proto.txt` | `b66a8c263ce7c7d3426ff415d9563292c3fa8830f47d5973b4f16581a8387718` |

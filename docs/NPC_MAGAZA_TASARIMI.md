@@ -1,5 +1,10 @@
 # Silahçı, zırhçı ve market — ayrı NPC tasarımı
 
+Güncelleme: kullanıcı bu önerilerin uygulanmasını, ayrıca 30 seviye silahların
++9 satılıp metinlerden çıkarılmasını istedi. Kesin uygulanan seçki ve fiyatlar
+[NPC_CANLI_STOK.md](NPC_CANLI_STOK.md) içinde; aşağıdaki araştırmadaki
+“30 silahlar farmda kalsın” ve “henüz uygulanmadı” ifadeleri önceki önerilerdir.
+
 20 Ekim 2026. Hedef: klasik 1–99 orta-kolay; başlangıç rahat, üst ekipman farmda.
 **Mağaza tabloları öneridir; henüz shop SQL'ine veya canlı mağazalara uygulanmadı.**
 Işınlanma yüzüğünün başlangıç teslimi ise ayrı bir düzeltme olarak canlıdır.

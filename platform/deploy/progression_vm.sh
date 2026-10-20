@@ -9,6 +9,8 @@ locale=/usr/home/share/locale/europe
 names='deviltower_zone devilcatacomb_zone dragonlair spider_dungeon midpvp_progression'
 if test -f data-only; then names=''; fi
 if test -f starter-ring; then names='starter_ring'; fi
+if test -f npc-support; then names='starter_support'; fi
+if test -f support-only; then names='starter_support'; fi
 health() {
     ps -U metin2 -o command= | awk '
         { gsub(/^[ \t]+|[ \t]+$/, ""); sub(/ \(game\)$/, "") }
@@ -70,6 +72,9 @@ install_files() {
 }
 restore() {
     stop_game </dev/null >rollback-stop.log 2>&1 || return 1
+    if test -f DATABASE_CHANGED; then
+        mariadb player <previous-database.sql >rollback-database.log 2>&1 || return 1
+    fi
     remove_objects || return 1
     while IFS= read -r file; do rm -f "$locale/$file"; done <install-files.txt
     tar -xpf previous.tar -C "$locale" || return 1
@@ -84,7 +89,12 @@ prepare)
     tar -xzf payload.tar.gz
     if test -f data-only; then names=''; fi
     if test -f starter-ring; then names='starter_ring'; fi
+    if test -f npc-support; then names='starter_support'; fi
+    if test -f support-only; then names='starter_support'; fi
     while IFS= read -r file; do sha256 "$locale/$file"; done <expected-files.txt | cmp expected.sha256 -
+    if test -f new-files.txt; then
+        while IFS= read -r file; do test ! -e "$locale/$file"; done <new-files.txt
+    fi
     health
     if test -n "$names"; then
     mkdir compile
@@ -131,6 +141,31 @@ install)
     trap 'status=$?; trap - EXIT HUP INT TERM; restore || echo "ROLLBACK FAILED: operator required" >&2; exit "$status"' EXIT
     trap 'exit 130' HUP INT TERM
     stop_game </dev/null >install-stop.log 2>&1
+    if test -f npc-support; then
+        # Only the five legacy shop registrations and two global event flags.
+        # Players, inventories and all other quest flags are excluded.
+        {
+            echo 'USE player; START TRANSACTION;'
+            echo 'DELETE FROM shop_item WHERE shop_vnum IN (1,2,3,6,7);'
+            echo 'DELETE FROM shop WHERE vnum IN (1,2,3,6,7);'
+            echo "DELETE FROM quest WHERE dwPID=0 AND szName IN ('mob_gold','mob_gold_buyer');"
+            mariadb-dump --compact --skip-add-locks --no-create-info --skip-lock-tables player shop \
+                --where='vnum IN (1,2,3,6,7)'
+            mariadb-dump --compact --skip-add-locks --no-create-info --skip-lock-tables player shop_item \
+                --where='shop_vnum IN (1,2,3,6,7)'
+            mariadb-dump --compact --skip-add-locks --no-create-info --skip-lock-tables player quest \
+                --where="dwPID=0 AND szName IN ('mob_gold','mob_gold_buyer')"
+            echo 'COMMIT;'
+        } >previous-database.sql
+        test -s previous-database.sql
+        touch DATABASE_CHANGED
+        mariadb player <database.sql >install-database.log 2>&1
+        shop_count=$(mariadb -N -B player -e 'SELECT COUNT(*) FROM shop WHERE vnum IN (1,2,3,6,7)')
+        gold_query="SELECT COUNT(*) FROM quest WHERE dwPID=0 AND szName IN ('mob_gold','mob_gold_buyer') AND lValue=400"
+        gold_count=$(mariadb -N -B player -e "$gold_query")
+        test "$shop_count" = 0
+        test "$gold_count" = 2
+    fi
     remove_objects
     install_files
     service metin2 start </dev/null >install-start.log 2>&1
