@@ -1,5 +1,21 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### NPC araştırması ve başlangıç yüzüğü — 2026-10-20
+
+- Zırhçı/market ayrı incelendi. Canlı 9002/shop2 19, 9003/shop3 9 satır;
+  9008/shop7'de ek erken ekipman var. `docs/NPC_MAGAZA_TASARIMI.md` görsel
+  referans, doğrudan PvP mağaza kaynakları ve ayrı içerik önerilerini toplar.
+  Yeni shop içeriği/fiyatı henüz uygulanmadı; Abanoz/Yeşim tavanı öneridir.
+- 40004 `move_ring` canlı derlenmişti; başlangıç teslimi yoktu. Ayrı
+  `starter_ring` yeni ve mevcut karakterlerde bir defa teslim eder; mevcut
+  yüzüğü çoğaltmaz, envanter doluysa Satıcı konuşması veya sonraki girişe kalır.
+  `welcome` ekipmanı tekrar verilmez; yüzük menüsü ve zindan koşulları aynı.
+- **20261020-165717 canlı:** yalnız quest_list + yeni görev ve derlenmiş
+  namespace. Host `/home/m2web/progression-20261020-165717`, VM
+  `/usr/metin2-progression-20261020-165717`; previous.tar ve hash kayıtları var.
+  Gerçek VM qc derlemesi, dosya eşleşmesi, altı süreç/port sağlıklı. Oyun testi
+  yapılmadı. Client/engine/corpus ve mağaza SQL'i değişmedi.
+
 ### CANLI klasik zincirler ve loot v4 — 2026-10-20
 
 - Kullanıcı araştırmanın ardından doğrudan canlıya alınmasını istedi. Tasarım

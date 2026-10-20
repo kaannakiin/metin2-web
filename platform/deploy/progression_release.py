@@ -19,7 +19,9 @@ BASE_COMMIT = '8ae9aadb3'
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--install', action='store_true')
-    parser.add_argument('--spawns-only', action='store_true', help='Install only the two access-boss spawn timers')
+    scope = parser.add_mutually_exclusive_group()
+    scope.add_argument('--spawns-only', action='store_true', help='Install only the two access-boss spawn timers')
+    scope.add_argument('--starter-ring', action='store_true', help='Install only the one-time starter ring quest')
     args = parser.parse_args()
     release = datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')
     remote = '/home/m2web/progression-' + release
@@ -27,12 +29,17 @@ def main():
     files = ['mob_drop_item.txt', 'quest/quest_list'] + [
         'quest/quest_tr/_midpvp/' + name + '.lua' for name in NAMES]
     existing = ['mob_drop_item.txt', 'quest/quest_list']
+    baseline = BASE_COMMIT
+    if args.starter_ring:
+        files = ['quest/quest_list', 'quest/quest_tr/_midpvp/starter_ring.lua']
+        existing = ['quest/quest_list']
+        baseline = '52531594b'
     if args.spawns_only:
         files = ['map/metin2_map_spiderdungeon/boss.txt', 'map/metin2_map_skipia_dungeon_02/boss.txt']
         existing = list(files)
     expected = []
     for name in existing:
-        previous = subprocess.check_output(['git', 'show', BASE_COMMIT + ':runtime/freebsd/share/locale/europe/' + name], cwd=ROOT)
+        previous = subprocess.check_output(['git', 'show', baseline + ':runtime/freebsd/share/locale/europe/' + name], cwd=ROOT)
         if name == 'quest/quest_list':
             # Read-only live comparison found this optional reward quest absent.
             # Preserve the live selection instead of enabling unrelated rewards.
@@ -46,6 +53,8 @@ def main():
                     'expected-files.txt': '\n'.join(existing) + '\n', 'expected.sha256': ''.join(expected)}
         if args.spawns_only:
             metadata['data-only'] = 'access boss spawn timers\n'
+        if args.starter_ring:
+            metadata['starter-ring'] = 'one-time ring delivery\n'
         with tarfile.open(archive, 'w:gz') as output:
             for name in files:
                 output.add(LOCALE / name, arcname='input/' + name, recursive=False)

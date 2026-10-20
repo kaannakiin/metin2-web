@@ -1,5 +1,14 @@
 # Oyun paketi doğrulaması — 2026-10-20
 
+## Başlangıç yüzüğü — 20261020-165717
+
+`progression_release.py --starter-ring --install`: yalnız quest_list ve
+starter_ring kaynak/derlenmiş namespace. Baseline 52531594b, canlı kurulum
+tamamlandı. Host `/home/m2web/progression-20261020-165717`, VM
+`/usr/metin2-progression-20261020-165717`; önceki dosyalar previous.tar içinde.
+Gerçek qc derlemesi ve altı süreç/port kontrolü başarılı; oyun testi yapılmadı.
+Mağazaların yeni içerikleri araştırma önerisi olarak kaldı.
+
 ## Canlı klasik zincirler ve loot v4
 
 **20261020-153340**: beş gerçek qc görev derlemesi ve loot v4 kuruldu.

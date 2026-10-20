@@ -8,6 +8,7 @@ cd "$stage"
 locale=/usr/home/share/locale/europe
 names='deviltower_zone devilcatacomb_zone dragonlair spider_dungeon midpvp_progression'
 if test -f data-only; then names=''; fi
+if test -f starter-ring; then names='starter_ring'; fi
 health() {
     ps -U metin2 -o command= | awk '
         { gsub(/^[ \t]+|[ \t]+$/, ""); sub(/ \(game\)$/, "") }
@@ -82,6 +83,7 @@ prepare)
     sha256 -q payload.tar.gz | cmp payload.sha256 -
     tar -xzf payload.tar.gz
     if test -f data-only; then names=''; fi
+    if test -f starter-ring; then names='starter_ring'; fi
     while IFS= read -r file; do sha256 "$locale/$file"; done <expected-files.txt | cmp expected.sha256 -
     health
     if test -n "$names"; then
@@ -136,7 +138,7 @@ install)
     while IFS= read -r file; do cmp "input/$file" "$locale/$file"; done <install-files.txt
     touch INSTALLED
     trap - EXIT HUP INT TERM
-    echo 'INSTALLED: repeatable classic progression, guaranteed access materials and boss chests; six processes and ports healthy.'
+    echo 'INSTALLED: selected data and quest namespaces; six processes and ports healthy.'
     ;;
 *) exit 2 ;;
 esac

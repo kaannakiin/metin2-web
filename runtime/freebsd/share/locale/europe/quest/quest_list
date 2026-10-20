@@ -69,6 +69,7 @@ quest_tr/_npc_talk_mission/reset_status.quest
 quest_tr/_npc_talk_mission/socket_clean_stone_plus.lua
 quest_tr/_npc_talk_mission/upgrade_refine_scroll.quest
 quest_tr/_npc_talk_mission/welcome.lua
+quest_tr/_midpvp/starter_ring.lua
 quest_tr/_openwindow/acce_mission.lua
 quest_tr/_openwindow/arboreal_craft.lua
 quest_tr/_openwindow/mining.lua

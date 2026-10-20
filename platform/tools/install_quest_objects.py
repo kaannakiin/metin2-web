@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sync compiled build artifacts for the five owned progression quest namespaces."""
+"""Sync compiled build artifacts for the selected owned quest namespaces."""
 import argparse
 from pathlib import Path, PurePosixPath
 import tarfile
@@ -16,7 +16,11 @@ def owned(name):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('archive', type=Path)
+    parser.add_argument('--starter-ring', action='store_true', help='Sync only the starter ring build')
     args = parser.parse_args()
+    if args.starter_ring:
+        NAMES.clear()
+        NAMES.add('starter_ring')
     outputs = {}
     with tarfile.open(args.archive) as archive:
         for member in archive.getmembers():
@@ -40,7 +44,7 @@ def main():
     for path, data in outputs.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
-    print('Synced %d compiled artifacts across five quest namespaces' % len(outputs))
+    print('Synced %d compiled artifacts across %d quest namespaces' % (len(outputs), len(NAMES)))
 
 
 if __name__ == '__main__':

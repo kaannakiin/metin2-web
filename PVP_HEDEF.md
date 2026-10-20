@@ -171,6 +171,16 @@ tamamlanmış mevcut karakterlerin eşyaları otomatik yeniden yazılmaz.
 
 ### NPC (trim)
 
+#### Başlangıç ulaşımı — 2026-10-20
+
+Her karaktere bir defa **1 × Işınlanma Yüzüğü (40004)** verilir. Yeni karakterler
+ilk girişte; mevcut karakterler yüzükleri yoksa sonraki girişte alır. Envanterde
+yüzük varsa ikinci kopya verilmez. Yer yoksa teslim sonraki girişe veya
+Satıcı (9003) üzerindeki teslim konuşmasına kalır. Başlangıç ekipmanı yeniden
+verilmez. Mevcut yüzüğün harita seçenekleri ve zindan giriş koşulları korunur.
+Zırhçı ve marketin yeni içerikleri `docs/NPC_MAGAZA_TASARIMI.md` içinde öneridir;
+bu araştırma sırasında shop SQL'i değiştirilmez.
+
 | Shop | Satılan                                             |
 | ---- | --------------------------------------------------- |
 | 1    | Bamboo/Battle/… **lv15 +9** + ok (lv0/5/10 silindi) |

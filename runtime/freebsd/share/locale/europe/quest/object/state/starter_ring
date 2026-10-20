@@ -1,0 +1,14 @@
+starter_ring={["start"]=0,["__COMPLETE__"]=668443392,deliver= function ()if pc . count_item ( 40004 ) > 0 then 
+set_state ( "__COMPLETE__" ) 
+return 
+end 
+if pc . get_empty_inventory_count ( ) < 1 then 
+syschat ( "Isinlanma yuzugu icin envanterinde bir yer ac. Saticidan teslim alabilirsin." ) 
+return 
+end 
+pc . give_item2 ( 40004 , 1 ) 
+if pc . count_item ( 40004 ) > 0 then 
+set_state ( "__COMPLETE__" ) 
+syschat ( "Isinlanma yuzugun envanterine eklendi. Sag tiklayarak kullanabilirsin." ) 
+end 
+end }
