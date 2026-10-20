@@ -285,23 +285,24 @@ aynı adı paylaşmaz.
 
 #### Açık dünya metin yoğunluğu — 2026-10-20
 
-Kullanıcı kararı: mevcut bölgelerde yaklaşık **2 kat metin**. Mevcut doğma
-bölgeleri ve yeniden doğma süreleri korunur. Her mevcut metin kaydının bir
-bağımsız kopyası eklenir; kayıt başına `max_count=1` kalır. Böylece RESP
-takibinde iki taş aynı regen kimliğini paylaşmaz. Aynı bölge içinde motor
+Kullanıcı kararı: başlangıca göre **4 kat metin**, yeniden doğma süreleri
+başlangıcın **yarısı** (kesirli saniyeler yukarı yuvarlanır). Mevcut doğma
+bölgeleri korunur. Her başlangıç metin kaydının üç bağımsız kopyası eklenir;
+kayıt başına `max_count=1` kalır. Böylece RESP
+takibinde taşlar aynı regen kimliğini paylaşmaz. Aynı bölge içinde motor
 her taş için ayrı rastgele konum seçer; arazi engelleri gerçek sayıyı etkileyebilir.
 
-| Harita | Mevcut metin kapasitesi | Yeni kapasite |
+| Harita | Başlangıç metin kapasitesi | Yeni kapasite |
 | --- | ---: | ---: |
-| Shinsoo / Chunjo / Jinno 1. köy (1 / 21 / 41) | 12 / 12 / 12 | 24 / 24 / 24 |
-| Shinsoo / Chunjo / Jinno 2. köy (3 / 23 / 43) | 10 / 9 / 10 | 20 / 18 / 20 |
-| Seungryong (64) | 3 | 6 |
-| Yongbi Çölü (63) | 10 | 20 |
-| Sohan (61) | 5 | 10 |
-| Doyyum (62) | 4 | 8 |
-| Hayalet Orman / Kızıl Orman (67 / 68) | 4 / 4 | 8 / 8 |
-| `metin2_map_nusluck01` (70) | 2 | 4 |
-| **Toplam — 13 harita** | **97** | **194** |
+| Shinsoo / Chunjo / Jinno 1. köy (1 / 21 / 41) | 12 / 12 / 12 | 48 / 48 / 48 |
+| Shinsoo / Chunjo / Jinno 2. köy (3 / 23 / 43) | 10 / 9 / 10 | 40 / 36 / 40 |
+| Seungryong (64) | 3 | 12 |
+| Yongbi Çölü (63) | 10 | 40 |
+| Sohan (61) | 5 | 20 |
+| Doyyum (62) | 4 | 16 |
+| Hayalet Orman / Kızıl Orman (67 / 68) | 4 / 4 | 16 / 16 |
+| `metin2_map_nusluck01` (70) | 2 | 8 |
+| **Toplam — 13 harita** | **97** | **388** |
 
 Yalnız bu haritalardaki 8001–8027 metin kayıtları değiştirilir. Madenler,
 normal yaratıklar, bosslar, zindan/etkinlik kayıtları ve 100+ haritalar aynı kalır.

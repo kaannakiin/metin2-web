@@ -1,85 +1,222 @@
 {
-  "version": 1,
-  "multiplier": 2,
+  "version": 2,
+  "multiplier": 4,
   "base_release": "20261019-213727",
   "maps": [
     {
       "path": "map/metin2_map_a1/stone.txt",
       "baseline_sha256": "53c2e4293179f9e6e01419cb64c62cd686a3c114ca5490ef74e7e314167beb6b",
       "base_capacity": 12,
-      "added_records": 12
+      "added_records": 36,
+      "baseline_respawn": [
+        "2000s",
+        "1800s",
+        "1700s",
+        "1850s",
+        "1700s",
+        "1650s",
+        "1950s",
+        "1850s",
+        "2000s",
+        "1550s",
+        "2550s",
+        "1050s"
+      ],
+      "previous_sha256": "c14eb506e1384d143c4a24361a9020c5c33740169dc54e751f4f2bb8e1cdf9a3"
     },
     {
       "path": "map/metin2_map_b1/stone.txt",
       "baseline_sha256": "64b4e20e737e5274eeb96c0246cf88883c26514b174f3ead6b136b105f37d4db",
       "base_capacity": 12,
-      "added_records": 12
+      "added_records": 36,
+      "baseline_respawn": [
+        "1850s",
+        "1900s",
+        "1750s",
+        "1650s",
+        "1700s",
+        "1650s",
+        "1750s",
+        "1800s",
+        "2200s",
+        "1550s",
+        "1950s",
+        "1800s"
+      ],
+      "previous_sha256": "234f56b620f8adba59a98b0f2d310d1540b0d3826bc6e1bbc9fda1e1b9745008"
     },
     {
       "path": "map/metin2_map_c1/stone.txt",
       "baseline_sha256": "52da993a0b7493548f0f5925b756bf2c411bc613829089deea9c4506aa0a8811",
       "base_capacity": 12,
-      "added_records": 12
+      "added_records": 36,
+      "baseline_respawn": [
+        "1800s",
+        "1700s",
+        "1600s",
+        "1500s",
+        "1900s",
+        "1850s",
+        "1750s",
+        "1650s",
+        "2100s",
+        "1650s",
+        "1950s",
+        "2050s"
+      ],
+      "previous_sha256": "0e1ebed4d8ed856e022d8aa8ad11b616e34fcc73753819e25e30625ae4f2737c"
     },
     {
       "path": "map/metin2_map_a3/stone.txt",
       "baseline_sha256": "ba38ef1883c3b50878b607490506b4ebcab48f1a52e1a56da77e00edad427d75",
       "base_capacity": 10,
-      "added_records": 10
+      "added_records": 30,
+      "baseline_respawn": [
+        "900s",
+        "875s",
+        "850s",
+        "825s",
+        "800s",
+        "775s",
+        "750s",
+        "1000s",
+        "900s",
+        "800s"
+      ],
+      "previous_sha256": "1dc61525fc12c90b0d3145fd72206533cb7620dec043024795b77f308758b809"
     },
     {
       "path": "map/metin2_map_b3/stone.txt",
       "baseline_sha256": "5709db9a14e4391ab47257f04129059ed8ebdb74dc9be4f307b0aee9e02deaaf",
       "base_capacity": 9,
-      "added_records": 9
+      "added_records": 27,
+      "baseline_respawn": [
+        "900s",
+        "875s",
+        "850s",
+        "825s",
+        "800s",
+        "775s",
+        "1000s",
+        "900s",
+        "800s"
+      ],
+      "previous_sha256": "868d3aa43b8cb81f9ec53f3e8f1fc009dcb05d18a12adcd2918a93c0d85c7574"
     },
     {
       "path": "map/metin2_map_c3/stone.txt",
       "baseline_sha256": "dc13d7f30ecbd0d4c51548983db3133119978773103a8bf75328965882b23da9",
       "base_capacity": 10,
-      "added_records": 10
+      "added_records": 30,
+      "baseline_respawn": [
+        "900s",
+        "875s",
+        "850s",
+        "825s",
+        "800s",
+        "775s",
+        "750s",
+        "1000s",
+        "900s",
+        "800s"
+      ],
+      "previous_sha256": "a0d1fb1fbe97b4753f26a954aa7cf15f09305e37adc003b7e012bcffdf8fd1ba"
     },
     {
       "path": "map/map_n_threeway/stone.txt",
       "baseline_sha256": "e1049af09c32cbd6d0f682341ba754d77669d5a1d2e03cb94c873cc91fafccd4",
       "base_capacity": 3,
-      "added_records": 3
+      "added_records": 9,
+      "baseline_respawn": [
+        "1800s",
+        "1700s",
+        "1600s"
+      ],
+      "previous_sha256": "f7c4902089fc643e09126c592fa8b01d6bea4483ac8f6393c335ff6e0c84186e"
     },
     {
       "path": "map/metin2_map_n_desert_01/stone.txt",
       "baseline_sha256": "15fcb9dc875f06ed2d437d1d70fe71d0267a515bed960ba94fef9200256b5329",
       "base_capacity": 10,
-      "added_records": 10
+      "added_records": 30,
+      "baseline_respawn": [
+        "1900s",
+        "1800s",
+        "1100s",
+        "1000s",
+        "1600s",
+        "1500s",
+        "1850s",
+        "1050s",
+        "1150s",
+        "1650s"
+      ],
+      "previous_sha256": "57bfc449bb3c9651b5b092ebf5b9861f47bede9cc93ea53dd8c7e5bd78e29168"
     },
     {
       "path": "map/map_n_snowm_01/stone.txt",
       "baseline_sha256": "cf4dcb4773720579a4cca9b7816a0cfc48262fb660b98793adb06aed6f71c479",
       "base_capacity": 5,
-      "added_records": 5
+      "added_records": 15,
+      "baseline_respawn": [
+        "1800s",
+        "1700s",
+        "1600s",
+        "1500s",
+        "1900s"
+      ],
+      "previous_sha256": "433a78a8af0a4d789699ac197ee917c38123087c758d09e5d9d23de8ae7ebc20"
     },
     {
       "path": "map/metin2_map_n_flame_01/stone.txt",
       "baseline_sha256": "28bf47843df4d0a51247663bd0113eaf7bcfbbd5543cd16dca2196d456e5e8fe",
       "base_capacity": 4,
-      "added_records": 4
+      "added_records": 12,
+      "baseline_respawn": [
+        "1800s",
+        "1950s",
+        "1750s",
+        "1700s"
+      ],
+      "previous_sha256": "aca9274b13c7fb6a0de646cd3d9032c5fb986bcc2ae5618bbb596b96bd51348e"
     },
     {
       "path": "map/metin2_map_trent/stone.txt",
       "baseline_sha256": "dbb774586af4d894d64adc093e4d4c02185d8f9efc1118c61430e29c162f7c2b",
       "base_capacity": 4,
-      "added_records": 4
+      "added_records": 12,
+      "baseline_respawn": [
+        "3650s",
+        "3650s",
+        "3600s",
+        "3750s"
+      ],
+      "previous_sha256": "a8f33bae542d9014f3aa318524f0f5e0d5fa8f9d71e0c38dc8ec636c4ef2c6e0"
     },
     {
       "path": "map/metin2_map_trent02/stone.txt",
       "baseline_sha256": "a00b23affaf73272c99aee3cac94a261324555b01d6b1e456df19561ef0e9ce5",
       "base_capacity": 4,
-      "added_records": 4
+      "added_records": 12,
+      "baseline_respawn": [
+        "1660s",
+        "1660s",
+        "1910s",
+        "1910s"
+      ],
+      "previous_sha256": "ba0cdbffcca48c6dd1802a3c94a389885971c5661b17ad5e7573ca87896101fa"
     },
     {
       "path": "map/metin2_map_nusluck01/stone.txt",
       "baseline_sha256": "527ea2a7eb602ffead434fc50f3fe2b94928d36c023ca2a5fbec874bbf9894a2",
       "base_capacity": 2,
-      "added_records": 2
+      "added_records": 6,
+      "baseline_respawn": [
+        "3600s",
+        "3700s"
+      ],
+      "previous_sha256": "c1c55ac7fc767551c21cf6052ba7e87d0c4cdcc53d74a543cfc91ac7ef7cb8d2"
     }
-  ]
+  ],
+  "respawn_multiplier": 0.5
 }

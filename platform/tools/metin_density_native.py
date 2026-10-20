@@ -56,8 +56,8 @@ int main(int argc, char** argv) {
         }
         std::fclose(input);
     }
-    if (argc != 14 || count != 194 || ids.size() != 194) return 5;
-    std::puts("SERVER REGEN PARSER: 13 maps, 194 Metins, 194 distinct RESP ids; timers and spawn areas valid PASS");
+    if (argc != 14 || count != 388 || ids.size() != 388) return 5;
+    std::puts("SERVER REGEN PARSER: 13 maps, 388 Metins, 388 distinct RESP ids; timers and spawn areas valid PASS");
 }
 '''
     compiler = shutil.which('clang++') or shutil.which('c++')

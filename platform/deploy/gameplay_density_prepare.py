@@ -18,6 +18,9 @@ spec.loader.exec_module(density)
 
 
 def main():
+    policy = json.loads((ROOT / 'platform/gameplay/metin_density.json').read_text())
+    if policy['version'] != 1:
+        raise SystemExit('Historical v1 candidate only; use density_release.py for v2 live updates')
     report = density.check()
     release = report['base_release']
     if not re.fullmatch(r'\d{8}-\d{6}', release):

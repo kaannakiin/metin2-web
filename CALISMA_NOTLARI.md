@@ -1,5 +1,22 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### Metin yoğunluğu 4× / yarım süre — 2026-10-20
+
+- Kullanıcı 2× sayıyı az buldu; başlangıca göre 4× metin ve daha kısa yeniden
+  doğma süresi istedi. Sayılar önce `PVP_HEDEF.md`'ye işlendi.
+- 13 açık dünya haritasında kapasite 194 → 388 (ilk baseline 97). İlk süreler
+  yarıya indirildi; kesirli saniyeler yukarı yuvarlandı. Bölgeler, taş türleri,
+  maden kayıtları ve kayıt başına `max_count=1` korundu.
+- Politika `metin_density.json` v2; denetleyici başlangıç SHA'sını eski süreleri
+  geri koyarak doğrular. Yeni bakım yolu `python3 platform/deploy/density_release.py --install`:
+  sadece 13 `stone.txt`, canlı 2× SHA eşleşmesi, yedek, geri alma ve servis
+  süreç/port koşulları. Yeni client build veya oyun/regresyon testi yok.
+- **Canlı:** `20261020-140835` kuruldu. Host kayıtları
+  `/home/m2web/density-20261020-140835`, VM kayıt/yedeği
+  `/usr/metin2-density-20261020-140835/previous`. İki uçta `INSTALLED`.
+  Canlı 2× dosya hash'leri kurulum öncesinde eşleşti; kurulum sonrası 13 dosya
+  adayla aynı, altı servis süreci ve altı port sağlıklı. Oyun testi kullanıcıda.
+
 ### CANLI — loot v3, wiki boss omurgası ve web tuşları (2026-10-20)
 
 Kullanıcı bu tur açıkça “hepsini canlıya al, main'e commit et, test etme; ben

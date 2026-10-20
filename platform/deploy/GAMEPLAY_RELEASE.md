@@ -1,5 +1,21 @@
 # Oyun paketi doğrulaması — 2026-10-20
 
+## Metin yoğunluğu 4× / yarım süre
+
+**Canlı sürüm: `20261020-140835`.** Güncel politika `platform/gameplay/metin_density.json` v2: 13 haritada ilk
+97 kapasite yerine 388; ilk yeniden doğma süreleri yarıya iner (yukarı saniyeye
+yuvarlanır). Önceki 2× canlı kapasite 194'tü. Bölgeler ve metin türleri korunur.
+
+Yeni bağımsız bakım yolu: `python3 platform/deploy/density_release.py --install`.
+13 dosyanın canlı 2× SHA'sı eşleşmeden kurulmaz; önce VM üzerinde yedek alınır.
+Kurulum yalnız `map/*/stone.txt` dosyalarını değiştirip Metin2 servisini yeniden
+başlatır. Hata halinde önceki dosyalar geri yüklenir. Client/corpus yeniden
+derlenmez. Yeni oyun veya regresyon testi çalıştırılmadı.
+
+Geri alma: host üzerinden VM'de `sh /usr/metin2-density-<sürüm>/density_install_vm.sh rollback /usr/metin2-density-<sürüm>`.
+Canlı kurulum sonucu `CALISMA_NOTLARI.md` içinde tutulur. Aşağıdaki 2× sayıları
+önceki dondurulmuş sürümün tarihsel kaydıdır.
+
 ## Canlı — loot v3 / 20261020-134850
 
 **KURULDU.** Kullanıcı açıkça canlı kurulumu ve main commit'ini istedi; oyun

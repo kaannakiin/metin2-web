@@ -123,7 +123,7 @@ def render():
     put('- Diğer klasik boss sandıkları da artık silah ve zırh içerir; sadece tüketim malzemesi vermez.')
     put('- Önceki rehberde ayrı dengeleme bekleyen 10 klasik bossun tamamına özel loot eklendi. '
         'Azrail kendi sandığını verir; Barones/Cadı/Ağaç bossları/Kharoon doğrudan düşürür.')
-    put('- Harita, spawn noktası, mevcut 2× metin yoğunluğu, respawn, exp ve zindan mekaniği değiştirilmedi.')
+    put('- Haritalar ve doğma bölgeleri korunur; metin yoğunluğu başlangıcın 4 katı, yeniden doğma süreleri yarısıdır. Exp ve zindan mekaniği değiştirilmedi.')
     put()
     put('## 2. Oranlar nasıl okunur?')
     put()

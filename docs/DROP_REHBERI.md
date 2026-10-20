@@ -12,7 +12,7 @@ Tarih: **20 Ekim 2026** · Loot politikası: **v3**
 - Havalı Çelik Yay **2170**; Geyik Boynuzu Yay **2150** ve 30 seviyedir. ID ve seviye ayrımı gerçek item_proto üzerinden denetlendi.
 - Diğer klasik boss sandıkları da artık silah ve zırh içerir; sadece tüketim malzemesi vermez.
 - Önceki rehberde ayrı dengeleme bekleyen 10 klasik bossun tamamına özel loot eklendi. Azrail kendi sandığını verir; Barones/Cadı/Ağaç bossları/Kharoon doğrudan düşürür.
-- Harita, spawn noktası, mevcut 2× metin yoğunluğu, respawn, exp ve zindan mekaniği değiştirilmedi.
+- Haritalar ve doğma bölgeleri korunur; metin yoğunluğu başlangıcın 4 katı, yeniden doğma süreleri yarısıdır. Exp ve zindan mekaniği değiştirilmedi.
 
 ## 2. Oranlar nasıl okunur?
 

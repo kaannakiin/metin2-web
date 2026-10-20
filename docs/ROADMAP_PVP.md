@@ -103,7 +103,10 @@ Offline: beş `mid_pvp_*.py` yeşil. **Karşılandı (repo).** Canlı: VM_MID_PV
 paketi canlıda. Yeni revizyon: klavye toplama ve binek saldırısı düzeltmesi;
 6/10/12/14 BK, okuma malzemeleri, kademeli ruh taşı ve klasik boss sandıkları.
 `platform/gameplay/phase3_loot.json` sayıların makine tarafından doğrulanan kopyası;
-asıl tasarım kilidi `PVP_HEDEF.md`. Mevcut harita, spawn ve respawn akışı korunur.
+asıl tasarım kilidi `PVP_HEDEF.md`. Haritalar ve doğma bölgeleri korunur.
+Son kullanıcı kararı: metin sayısı başlangıcın 4 katı, yeniden doğma süreleri yarısı;
+13 haritada toplam kapasite 388, `20261020-140835` ile canlıda.
+Sayılar `metin_density.json` v2 içinde.
 Loot v3 ve web tuş düzeltmeleri **20261020-134850 ile canlıya kuruldu**.
 Kullanıcı oyun kabulünü üstlendi; bu tur yeni test çalıştırılmadı. Kayıt ve yedekler
 `platform/deploy/GAMEPLAY_RELEASE.md` içinde. Boss notice/izleme ve zindan
