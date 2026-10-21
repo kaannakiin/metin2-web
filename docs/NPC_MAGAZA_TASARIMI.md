@@ -1,5 +1,9 @@
 # Silahçı, zırhçı ve market — ayrı NPC tasarımı
 
+Son kullanıcı revizyonu: her satıcı tek sayfa. Silahlar başlangıç/15/30,
+zırhlar başlangıç/34/48 +9 ve azaltılmış kask/kalkan/takı seçkisi.
+Kesin güncel stok [NPC_CANLI_STOK.md](NPC_CANLI_STOK.md) içindedir.
+
 21 Ekim düzeltmesi: aktif mağaza kaynağı `shopex` / `shopex_item` SQL tablolarıdır.
 Dosya tabanlı eski stok yolu kaldırıldı. Kesin stok ve fiyat kaynağı
 `npc_profile.py stock()`; aşağıdaki kısım tarihî araştırmadır.

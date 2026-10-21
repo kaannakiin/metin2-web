@@ -1,5 +1,21 @@
 # Oyun paketi doğrulaması — 2026-10-21
 
+## Silahçı/zırhçı tek sayfa — 20261021-085048
+
+`progression_release.py --npc-stock --install`: silahçı 9001/9007 yalnız
+başlangıç/15/30 +9 ve normal ok; zırhçı 9002/9008 başlangıç/34/48 +9 ile
+azaltılmış kask/kalkan/takı seçkisi. İstenen 49 zırh ailesi protoda 48'dir;
+başlangıçların proto sınırı 0. Her NPC tek sayfa; market 17 ürünüyle aynı.
+
+Silahçı 18 ürün/30 hücre, zırhçı 25 ürün/37 hücre. Yerleşim gerçek item_vnum
+yükleme sırasıyla kontrol edildi. Aktif beş sayfa/103 ürün; sahip olunan 13
+kimliğin tamamı SQL temizliği ve doğrulamada tarandı. Eski sekmeler kalmadı.
+Yeni profil tüm fiyat/adet/para türü/soket/efsunlarıyla birebir eşleşti;
+altı süreç/port sağlıklı. Oyun testi yapılmadı.
+
+VM `/usr/metin2-progression-20261021-085048`; önceki 13 sayfa/169 ürün
+`previous-database.sql` içinde. Görev, binary, drop, Yang ve istemci değişmedi.
+
 ## Harita bazlı Yang — 20261021-081923
 
 `progression_release.py --map-yang --install`: onaylı 17 haritanın normal

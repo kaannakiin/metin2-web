@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 LOCALE = ROOT / 'runtime/freebsd/share/locale/europe'
 WEAPONS_30 = [299, 1179, 2159, 3219, 5119, 7169]
 BASES_30 = [v - 9 for v in WEAPONS_30]
+OWNED_SHOPS = (101, 102, 103, 111, 112, 113, 201, 202, 203, 211, 212, 213, 301)
 P = catalogue.proto('item')
 
 
@@ -29,20 +30,15 @@ def entries(ids, minimum, count=1):
 
 
 def stock():
-    early = entries([49, 1019, 2039, 3039, 5019, 7039], 25000)
-    normal = entries([59, 1029, 2049, 3049, 5029, 7049], 75000)
-    normal += entries([69, 4029, 2059, 3059, 7059], 150000)
-    weapons30 = entries(WEAPONS_30, 500000)
-    weapons30 += entries([8000, 8001, 8002, 8003, 8004, 8005], 1000, 200)
+    weapons = entries([19, 1009, 2009, 3009, 7009], 10000)
+    weapons += entries([49, 4019, 2039, 3039, 5019, 7039], 25000)
+    weapons += entries(WEAPONS_30, 500000)
+    weapons += entries([8000], 1000, 200)
     bodies = []
-    for offset, price in [(29, 50000), (39, 125000), (49, 250000), (59, 500000)]:
+    for offset, price in [(9, 25000), (49, 250000), (69, 750000)]:
         bodies += entries([base + offset for base in [11200, 11400, 11600, 11800]], price)
-    defensive = entries([12209, 12349, 12489, 12629, 13009], 25000)
-    defensive += entries([12229, 12369, 12509, 12649, 13029], 75000)
-    jewels = entries([14009, 14029, 14049, 14069, 14089,
-                      16009, 16029, 16049, 16069, 16089,
-                      17009, 17029, 17049, 17069, 17089, 17109,
-                      15009, 15029, 15049, 15069, 15089], 25000)
+    defensive = entries([12229, 12369, 12509, 12649, 13029], 75000)
+    jewels = entries([14009, 14089, 16009, 16089, 17009, 17109, 15009, 15089], 25000)
     market = entries([27001, 27002, 27004, 27005], 1000, 50)
     market += entries([27003, 27006], 10000, 200)
     market += entries([72725, 72729], 100000)
@@ -53,19 +49,15 @@ def stock():
     market += entries([50053], 10000)
     tabs = []
     for npc, base in [(9001, 100), (9007, 110)]:
-        tabs += [(npc, base + 1, 'Baslangic', early),
-                 (npc, base + 2, '20-25 Silah', normal),
-                 (npc, base + 3, '30 Silah-Ok', weapons30)]
+        tabs += [(npc, base + 1, 'Silahlar', weapons)]
     for npc, base in [(9002, 200), (9008, 210)]:
-        tabs += [(npc, base + 1, 'Zirhlar', bodies),
-                 (npc, base + 2, 'Kask-Kalkan', defensive),
-                 (npc, base + 3, 'Ic Itemler', jewels)]
+        tabs += [(npc, base + 1, 'Zirhlar', bodies + defensive + jewels)]
     tabs += [(9003, 301, 'Market', market)]
     for npc, shop, name, rows in tabs:
         # ShopEx's 5x9 grid writes into a 40-entry packet. Keep every placed
         # cell inside the safe first 40 cells, not just the total item count.
         grid = [False] * 40
-        for vnum, count, price in rows:
+        for vnum, count, price in sorted(rows):
             height = int(P[vnum]['Size'])
             positions = [[pos + 5 * y for y in range(height)] for pos in range(40)]
             cells = next((cells for cells in positions if cells[-1] < 40 and
@@ -118,7 +110,8 @@ COMMIT;
 
 def shop_inserts():
     tabs = stock()
-    ids = ','.join(str(tab[1]) for tab in tabs)
+    # Retired tabs are owned too: remove them so they cannot remain visible.
+    ids = ','.join(map(str, OWNED_SHOPS))
     lines = ['DELETE FROM shopex_item WHERE shop_vnum IN (%s);' % ids,
              'DELETE FROM shopex WHERE vnum IN (%s);' % ids,
              'INSERT INTO shopex (vnum,name,npc_vnum) VALUES']
@@ -145,7 +138,7 @@ def snapshot():
 
 
 def snapshot_sql():
-    ids = ','.join(str(tab[1]) for tab in stock())
+    ids = ','.join(map(str, OWNED_SHOPS))
     attrs = ','.join('attrtype%d,attrvalue%d' % (i, i) for i in range(7))
     return (
         "SELECT 'S',vnum,name,npc_vnum FROM shopex WHERE vnum IN (%s) ORDER BY vnum;\n"
@@ -168,7 +161,9 @@ def report():
     names = catalogue.read_names('item', 'tr')
     lines = ['# NPC stokları — uygulanan orta-kolay profil', '',
              'Silahçı 9001 ve 9007 aynı seçki; zırhçı 9002 ve 9008 aynı seçki.',
-             'Her NPC kendi sekmelerini açar. Market 9003 ayrı kalır.',
+             'Her NPC tek sayfa açar; Market 9003 ayrı kalır.',
+             'Silahlar 1/15/30; gövde zırhları 1/34/48 +9. Başlangıç proto sınırı 0’dır.',
+             'Azaltılmış kask/kalkan/takılar zırhlarla aynı sayfadadır.',
              'Fiyatlar paket toplamıdır; standart geri satıştan yüksektir.', '',
              '30 seviye altı klasik silah ailesi yalnız +9 stoklanır. Ortalama/beceri',
              'zararı mevcut doğal üretim kuralından gelir; sabit yüksek ortalama basılmaz.',

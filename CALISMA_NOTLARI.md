@@ -1,5 +1,28 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### Silahçı/zırhçı tek sayfa — 2026-10-21
+
+- Kullanıcı gizli sekmeleri ve ara seviyeleri istemedi. Silahlar yalnız
+  başlangıç/15/30 +9; zırhlar başlangıç/34/48 +9. İstenen 49 aile seviyesi
+  gerçek protoda 48. Başlangıçların proto sınırı 0; ilk seviyede kullanılabilir.
+  Kask/kalkan/takıların azaltılmış seçkisi kullanıcı tarafından ayrıca onaylandı.
+- Silahçı: beş başlangıç ailesi, altı 15 ve altı 30 ailesi, 200 normal ok.
+  Başlangıç çanı yok; 15 hançeri gerçek 4019, önceki 1019 ise 10 seviyedir.
+  Zırhçı: 12 gövde, dört 21 kaskı ve Beşgen Kalkan, sekiz takı/ayakkabı.
+  Ana/ikinci köy aynı seçkide ve her NPC tek sayfa. Market 17 ürünüyle aynı.
+- Gerçek DB item_vnum sırasındaki yerleşim: silahçı 18 ürün/30 hücre,
+  zırhçı 25 ürün/37 hücre. Toplam beş sayfa/103 ürün. +9, doğal ortalama
+  üretimi ve geri satıştan yüksek fiyat ilkeleri korunur.
+- Sabit sahip olunan 13 shop kimliğiyle eski sekmeler SQL'den temizlenir;
+  doğrulama sorgusu emekli sekmeleri de tarar. Böylece yalnız yeni beş kaydı
+  kontrol edip eski gizli sekmeleri yanlışlıkla canlı bırakmaz.
+  Tam/onarım SQL, fresh seed ve oyuncu stok rehberi tek kaynaktan yenilendi.
+  Yayın `--npc-stock`; görev/binary/istemci/drop/Yang değişikliği yok.
+- Canlı sürüm `20261021-085048`: beş sayfa/103 ürün kurulum içinde tüm
+  fiyat/adet/efsun/soketleriyle birebir doğrulandı; altı süreç/port sağlıklı.
+  Önceki 13 sayfa/169 ürün aynı VM sürüm dizininde `previous-database.sql`
+  içinde. Oyun içi pencere/satın alma testi kullanıcıda.
+
 ### Harita bazlı Yang tabanları — 2026-10-21
 
 - Kullanıcı harita bazlı normal yaratık/metin aralıklarını onayladı; kesin tablo

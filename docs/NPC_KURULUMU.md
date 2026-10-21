@@ -6,6 +6,12 @@ Kanonik stok: `platform/tools/npc_profile.py stock()`. Dosya mağazası, eski
 shop +9/trim SQL dosyaları ve tek seferlik NPC yayın betikleri kaldırıldı.
 Diğer NPC'lerin standart shop kayıtları korunur.
 
+21 Ekim tek sayfa profili: 101/111 silahçı, 201/211 zırhçı, 301 market.
+Her NPC tek sayfadır. Silahlar başlangıç/15/30; zırhlar başlangıç/34/48 +9.
+Azaltılmış kask/kalkan/takılar zırhlarla aynı sayfada; market aynıdır.
+Kaldırılan 102/103/112/113/202/203/212/213 kayıtları sahip olunan kimlikler
+arasında tutulur: yayın bunları siler, doğrulama yeniden belirmelerini yakalar.
+
 Stok değişikliğinde önce `PVP_HEDEF.md`, sonra `stock()` güncellenir.
 `npc_profile.py sql` tam profil migration'ını, `repair_sql` yalnız aktif
 mağazaların onarımını, `report` oyuncu stok rehberini üretir. Bunların çıktıları

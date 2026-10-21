@@ -7,6 +7,9 @@ Destek becerileri 5. seviyede, login/levelup ve gerçek döngü zamanlayıcısı
 Kullanıcı bütün işleri sırayla uygulayıp iş bitiminde canlıya almamızı istedi.
 Oyun testi kullanıcıda; gerekli derleme ve dosya/servis kontrolleri yapılır.
 
+- [x] Silahçı/zırhçıyı tek sayfaya indir: 1/15/30 silah; 1/34/48 zırh ve
+      azaltılmış kask/kalkan/takı. Eski sekmeler silindi. Canlı SQL: `20261021-085048`.
+
 - [x] Onaylı harita bazlı Yang aralıklarını uygula; sıfır protolu normal mobları
       kapsa. 17 harita, 1–99; canlı game yayını `20261021-081923`.
 

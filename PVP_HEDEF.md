@@ -125,9 +125,14 @@ Dosyalar: `content/server/sql/seed_shop_refine_pet.sql`, `content/server/sql/upd
 
 ### Shop / drop matrisi (orta-kolay, 2026-10-17)
 
-**2026-10-20 kullanıcı revizyonu:** NPC silahları normal 25 ve altı +
-altı klasik 30 silah ailesi **+9**; dört sınıfın 18/26/34/42 gövdeleri +9;
-takılarda Abanoz/Yeşim tavanı (33), kask/kalkan 21 tavanı. 48+ gövdeler,
+**2026-10-21 tek sayfa revizyonu:** Silahçı yalnız başlangıç (1), 15 ve 30
+seviye ailelerini +9 satar; 20/25 ve diğer ara seviyeler kaldırılır.
+Başlangıç eşyalarının gerçek proto sınırı 0'dır. Başlangıç çanı bulunmadığı
+için bu basamakta beş aile, 15 ve 30'da altışar aile vardır; ayrıca normal ok.
+Zırhçı dört sınıfın başlangıç (1), 34 ve 48 gövdelerini +9 satar. Kullanıcının
+49 dediği aile gerçek protoda 48'dir. Azaltılmış kask/kalkan/takı seçkisi de
+aynı sayfada kalır: dört 21 kaskı, Beşgen Kalkan; başlangıç ve Yeşim bilezik/kolye,
+başlangıç ve Abanoz küpe, Deri Ayakkabı ve Deri Çizme. 54+ gövdeler,
 üst takılar ve 65/70/75 silah edinimi mevcut farm hattında kalır.
 30 aileleri: Dolunay, Siyah Yaprak, Geyik Boynuzu, Kırmızı Demir, Antik Çan,
 Sonbahar Yelpazesi. Bu ailelerin +0…+9 sürümleri metinlerden çıkarılır;
@@ -136,8 +141,9 @@ boss tabloları bu istekle topluca silinmez. İsimsiz/hiçbir sınıfın kullana
 Mağaza eşyalarına elle başlangıç bonusu veya sabit yüksek ortalama eklenmez.
 
 ShopEx, ana/ikinci köy silahçı ve zırhçılarını ayrı NPC kimlikleriyle aynı
-seçkiye bağlar: silah 3, zırh 3 sekme, market 1. Her sekme ilk 40 hücreye
-sığar. Fiyatlar satın al/sat döngüsünden Yang üretmez: en az ürün geri satışının
+seçkiye bağlar: her NPC yalnız 1 sayfa açar. Silah 18 ürün/30 hücre,
+zırh 25 ürün/37 hücre; market 17 ürün. Yerleşim gerçek DB yükleme sırasıyla
+ilk 40 hücrede doğrulanır. Fiyatlar satın al/sat döngüsünden Yang üretmez: en az ürün geri satışının
 2 katı (ekipman), 1,25 katı (sarf), ayrıca seçilen taban fiyat.
 İlk ücretsiz yüzük/dedektör/at kitabından ayrı, markette ücretli yedekleri vardır.
 BK, Ruh Taşı ve zindan anahtarları markete konmaz.
@@ -156,7 +162,7 @@ Süreli 52034 bineği ve süresi değişmez. Atın klasik bakım/ölüm davranı
 | Band           | Erişim                                                           | Ne kalır                                                                 |
 | -------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | Start          | `welcome`                                                        | Job +9 set                                                               |
-| Early NPC      | Silahçı başlangıç, 20–25 ve 30+ok; zırhçı 18–42 gövdeler +9 | Sekmeler gerçek hücre sınırında |
+| Early NPC      | Silahçı 1/15/30+ok; zırhçı 1/34/48 gövdeler +9 ve azaltılmış iç itemler | Her NPC tek sayfa |
 | Late-early     | İkinci köy silahçı/zırhçı aynı seçki | Ayrı NPC kimliği korunur |
 | Bridge 25–35   | NPC normal silah/takı ve 30 ortalamalı aileler +9 | Altı 30 silah ailesi metinlerden çıkarılır |
 | Mid 50–70      | metin                                                            | Flying Wizard, Rib, Unicorn… + Scale/Fog body **+0**                     |
@@ -218,8 +224,8 @@ araştırma geçmişi `docs/NPC_MAGAZA_TASARIMI.md` içinde tutulur.
 
 | Shop | Satılan                                             |
 | ---- | --------------------------------------------------- |
-| 101–103 / 111–113 | Ana/ikinci köy silahçıları; başlangıç, 20–25, 30+ok |
-| 201–203 / 211–213 | Ana/ikinci köy zırhçıları; gövde, kask-kalkan, iç item |
+| 101 / 111 | Ana/ikinci köy silahçıları; 1/15/30+ok tek sayfa |
+| 201 / 211 | Ana/ikinci köy zırhçıları; 1/34/48 gövde+kask/kalkan/takı tek sayfa |
 | 301 | Market; günlük sarf ve yüzük/dedektör/at kitabı yedekleri |
 | 11   | boş                                                 |
 
