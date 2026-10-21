@@ -23,6 +23,7 @@ def main():
     scope.add_argument('--spawns-only', action='store_true', help='Install only the two access-boss spawn timers')
     scope.add_argument('--starter-ring', action='store_true', help='Install only the one-time starter ring quest')
     scope.add_argument('--npc-profile', action='store_true', help='Install the active renewed SQL shops and support quest')
+    scope.add_argument('--metin-metal', action='store_true', help='Install only the approved Magic Metal metin drops')
     args = parser.parse_args()
     release = datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')
     remote = '/home/m2web/progression-' + release
@@ -42,6 +43,10 @@ def main():
         files = ['quest/quest_tr/_midpvp/starter_support.lua']
         existing = files + ['shop_table_ex.txt']
         baseline = 'faaf95e85'
+    if args.metin_metal:
+        files = ['mob_drop_item.txt']
+        existing = list(files)
+        baseline = '4f0c9a16b'
     expected = []
     for name in existing:
         previous = subprocess.check_output(['git', 'show', baseline + ':runtime/freebsd/share/locale/europe/' + name], cwd=ROOT)
@@ -56,8 +61,8 @@ def main():
         archive = Path(temporary) / 'payload.tar.gz'
         metadata = {'install-files.txt': '\n'.join(files) + '\n',
                     'expected-files.txt': '\n'.join(existing) + '\n', 'expected.sha256': ''.join(expected)}
-        if args.spawns_only:
-            metadata['data-only'] = 'access boss spawn timers\n'
+        if args.spawns_only or args.metin_metal:
+            metadata['data-only'] = 'selected runtime data; no quest or binary change\n'
         if args.starter_ring:
             metadata['starter-ring'] = 'one-time ring delivery\n'
         if args.npc_profile:

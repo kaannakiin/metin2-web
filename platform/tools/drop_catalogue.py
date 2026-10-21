@@ -106,7 +106,7 @@ def render():
 
     put('# Metin ve Boss Drop Rehberi — Anka2')
     put()
-    put('Tarih: **20 Ekim 2026** · Loot politikası: **v' + str(policy['version']) + '**')
+    put('Tarih: **21 Ekim 2026** · Loot politikası: **v' + str(policy['version']) + '**')
     put()
     put('**Durum:** Bu rehber repodaki güncel loot verisini anlatır; tek başına canlı kurulum kanıtı değildir. '
         'Önceki malzeme ağırlıklı sandık özeti geçersizdir. Yayın adayının durumu '
@@ -114,6 +114,10 @@ def render():
     put()
     put('## 1. En önemli düzeltmeler')
     put()
+    metal = policy['metin_magic_metal']
+    put('- **Büyülü Metal (25041), 1 adet:** ' + '; '.join(
+        str(band['min']) + '–' + str(band['max']) + ' seviye metinlerde %' + str(band['pct'])
+        for band in metal['bands']) + '. Eşik metin seviyesidir; oranlar baz şanstır.')
     put('- **Lusifer Sandığı 65 / 70 / 75 silah içerir.** Altı gerçek 75 silahın her biri %5 '
         '(toplam %30), beş doğrulanmış 70 silahın her biri %3 (toplam %15), yedi 65 silah '
         'her biri %1 (toplam %7). Hepsi +0. Barones de 75 silahları doğrudan her biri %3 verir.')

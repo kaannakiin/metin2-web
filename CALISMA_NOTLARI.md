@@ -1,5 +1,22 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### Büyülü Metal metin dropları — 2026-10-21
+
+- Kullanıcı ilk etapta 55–60 metinlere %5, 65–75'e %8, 80–90'a %12
+  temel oranla birer Büyülü Metal (25041) eklenmesini onayladı. Karakter
+  seviyesi değil metin seviyesi esas alınır. 400 ölçeğinde ham değerler 20/32/48.
+- Önce `PVP_HEDEF.md` kilidi ve loot politikası v6 güncellendi.
+  `metin_metal.py` yalnız mevcut klasik `MetinLv*` gruplarını işler;
+  metin kimliği/seviyesi gerçek proto ile doğrulanır. 12 grup kapsamda.
+  Boss/sandık ödülleri, diğer droplar ve harita doğma ayarları korunur.
+- Rehber gerçek runtime tablosundan yenilenir. `--metin-metal` yayın modu
+  yalnız `mob_drop_item.txt` taşır; önceki canlı dosya hash'i `4f0c9a16b`
+  üzerinden korunur. Derleme/istemci paketi gerekmez; oyun testi kullanıcıda.
+- Canlı kurulum `20261021-073648` tamamlandı. Aday/canlı dosya birebir aynı;
+  SHA256 `70e6f344d1ad93aabce6140774380872c3942f0caf972bd302e73fdec102b7ae`.
+  Altı süreç/port sağlıklı. Önceki dosya aynı VM sürüm dizininde `previous.tar`
+  içinde. Statik karşılaştırmada yalnız 12 metin grubu değişti, diğer 79 grup aynı.
+
 ### Aktif mağaza yolu ve destek becerisi onarımı — 2026-10-21
 
 - Kullanıcı 5. seviyede destek/at becerilerinin gelmediğini ve silahçı/zırhçının

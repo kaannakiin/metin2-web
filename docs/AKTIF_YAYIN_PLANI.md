@@ -7,6 +7,9 @@ Destek becerileri 5. seviyede, login/levelup ve gerçek döngü zamanlayıcısı
 Kullanıcı bütün işleri sırayla uygulayıp iş bitiminde canlıya almamızı istedi.
 Oyun testi kullanıcıda; gerekli derleme ve dosya/servis kontrolleri yapılır.
 
+- [x] Büyülü Metal'i 55–60 / 65–75 / 80–90 metinlere %5 / %8 / %12
+      temel oranla birer adet ekle. Canlı ek yayın: `20261021-073648`, loot v6.
+
 - [x] Silahçı, zırhçı ve market önerilerini gerçek mağaza stoklarına uygula.
 - [x] Silahçıya 30 seviye silah ailelerini +9 koy; aynı ailelerin tüm
       geliştirme seviyelerini metin droplarından çıkar. Bosslar ayrı kapsamdır.

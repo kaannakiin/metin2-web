@@ -1,5 +1,19 @@
 # Oyun paketi doğrulaması — 2026-10-21
 
+## Büyülü Metal — 20261021-073648
+
+`progression_release.py --metin-metal --install`: yalnız `mob_drop_item.txt`
+kuruldu. 55–60 metinlerde %5, 65–75'te %8, 80–90'da %12 temel oranla
+birer 25041. Ham değerler 20/32/48; karakter seviyesi giriş koşulu eklenmedi.
+12 klasik metin grubu değişti, diğer 79 drop grubu birebir korundu.
+Loot politikası v6; drop rehberi runtime tablosuyla eşleşiyor.
+
+Kurucu baseline `4f0c9a16b` hash'ini, yedeği, aday/canlı dosya eşleşmesini
+ve altı süreç/portu doğruladı. Yeni dosya SHA256:
+`70e6f344d1ad93aabce6140774380872c3942f0caf972bd302e73fdec102b7ae`.
+VM `/usr/metin2-progression-20261021-073648`, önceki dosya `previous.tar` içinde.
+SQL, görev, binary ve istemci değişmedi. Oyun testi kullanıcıda.
+
 ## Aktif NPC SQL / beceri / at onarımı — 20261021-072726
 
 Kullanıcı mağazaları açamadı ve 5. seviyede destek becerileri gelmedi.

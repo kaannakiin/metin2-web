@@ -1,5 +1,14 @@
 {
-  "version": 5,
+  "version": 6,
+  "metin_magic_metal": {
+    "vnum": 25041,
+    "count": 1,
+    "bands": [
+      { "min": 55, "max": 60, "pct": 5 },
+      { "min": 65, "max": 75, "pct": 8 },
+      { "min": 80, "max": 90, "pct": 12 }
+    ]
+  },
   "reaper_75_weapons": [
     180,
     190,

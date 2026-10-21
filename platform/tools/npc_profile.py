@@ -136,7 +136,7 @@ def repair_sql():
 
 def policy():
     data = json.loads((ROOT / 'platform/gameplay/phase3_loot.json').read_text())
-    data['version'] = 5
+    data['version'] = max(data['version'], 5)
     data['npc_30_weapons'] = BASES_30
     data['metin_excluded_weapons'] = sorted(set(data['metin_excluded_weapons'] + BASES_30))
     return json.dumps(data, ensure_ascii=False, indent=2) + '\n'

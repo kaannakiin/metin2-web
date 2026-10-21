@@ -1,11 +1,12 @@
 # Metin ve Boss Drop Rehberi — Anka2
 
-Tarih: **20 Ekim 2026** · Loot politikası: **v5**
+Tarih: **21 Ekim 2026** · Loot politikası: **v6**
 
 **Durum:** Bu rehber repodaki güncel loot verisini anlatır; tek başına canlı kurulum kanıtı değildir. Önceki malzeme ağırlıklı sandık özeti geçersizdir. Yayın adayının durumu [kurulum belgesinde](../platform/deploy/GAMEPLAY_RELEASE.md) takip edilir.
 
 ## 1. En önemli düzeltmeler
 
+- **Büyülü Metal (25041), 1 adet:** 55–60 seviye metinlerde %5; 65–75 seviye metinlerde %8; 80–90 seviye metinlerde %12. Eşik metin seviyesidir; oranlar baz şanstır.
 - **Lusifer Sandığı 65 / 70 / 75 silah içerir.** Altı gerçek 75 silahın her biri %5 (toplam %30), beş doğrulanmış 70 silahın her biri %3 (toplam %15), yedi 65 silah her biri %1 (toplam %7). Hepsi +0. Barones de 75 silahları doğrudan her biri %3 verir.
 - 85/90 metinlerden Zehir ve Orkide kaldırıldı. Diğer 75 silahlar da bu metin havuzuna eklenmedi.
 - Dolunay, Siyah Yaprak, Geyik Boynuzu, Kırmızı Demir, Antik Çan ve Sonbahar Yelpazesi +9 silahçıya taşındı. Bu altı 30 seviye ailenin +0…+9 sürümleri metin gruplarından çıkarıldı; boss grupları bu değişiklikle silinmedi.
@@ -151,9 +152,9 @@ Taşlar: Ruh Metini (`8008`); Gölge Metini (`8009`).
 | YeşimTaşı Küpe+0 | 17080 | 28 | 1 | 2% |
 | Ruh Taşı | 50513 | — | 1 | 5% |
 
-### Metin seviyesi 50 / 55
+### Metin seviyesi 50
 
-Taşlar: Dayanıklılık Metini (`8010`); Şeytan Metini (`8011`); Dayanıklılık Metini (`8015`); Şeytan Metini (`8016`).
+Taşlar: Dayanıklılık Metini (`8010`); Dayanıklılık Metini (`8015`).
 
 | Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
 |---|---:|---:|---:|---:|
@@ -175,6 +176,32 @@ Taşlar: Dayanıklılık Metini (`8010`); Şeytan Metini (`8011`); Dayanıklıl�
 | Belirsiz Plaka Zırh+0 | 11660 | 48 | 1 | 2% |
 | Manevi Elbise+0 | 11860 | 48 | 1 | 2% |
 | Ruh Taşı | 50513 | — | 1 | 15% |
+
+### Metin seviyesi 55
+
+Taşlar: Şeytan Metini (`8011`); Şeytan Metini (`8016`).
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Beceri Kitabı | 50300 | — | 12 ayrı × 1 | 100% |
+| Kötü Ruh Kovma Kağıdı | 71001 | — | 5 | 100% |
+| Münzevi Tavsiyesi | 71094 | — | 5 | 100% |
+| Zihin Taşı Kesesi | 27999 | — | 2 | 100% |
+| Kutsama Kağıdı | 25040 | — | 1 | 100% |
+| Efsun Nesnesi | 71084 | — | 15 | 60% |
+| Arttırma Kağıdı | 71085 | — | 8 | 60% |
+| Uçan Büyücü Kılıcı+0 | 120 | 55 | 1 | 3% |
+| Kaburga Bıçak+0 | 1080 | 55 | 1 | 3% |
+| Tek Boynuzlu Yay+0 | 2110 | 55 | 1 | 3% |
+| Kurtuluş Palası+0 | 3110 | 55 | 1 | 3% |
+| Altın Böcek Çanı+0 | 5070 | 55 | 1 | 3% |
+| Kaş Yelpaze+0 | 7110 | 55 | 1 | 3% |
+| Mavi Taş Zırh+0 | 11260 | 48 | 1 | 2% |
+| Genç Ejderha Takımı +0 | 11460 | 48 | 1 | 2% |
+| Belirsiz Plaka Zırh+0 | 11660 | 48 | 1 | 2% |
+| Manevi Elbise+0 | 11860 | 48 | 1 | 2% |
+| Ruh Taşı | 50513 | — | 1 | 15% |
+| Büyülü Metal | 25041 | — | 1 | 5% |
 
 ### Metin seviyesi 60
 
@@ -200,6 +227,7 @@ Taşlar: Lanet Metini (`8012`); Lanet Metini (`8017`).
 | Belirsiz Plaka Zırh+0 | 11660 | 48 | 1 | 2% |
 | Manevi Elbise+0 | 11860 | 48 | 1 | 2% |
 | Ruh Taşı | 50513 | — | 1 | 30% |
+| Büyülü Metal | 25041 | — | 1 | 5% |
 
 ### Metin seviyesi 65
 
@@ -225,6 +253,7 @@ Taşlar: Ölüm Metini (`8013`); Ölüm Metini (`8018`).
 | Belirsiz Plaka Zırh+0 | 11660 | 48 | 1 | 2% |
 | Manevi Elbise+0 | 11860 | 48 | 1 | 2% |
 | Ruh Taşı | 50513 | — | 1 | 40% |
+| Büyülü Metal | 25041 | — | 1 | 8% |
 
 ### Metin seviyesi 70
 
@@ -250,10 +279,11 @@ Taşlar: Katil Metini (`8014`); Katil Metini (`8019`).
 | Belirsiz Plaka Zırh+0 | 11660 | 48 | 1 | 2% |
 | Manevi Elbise+0 | 11860 | 48 | 1 | 2% |
 | Ruh Taşı | 50513 | — | 1 | 50% |
+| Büyülü Metal | 25041 | — | 1 | 8% |
 
-### Metin seviyesi 75 / 80
+### Metin seviyesi 75
 
-Taşlar: Metin Pung-Ma (`8024`); Metin Ma-An (`8025`).
+Taşlar: Metin Pung-Ma (`8024`).
 
 | Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
 |---|---:|---:|---:|---:|
@@ -276,6 +306,34 @@ Taşlar: Metin Pung-Ma (`8024`); Metin Ma-An (`8025`).
 | Ruh Plaka Zırh+0 | 11680 | 61 | 1 | 2% |
 | Soylu Kadın Elbisesi+0 | 11880 | 61 | 1 | 2% |
 | Ruh Taşı | 50513 | — | 1 | 60% |
+| Büyülü Metal | 25041 | — | 1 | 8% |
+
+### Metin seviyesi 80
+
+Taşlar: Metin Ma-An (`8025`).
+
+| Eşya | VNUM | Giyme/kullanım seviyesi | Adet | Baz düşme şansı |
+|---|---:|---:|---:|---:|
+| Beceri Kitabı | 50300 | — | 14 ayrı × 1 | 100% |
+| Kötü Ruh Kovma Kağıdı | 71001 | — | 6 | 100% |
+| Münzevi Tavsiyesi | 71094 | — | 6 | 100% |
+| Zihin Taşı Kesesi | 27999 | — | 3 | 100% |
+| Kutsama Kağıdı | 25040 | — | 2 | 100% |
+| Efsun Nesnesi | 71084 | — | 20 | 75% |
+| Arttırma Kağıdı | 71085 | — | 10 | 75% |
+| Su Perisi Kılıcı+0 | 160 | 65 | 1 | 2,5% |
+| Şeytan Çıkarma Kılıcı+0 | 240 | 65 | 1 | 2,5% |
+| Şimşek Bıçağı+0 | 1110 | 65 | 1 | 2,5% |
+| Kutsal Sert Yay+0 | 2130 | 65 | 1 | 2,5% |
+| Elektromanyetik Pala+0 | 3140 | 65 | 1 | 2,5% |
+| Cennet ve Dünya Çanı+0 | 5100 | 65 | 1 | 2,5% |
+| Kurtuluş Yelpazesi+0 | 7140 | 65 | 1 | 2,5% |
+| Ejderha Tanrısı Zırhı+0 | 11280 | 61 | 1 | 2% |
+| Küpeçiçeği Takım+0 | 11480 | 61 | 1 | 2% |
+| Ruh Plaka Zırh+0 | 11680 | 61 | 1 | 2% |
+| Soylu Kadın Elbisesi+0 | 11880 | 61 | 1 | 2% |
+| Ruh Taşı | 50513 | — | 1 | 60% |
+| Büyülü Metal | 25041 | — | 1 | 12% |
 
 ### Metin seviyesi 85
 
@@ -307,6 +365,7 @@ Taşlar: Metin Tu-Young (`8026`).
 | Yarı-İnsan Kılıç+0 | 3150 | 70 | 1 | 2,5% |
 | Mutluluk Yelpazesi+0 | 7150 | 70 | 1 | 2,5% |
 | Ruh Taşı | 50513 | — | 1 | 70% |
+| Büyülü Metal | 25041 | — | 1 | 12% |
 
 ### Metin seviyesi 90
 
@@ -342,6 +401,7 @@ Taşlar: Metin Jeon-Un (`8027`).
 | Siyah Rüzgar Takımı+0 | 11490 | 66 | 1 | 6% |
 | Kara Büyü Zırh+0 | 11690 | 66 | 1 | 6% |
 | Siyah Elbise+0 | 11890 | 66 | 1 | 6% |
+| Büyülü Metal | 25041 | — | 1 | 12% |
 
 Yang bu statik eşya tablosundan ayrıdır. Sıfır gold tanımlı metin için kaynak formülü `500 + metin_seviyesi × 150` kullanılır; üstüne mevcut yang miktarı/bonus kuralları uygulanır. Buradaki formül ekranda kesin görülecek toplam yang diye okunmamalıdır.
 
@@ -1450,8 +1510,8 @@ Bu belge `python3 platform/tools/drop_catalogue.py` çıktısıdır. `python3 pl
 
 | Dosya | SHA-256 |
 |---|---|
-| `platform/gameplay/phase3_loot.json` | `39f7b35778e5f766428263aef3d994ecb0c6369bbee2985e89cff58e06ae51c4` |
-| `runtime/freebsd/share/locale/europe/mob_drop_item.txt` | `602de1740c4ed790245fb2cc98a96a199747b787ae5c87338b1019789e126630` |
+| `platform/gameplay/phase3_loot.json` | `aff95dff7c46f2487a4533635aa38767d9d897e1848d070dab0eb0ad7ee9b844` |
+| `runtime/freebsd/share/locale/europe/mob_drop_item.txt` | `70e6f344d1ad93aabce6140774380872c3942f0caf972bd302e73fdec102b7ae` |
 | `runtime/freebsd/share/locale/europe/special_item_group.txt` | `af4371b9ca4c88b5993e10d569848a228002c5ed55738dc868de2adeb7ffa288` |
 | `runtime/freebsd/share/conf/item_proto.txt` | `bc6ea5af8df343a71e518cd89bada151c3703d0924d135b3f46542649f7e5270` |
 | `runtime/freebsd/share/conf/mob_proto.txt` | `b66a8c263ce7c7d3426ff415d9563292c3fa8830f47d5973b4f16581a8387718` |

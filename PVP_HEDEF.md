@@ -224,6 +224,15 @@ Dosya tabanlı `shop_table_ex.txt` kullanılmaz ve dağıtılmaz.
 
 ### Metin bereketi — 2026-10-20 (400 ≈ %100)
 
+**Büyülü Metal — 2026-10-21:** 25041, her başarılı düşüşte 1 adet.
+Eşik karakter seviyesi değil, metin seviyesidir. 55–60 metinlerde %5,
+65–75 metinlerde %8, 80–90 metinlerde %12 temel oran uygulanır.
+Mevcut 400 ölçeğinde ham değerler sırasıyla 20/32/48'dir. 55 altına eklenmez.
+Kapsam mevcut klasik `MetinLv*` gruplarıdır; aynı seviyedeki tüm bu metinler
+aynı oranı kullanır. Mevcut boss/sandık ödülleri ve diğer metin dropları korunur.
+Oyunun seviye farkı, düşürme bonusları ve drop hesaplamaları geçerlidir;
+bu oranlar her kesimde garanti veya oyuncuya günlük kota değildir.
+
 **Son revizyon — loot v3:** Kullanıcı Lusifer'e 70 silahları da ve eksik klasik
 bossların loot'unu istedi. Lusifer'de 6 gerçek 75 silah × %5 = %30; 5 mevcut
 70 silah (170/250/1120/3150/7150) × %3 = %15; 7 klasik 65 silah × %1 = %7;
