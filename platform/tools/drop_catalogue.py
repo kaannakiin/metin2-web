@@ -125,8 +125,9 @@ def render():
     put('- Dolunay, Siyah Yaprak, Geyik Boynuzu, Kırmızı Demir, Antik Çan ve Sonbahar '
         'Yelpazesi +9 silahçıya taşındı. Bu altı 30 seviye ailenin +0…+9 sürümleri '
         'metin gruplarından çıkarıldı; boss grupları bu değişiklikle silinmedi.')
-    put('- Yang miktarı tavan altında öncekinin 4 katı; normal/premium mob_gold 400. '
-        '400.000 kill tavanı ve düşme/seviye kuralları aynı.')
+    put('- Yang onaylı 17 haritada normal yaratık/metin tabanlarıyla hesaplanır; '
+        'aralıklar [hedef belgesinde](../PVP_HEDEF.md#harita-bazlı-yang--2026-10-21). '
+        'Global miktar flagleri 400; 400.000 tavanı ve düşme/seviye kuralları korunur.')
     put('- **Siam Bıçağı, Şeytani Pala, Yarı-İnsan Kılıç ve Mutluluk Yelpazesi 70 seviyedir.** '
         'Önceki özette 75 ailesiyle karıştırılmışlardı. Metinlerde kalırlar.')
     put('- Havalı Çelik Yay **2170**; Geyik Boynuzu Yay **2150** ve 30 seviyedir. '
@@ -200,9 +201,10 @@ def render():
         put('Taşlar: ' + '; '.join(mob_name(g['mob']) + ' (`' + str(g['mob']) + '`)' for g in group_list) + '.')
         put()
         table(list(entries))
-    put('Yang bu statik eşya tablosundan ayrıdır. Sıfır gold tanımlı metin için kaynak formülü '
-        '`500 + metin_seviyesi × 150` kullanılır; üstüne mevcut yang miktarı/bonus kuralları uygulanır. '
-        'Buradaki formül ekranda kesin görülecek toplam yang diye okunmamalıdır.')
+    put('Yang bu statik eşya tablosundan ayrıdır. Onaylı haritalarda `mid_pvp_yang.h` '
+        'tabanları uygulanır. Harita kapsamı dışındaki sıfır gold tanımlı metinlerde '
+        '`500 + metin_seviyesi × 150` (±%20) eski hesabı korunur. Yang düşme ihtimali, '
+        'seviye farkı, kişisel bonuslar ve 400.000 tavanı geçerlidir.')
     put()
     put('## 5. Boss → sandık ve toplam ekipman şansı')
     put()

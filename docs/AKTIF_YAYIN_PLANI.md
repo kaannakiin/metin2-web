@@ -7,6 +7,9 @@ Destek becerileri 5. seviyede, login/levelup ve gerçek döngü zamanlayıcısı
 Kullanıcı bütün işleri sırayla uygulayıp iş bitiminde canlıya almamızı istedi.
 Oyun testi kullanıcıda; gerekli derleme ve dosya/servis kontrolleri yapılır.
 
+- [x] Onaylı harita bazlı Yang aralıklarını uygula; sıfır protolu normal mobları
+      kapsa. 17 harita, 1–99; canlı game yayını `20261021-081923`.
+
 - [x] Markete büyük boy Güneş/Ay Özütü ekle; birer adet, tanesi 100.000 Yang.
       Canlı SQL yayını: `20261021-080602`, market 17 ürün.
 

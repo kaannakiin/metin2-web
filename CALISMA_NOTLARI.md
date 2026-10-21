@@ -1,5 +1,31 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### Harita bazlı Yang tabanları — 2026-10-21
+
+- Kullanıcı harita bazlı normal yaratık/metin aralıklarını onayladı; kesin tablo
+  `PVP_HEDEF.md` Harita bazlı Yang bölümünde. Canlı mob proto hash'i repo ile
+  aynı; 1–99 normal rank kayıtlarının 743/771'inde MaxGold=0. Global iki miktar
+  flag'i gerçekten 400, ancak sıfır proto tabanı bu artıştan yararlanmıyordu.
+- `mid_pvp_yang.h` 17 haritayı kapsar. Ölümün gerçekleştiği harita kullanılır;
+  özel indeksler ana haritaya indirgenir. 1–99 normal mob/metinler hedef tabandan
+  ödeme alır. Boss/king ve diğer kaynaklar eski hesapta kalır. Şans/seviye cezası,
+  kişisel ve nadir bonuslar, 400.000 toplam tavanı korunur.
+- Onaylı rakamlar mevcut flag=400'de doğrudan temel ödemedir; %50 × %400
+  ikinci kez uygulanmaz. Miktar flag'i daha sonra değiştirilirse 400'e göre
+  ölçeklenir. Para patlaması/normal ödeme yolları aynı tabanı kullanır.
+- Legacy `char_battle.cpp` düzenlenebilir UTF-8'e taşındı; eski C++ metin/karakter
+  literal byte'ları octal escape ile aynen korundu. Statik literal karşılaştırması
+  birebir eşleşti. İstemci/packet/proto/SQL değişikliği yok.
+- `--map-yang` yalnız sahip olunan iki sunucu kaynağını ayrı kopyada derler;
+  canlı kaynak/binary/flag değişikliği engellenir. Kaynak ve önceki binary
+  yedeklenir, servisler durduktan sonra kurulur; hata halinde geri dönülür.
+  Oyun testi kullanıcıda.
+
+- Canlı sürüm `20261021-081923`: ayrı kopyada gerçek FreeBSD game derlemesi
+  başarılı; iki kaynak ve binary kurulum sonrası adayla birebir eşleşti.
+  Altı süreç/port sağlıklı. Önceki binary `previous-game`, önceki kaynaklar
+  `previous-server-src` içinde; VM `/usr/metin2-progression-20261021-081923`.
+
 ### Market: büyük boy otomatik HP/SP özütleri — 2026-10-21
 
 - Kullanıcı markette büyük boy Güneş/Ay Özütü istedi. Gerçek proto ve sunucu

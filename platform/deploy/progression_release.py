@@ -25,6 +25,7 @@ def main():
     scope.add_argument('--npc-profile', action='store_true', help='Install the active renewed SQL shops and support quest')
     scope.add_argument('--metin-metal', action='store_true', help='Install only the approved Magic Metal metin drops')
     scope.add_argument('--npc-stock', action='store_true', help='Update only renewed NPC SQL stock; preserve quests and binaries')
+    scope.add_argument('--map-yang', action='store_true', help='Build/install only the approved map Yang server sources')
     args = parser.parse_args()
     release = datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')
     remote = '/home/m2web/progression-' + release
@@ -51,6 +52,9 @@ def main():
     if args.npc_stock:
         files = []
         existing = []
+    if args.map_yang:
+        files = []
+        existing = []
     expected = []
     for name in existing:
         previous = subprocess.check_output(['git', 'show', baseline + ':runtime/freebsd/share/locale/europe/' + name], cwd=ROOT)
@@ -65,8 +69,26 @@ def main():
         archive = Path(temporary) / 'payload.tar.gz'
         metadata = {'install-files.txt': ''.join(name + '\n' for name in files),
                     'expected-files.txt': ''.join(name + '\n' for name in existing), 'expected.sha256': ''.join(expected)}
-        if args.spawns_only or args.metin_metal or args.npc_stock:
+        if args.spawns_only or args.metin_metal or args.npc_stock or args.map_yang:
             metadata['data-only'] = 'selected runtime data; no quest or binary change\n'
+        if args.map_yang:
+            metadata['map-yang'] = 'map-specific Yang game binary and owned sources\n'
+            metadata['data-only'] = 'no quest or locale data; game binary updated\n'
+            sources = ['char_battle.cpp', 'mid_pvp_yang.h']
+            source_existing, source_new, source_hashes = [], [], []
+            for name in sources:
+                previous = subprocess.run(['git', 'show', 'HEAD:apps/server/game/src/' + name],
+                                          cwd=ROOT, capture_output=True)
+                if previous.returncode == 0:
+                    source_existing.append(name)
+                    source_hashes.append('SHA256 (/usr/metin2/apps/server/game/src/%s) = %s\n' %
+                                         (name, hashlib.sha256(previous.stdout).hexdigest()))
+                else:
+                    source_new.append(name)
+            metadata['server-source-files.txt'] = ''.join(name + '\n' for name in sources)
+            metadata['server-existing-files.txt'] = ''.join(name + '\n' for name in source_existing)
+            metadata['server-new-files.txt'] = ''.join(name + '\n' for name in source_new)
+            metadata['server-expected.sha256'] = ''.join(source_hashes)
         if args.npc_stock:
             metadata['npc-stock'] = 'active renewed NPC SQL stock only\n'
             for target, filename in [('repair_sql', 'database.sql'), ('snapshot', 'expected-database.tsv'),
@@ -87,6 +109,9 @@ def main():
                 output.add(LOCALE / name, arcname='input/' + name, recursive=False)
             if args.npc_profile:
                 output.add(ROOT / 'apps/server/game/src/shopEx.cpp', arcname='server-source/shopEx.cpp', recursive=False)
+            if args.map_yang:
+                for name in sources:
+                    output.add(ROOT / 'apps/server/game/src' / name, arcname='server-source/' + name, recursive=False)
             for name, value in metadata.items():
                 data = value.encode()
                 member = tarfile.TarInfo(name)

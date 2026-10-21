@@ -143,9 +143,9 @@ Aynı ailelerin +0…+9 sürümleri metin drop gruplarından kaldırıldı.
   doğrudan tamamlanır; sınıf sıfırlamasından sonra en geç beş saniyede yenilenir.
 - Kalıcı seviye 30 askeri at ve bir çağırma kitabı (50053). Süreli
   bineğin yedi günlük süresi değiştirilmez. Kitap kaybolursa markette yedeği var.
-- Yang miktarı normal ve premium için 4 kat; 400.000 kill tavanı,
-  düşme ihtimali ve seviye cezası aynı. Metin seviye 30/50/70/90
-  ödeme tabanı 10.000/16.000/22.000/28.000, ±%20 ve kişisel çarpanlar ayrı.
+- Yang, onaylı 17 haritada yaratık/metin türüne göre hesaplanır;
+  aralıklar `PVP_HEDEF.md` Harita bazlı Yang bölümündedir.
+  Global miktar flagleri 400; düşüş ihtimali, seviye cezası ve 400.000 tavanı korunur.
 - Kutsama/efsun, BK/Ruh Taşı ve zindan anahtarları bu markete eklenmedi.
 
 Kaynak: `npc_profile.py` → `shopex` / `shopex_item` SQL tabloları;

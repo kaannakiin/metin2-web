@@ -10,7 +10,7 @@ Tarih: **21 Ekim 2026** · Loot politikası: **v6**
 - **Lusifer Sandığı 65 / 70 / 75 silah içerir.** Altı gerçek 75 silahın her biri %5 (toplam %30), beş doğrulanmış 70 silahın her biri %3 (toplam %15), yedi 65 silah her biri %1 (toplam %7). Hepsi +0. Barones de 75 silahları doğrudan her biri %3 verir.
 - 85/90 metinlerden Zehir ve Orkide kaldırıldı. Diğer 75 silahlar da bu metin havuzuna eklenmedi.
 - Dolunay, Siyah Yaprak, Geyik Boynuzu, Kırmızı Demir, Antik Çan ve Sonbahar Yelpazesi +9 silahçıya taşındı. Bu altı 30 seviye ailenin +0…+9 sürümleri metin gruplarından çıkarıldı; boss grupları bu değişiklikle silinmedi.
-- Yang miktarı tavan altında öncekinin 4 katı; normal/premium mob_gold 400. 400.000 kill tavanı ve düşme/seviye kuralları aynı.
+- Yang onaylı 17 haritada normal yaratık/metin tabanlarıyla hesaplanır; aralıklar [hedef belgesinde](../PVP_HEDEF.md#harita-bazlı-yang--2026-10-21). Global miktar flagleri 400; 400.000 tavanı ve düşme/seviye kuralları korunur.
 - **Siam Bıçağı, Şeytani Pala, Yarı-İnsan Kılıç ve Mutluluk Yelpazesi 70 seviyedir.** Önceki özette 75 ailesiyle karıştırılmışlardı. Metinlerde kalırlar.
 - Havalı Çelik Yay **2170**; Geyik Boynuzu Yay **2150** ve 30 seviyedir. ID ve seviye ayrımı gerçek item_proto üzerinden denetlendi.
 - Diğer klasik boss sandıkları da artık silah ve zırh içerir; sadece tüketim malzemesi vermez.
@@ -403,7 +403,7 @@ Taşlar: Metin Jeon-Un (`8027`).
 | Siyah Elbise+0 | 11890 | 66 | 1 | 6% |
 | Büyülü Metal | 25041 | — | 1 | 12% |
 
-Yang bu statik eşya tablosundan ayrıdır. Sıfır gold tanımlı metin için kaynak formülü `500 + metin_seviyesi × 150` kullanılır; üstüne mevcut yang miktarı/bonus kuralları uygulanır. Buradaki formül ekranda kesin görülecek toplam yang diye okunmamalıdır.
+Yang bu statik eşya tablosundan ayrıdır. Onaylı haritalarda `mid_pvp_yang.h` tabanları uygulanır. Harita kapsamı dışındaki sıfır gold tanımlı metinlerde `500 + metin_seviyesi × 150` (±%20) eski hesabı korunur. Yang düşme ihtimali, seviye farkı, kişisel bonuslar ve 400.000 tavanı geçerlidir.
 
 ## 5. Boss → sandık ve toplam ekipman şansı
 

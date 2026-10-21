@@ -16,6 +16,7 @@
 #include "dungeon.h"
 #include "log.h"
 #include "unique_item.h"
+#include "mid_pvp_yang.h"
 #include "priv_manager.h"
 #include "db.h"
 #include "vector.h"
@@ -252,16 +253,16 @@ bool CHARACTER::Attack(LPCHARACTER pkVictim, BYTE bType)
 	}
 
 #ifdef __AUTO_HUNT__
-	// Metin/slot rezervasyon - SADECE AUTO_HUNT aktif olan oyuncular için
-	// Not: Rezervasyon kontrolü saldýrý sýrasýnda yapýlmaz, sadece hedef seçiminde kullanýlýr
-	// Böylece birden fazla oyuncu ayný hedefe damage verebilir
+	// Metin/slot rezervasyon - SADECE AUTO_HUNT aktif olan oyuncular iÃ§in
+	// Not: Rezervasyon kontrolÃ¼ saldÄ±rÄ± sÄ±rasÄ±nda yapÄ±lmaz, sadece hedef seÃ§iminde kullanÄ±lÄ±r
+	// BÃ¶ylece birden fazla oyuncu aynÄ± hedefe damage verebilir
 	if (IsPC() && m_bAutoHuntStatus && pkVictim && (pkVictim->IsStone() || pkVictim->IsNPC()))
 	{
 		DWORD dwTargetVID = pkVictim->GetVID();
 		DWORD dwPlayerPID = GetPlayerID();
 		
-		// Hedefi rezerve et (hedef seçiminde farklý hedeflere yönlendirmek için)
-		// Ama saldýrý sýrasýnda rezervasyon kontrolü yapmýyoruz, damage iþlemesi için
+		// Hedefi rezerve et (hedef seÃ§iminde farklÄ± hedeflere yÃ¶nlendirmek iÃ§in)
+		// Ama saldÄ±rÄ± sÄ±rasÄ±nda rezervasyon kontrolÃ¼ yapmÄ±yoruz, damage iÅŸlemesi iÃ§in
 		CHARACTER_MANAGER::instance().ReserveTarget(dwTargetVID, dwPlayerPID);
 	}
 #endif
@@ -402,7 +403,7 @@ void CHARACTER::DeathPenalty(BYTE bTown)
 		}
 		// END_OF_NO_DEATH_PENALTY_BUG_FIX
 
-		// Mid-effort PvP (PVP_HEDEF.md): no EXP loss on death — PvP should not punish leveling.
+		// Mid-effort PvP (PVP_HEDEF.md): no EXP loss on death â€” PvP should not punish leveling.
 		int iLoss = 0;
 
 		if (bTown)
@@ -625,11 +626,16 @@ bool CHARACTER::IsDead() const
 #define GetGoldMultipler() (distribution_test_server ? 3 : 1)
 
 // Mid-effort PvP: scale + hard-cap yang so bosses cannot print millions.
-static int MidPvpScaleGold(LPCHARACTER pkAttacker, int iGold)
+static int MidPvpScaleGold(LPCHARACTER pkAttacker, int iGold, bool useMapGold)
 {
 	long long ll = iGold;
-	ll = ll * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker) / 100;
-	ll = ll * GetMidPvpGoldAmountRate() / 100;
+	if (useMapGold)
+		ll = ll * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker) / 400;
+	else
+	{
+		ll = ll * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker) / 100;
+		ll = ll * GetMidPvpGoldAmountRate() / 100;
+	}
 	if (ll < 0)
 		ll = 0;
 	if (ll > INT_MAX)
@@ -721,8 +727,25 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 
 	DWORD dwGoldMin = GetMobTable().dwGoldMin;
 	DWORD dwGoldMax = GetMobTable().dwGoldMax;
-	// Classic metins ship with 0 yang — give modest farm yang for upgrades (PVP_HEDEF).
-	if (IsStone() && dwGoldMax == 0)
+	bool useMapGold = false;
+	const auto* yangBand = GetMidPvpYangBand(GetMapIndex());
+	if (yangBand && GetLevel() >= 1 && GetLevel() <= 99)
+	{
+		if (IsStone() && yangBand->stoneMax > 0)
+		{
+			dwGoldMin = yangBand->stoneMin;
+			dwGoldMax = yangBand->stoneMax;
+			useMapGold = true;
+		}
+		else if (!IsStone() && IsMonster() && GetMobRank() < MOB_RANK_BOSS)
+		{
+			dwGoldMin = yangBand->mobMin;
+			dwGoldMax = yangBand->mobMax;
+			useMapGold = true;
+		}
+	}
+	// Classic metins ship with 0 yang â€” give modest farm yang for upgrades (PVP_HEDEF).
+	if (!useMapGold && IsStone() && dwGoldMax == 0)
 	{
 		const int y = GetMidPvpMetinYang(GetLevel());
 		dwGoldMin = static_cast<DWORD>(y * 80 / 100);
@@ -760,7 +783,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 			int iGold = number(dwGoldMin, dwGoldMax) / iSplitCount;
 			if (test_server)
 				sys_log(0, "iGold %d", iGold);
-			iGold = MidPvpScaleGold(pkAttacker, iGold);
+			iGold = MidPvpScaleGold(pkAttacker, iGold, useMapGold);
 			iGold *= iGoldMultipler;
 			if (iGold > iPieceCap)
 				iGold = iPieceCap;
@@ -801,7 +824,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		for (int i = 0; i < 10; ++i)
 		{
 			int iGold = number(dwGoldMin, dwGoldMax);
-			iGold = MidPvpScaleGold(pkAttacker, iGold);
+			iGold = MidPvpScaleGold(pkAttacker, iGold, useMapGold);
 			iGold *= iGoldMultipler;
 			if (iGold > iPieceCap)
 				iGold = iPieceCap;
@@ -831,7 +854,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		// money drop in the usual way
 		//
 		int iGold = number(dwGoldMin, dwGoldMax);
-		iGold = MidPvpScaleGold(pkAttacker, iGold);
+		iGold = MidPvpScaleGold(pkAttacker, iGold, useMapGold);
 		iGold *= iGoldMultipler;
 		if (iGold > GetMidPvpGoldKillCap())
 			iGold = GetMidPvpGoldKillCap();
@@ -937,7 +960,7 @@ void CHARACTER::RewardAttendance()
 					if(ch->GetQuestFlag(szFlagname) == 0)
 					{
 						ch->SetQuestFlag(szFlagname, 1);
-						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Sistem> Günlük hediyenizi kazand?n?z."));
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Sistem> G\374nl\374k hediyenizi kazand?n?z."));
 						
 						TPacketGCAttendanceEvent packEvent;
 						packEvent.bHeader = HEADER_GC_ATTENDANCE_EVENT;
@@ -1046,7 +1069,7 @@ void CHARACTER::Reward(bool bItemDrop)
 				auto pkMob = CMobManager::instance().Get(i);
 				if (pkMob) {
 					char szKillNotice[QUERY_MAX_LEN];
-					snprintf(szKillNotice, sizeof(szKillNotice), "[CH%d] : %s, %s tarafýndan katledildi.", g_bChannel, pkMob->m_table.szLocaleName, pkAttacker->GetName());
+					snprintf(szKillNotice, sizeof(szKillNotice), "[CH%d] : %s, %s taraf\375ndan katledildi.", g_bChannel, pkMob->m_table.szLocaleName, pkAttacker->GetName());
 					BroadcastNotice(szKillNotice);
 				}
 			}
@@ -1327,7 +1350,7 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 	//@fixme320
 	if (quest::CQuestManager::instance().GetPCForce(GetPlayerID())->IsRunning() == true || IsWarping() || m_pkTimedEvent)
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("¢¯e¨öAAC ¨¬¢¬E¡Ì¡¤I ¨ú¨¡AIAUAI ¢Ò©ø¨úiAoAo ¨úE¨úO¨öA¢¥I¢¥U."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("\242\257e\250\366AAC \250\254\242\254E\241\314\241\244I \250\372\250\241AIAUAI \242\322\251\370\250\372iAoAo \250\372E\250\372O\250\366A\242\245I\242\245U."));
 		return;
 	}
 	//@fixme320
@@ -1626,13 +1649,13 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 			pkKiller->SetTarget(NULL);
 
 #ifdef __AUTO_HUNT__
-		// Ölen karakter bir metin/slot ise rezervasyonu kaldýr
+		// Ã–len karakter bir metin/slot ise rezervasyonu kaldÄ±r
 		if (IsStone() || (IsNPC() && !IsPC()))
 		{
 			CHARACTER_MANAGER::instance().ReleaseTarget(GetVID());
 		}
 
-		// Ölen oyuncu ise tüm rezervasyonlarýný kaldýr
+		// Ã–len oyuncu ise tÃ¼m rezervasyonlarÄ±nÄ± kaldÄ±r
 		if (IsPC())
 		{
 			CHARACTER_MANAGER::instance().ReleaseAllTargetsByPlayer(GetPlayerID());
@@ -1733,13 +1756,13 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 	ClearAffect(true);
 
 #ifdef __AUTO_HUNT__
-	// Ölen karakter bir metin/slot ise rezervasyonu kaldýr
+	// Ã–len karakter bir metin/slot ise rezervasyonu kaldÄ±r
 	if ((IsStone() || (IsNPC() && !IsPC())) && GetVID())
 	{
 		CHARACTER_MANAGER::instance().ReleaseTarget(GetVID());
 	}
 
-	// Ölen oyuncu ise tüm rezervasyonlarýný kaldýr
+	// Ã–len oyuncu ise tÃ¼m rezervasyonlarÄ±nÄ± kaldÄ±r
 	if (IsPC() && GetPlayerID())
 	{
 		CHARACTER_MANAGER::instance().ReleaseAllTargetsByPlayer(GetPlayerID());
@@ -2489,8 +2512,8 @@ void CHARACTER::SendDamagePacket(LPCHARACTER pAttacker, int Damage, BYTE DamageF
 #endif
 
 #ifdef MULTIPLE_DAMAGE_DISPLAY_SYSTEM
-	// Çoklu damage gösterimi: Sadece PC sald?rd???nda (kendi damage'lerini görmek için)
-	// GetTarget() kontrolü kald?r?ld? - böylece PC birden fazla moba sald?rd???nda her mob için damage gösterilir
+	// Ã‡oklu damage gÃ¶sterimi: Sadece PC sald?rd???nda (kendi damage'lerini gÃ¶rmek iÃ§in)
+	// GetTarget() kontrolÃ¼ kald?r?ld? - bÃ¶ylece PC birden fazla moba sald?rd???nda her mob iÃ§in damage gÃ¶sterilir
 	if (pAttacker && pAttacker->IsPC())
 	{
 		TPacketGCDamageInfo damageInfo;
@@ -2506,13 +2529,13 @@ void CHARACTER::SendDamagePacket(LPCHARACTER pAttacker, int Damage, BYTE DamageF
 		damageInfo.flag = DamageFlag;
 		damageInfo.damage = Damage;
 
-		// Kurban?n desc'i varsa (PC ise) ona gönder
+		// Kurban?n desc'i varsa (PC ise) ona gÃ¶nder
 		if (GetDesc() != NULL)
 		{
 			GetDesc()->Packet(&damageInfo, sizeof(TPacketGCDamageInfo));
 		}
 
-		// Sald?ran?n desc'ine gönder (PC kendi damage'lerini görsün)
+		// Sald?ran?n desc'ine gÃ¶nder (PC kendi damage'lerini gÃ¶rsÃ¼n)
 		if (pAttacker->GetDesc() != NULL)
 		{
 			pAttacker->GetDesc()->Packet(&damageInfo, sizeof(TPacketGCDamageInfo));
@@ -2534,7 +2557,7 @@ void CHARACTER::SendDamagePacket(LPCHARACTER pAttacker, int Damage, BYTE DamageF
 		damageInfo.flag = DamageFlag;
 		damageInfo.damage = Damage;
 
-		// Kurban PC'ye gönder (kendi ald??? damage'i görsün)
+		// Kurban PC'ye gÃ¶nder (kendi ald??? damage'i gÃ¶rsÃ¼n)
 		if (GetDesc() != NULL)
 		{
 			GetDesc()->Packet(&damageInfo, sizeof(TPacketGCDamageInfo));
@@ -2614,7 +2637,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 		return false;
 
 #ifdef ENABLE_BOT_PLAYER
-    // Bot oyuncular için MaxHP'nin asla 0 olmamasýný garanti et (divide by zero korumasý)
+    // Bot oyuncular iÃ§in MaxHP'nin asla 0 olmamasÄ±nÄ± garanti et (divide by zero korumasÄ±)
     if (IsBotCharacter() && GetMaxHP() <= 0)
     {
         SetMaxHP(30000);
@@ -2647,12 +2670,12 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 	//@fixme423
 	if (pAttacker && this) {
 		if (pAttacker->IsAffectFlag(AFF_GWIGUM) && !pAttacker->GetWear(WEAR_WEAPON)) {
-			pAttacker->RemoveAffect(SKILL_GWIGEOM);		// Büyülü Silah
+			pAttacker->RemoveAffect(SKILL_GWIGEOM);		// BÃ¼yÃ¼lÃ¼ Silah
 			return false;
 		}
 
 		if (pAttacker->IsAffectFlag(AFF_GEOMGYEONG) && !pAttacker->GetWear(WEAR_WEAPON)) {
-			pAttacker->RemoveAffect(SKILL_GEOMKYUNG);	// Hava Kýlýcý
+			pAttacker->RemoveAffect(SKILL_GEOMKYUNG);	// Hava KÄ±lÄ±cÄ±
 			return false;
 		}
 	}
@@ -2902,8 +2925,8 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			{
 				if (test_server)
 				{
-					pAttacker->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s ºí·°! (%d%%)"), GetName(), GetPoint(POINT_BLOCK));
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s ºí·°! (%d%%)"), GetName(), GetPoint(POINT_BLOCK));
+					pAttacker->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s \272\355\267\260! (%d%%)"), GetName(), GetPoint(POINT_BLOCK));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s \272\355\267\260! (%d%%)"), GetName(), GetPoint(POINT_BLOCK));
 				}
 
 				SendDamagePacket(pAttacker, 0, DAMAGE_BLOCK);
@@ -2917,8 +2940,8 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			{
 				if (test_server)
 				{
-					pAttacker->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s È¸ÇÇ! (%d%%)"), GetName(), GetPoint(POINT_DODGE));
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s È¸ÇÇ! (%d%%)"), GetName(), GetPoint(POINT_DODGE));
+					pAttacker->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s \310\270\307\307! (%d%%)"), GetName(), GetPoint(POINT_DODGE));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s \310\270\307\307! (%d%%)"), GetName(), GetPoint(POINT_DODGE));
 				}
 
 				SendDamagePacket(pAttacker, 0, DAMAGE_DODGE);
@@ -3150,7 +3173,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 				}
 			}
 
-			// Her vuruþta SP geri kazanýmý
+			// Her vuruÅŸta SP geri kazanÄ±mÄ±
 			if (pAttacker->GetPoint(POINT_HIT_SP_RECOVERY) && number(0, 4) > 0)
 			{
 				int i = ((iCurHP >= 0) ? MIN(dam, iCurHP) : dam) * pAttacker->GetPoint(POINT_HIT_SP_RECOVERY) / 100; //@fixme107
@@ -3162,7 +3185,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 				}
 			}
 #endif
-			// Rakibin manasýný ortadan kaldýrýr.
+			// Rakibin manasÄ±nÄ± ortadan kaldÄ±rÄ±r.
 			if (pAttacker->GetPoint(POINT_MANA_BURN_PCT))
 			{
 				if (number(1, 100) <= pAttacker->GetPoint(POINT_MANA_BURN_PCT))
@@ -3172,7 +3195,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 	}
 
 	//
-	// Düz vuruþ veya beceriden bonus hasar/savunma hesapla
+	// DÃ¼z vuruÅŸ veya beceriden bonus hasar/savunma hesapla
 	//
 	switch (type)
 	{
@@ -4640,7 +4663,7 @@ void CHARACTER::SetVictim(LPCHARACTER pkVictim)
 #endif
 
 		if (0 != (DWORD)m_kVIDVictim)
-			MonsterLog("°ø°? ´ë»óÀ» ÇØÁ¦");
+			MonsterLog("\260\370\260? \264\353\273\363\300\273 \307\330\301\246");
 
 		m_kVIDVictim.Reset();
 		battle_end(this);

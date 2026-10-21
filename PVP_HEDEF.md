@@ -56,7 +56,7 @@ Toplam sim ≈ **10.9 saat** (hedef 8–12). `event_flag mob_exp` varsayılan 10
 
 | Kaynak         | Politika                                                         |
 | -------------- | ---------------------------------------------------------------- |
-| Yang           | Orta-kolay farmı karşılar; miktar önceki sürümün 4 katı, kill tavanı korunur. |
+| Yang           | Onaylı 17 haritada yaratık/metin tabanları; aşağıdaki harita tablosu geçerli. Kill tavanı korunur. |
 | Stone / refine | Early +9 NPC/starter. Mid/end base basınca +9 uğraş.             |
 | Market         | NPC fiyatları yüksek; oyuncu stall yaşasın.                      |
 | Cash shop      | Power item yok.                                                  |
@@ -64,6 +64,9 @@ Toplam sim ≈ **10.9 saat** (hedef 8–12). `event_flag mob_exp` varsayılan 10
 10 kişide enflasyon hızlı gelir → drop’u baştan kıs, sonra aç.
 
 ### Uygulanan ekonomi ayarı (2026-10-17)
+
+Tarihî tablodur. 21 Ekim'de onaylanan 17 haritada aşağıdaki Harita bazlı Yang
+bölümü bunun yerini alır; eski formüller kapsam dışındaki kaynaklarda korunur.
 
 | Ayar                      | Değer                                          | Nerede                                             |
 | ------------------------- | ---------------------------------------------- | -------------------------------------------------- |
@@ -377,6 +380,36 @@ Dosya: `runtime/freebsd/share/locale/europe/mob_drop_item.txt` — +1/+2 çöp z
 **VM:** `mob_drop_item` + `item_proto` sync; güncel `shopex` migration; db/game restart.
 
 ---
+
+## Harita bazlı Yang — 2026-10-21
+
+Kullanıcı aşağıdaki aralıkları onayladı. Yang düşüşü gerçekleştiğinde toplam
+temel ödemedir; her kesimde garanti değildir. Seviye farkı, düşüş ihtimali ve
+kişisel/özel miktar bonusları korunur. Aynı yaratık farklı haritalarda farklı
+ödeyebildiği için mob proto yerine ölümün gerçekleştiği harita esas alınır.
+
+| Harita (indeks) | Normal yaratık | Metin |
+| --- | ---: | ---: |
+| 1. köyler (1/21/41) | 200–500 | 10.000–25.000 |
+| 2. köyler (3/23/43) | 750–1.500 | 40.000–60.000 |
+| Vadi (64) | 1.500–3.000 | 80.000–120.000 |
+| Çöl / Sohan (63/61) | 2.500–5.000 | 120.000–180.000 |
+| Doyyum (62) | 4.000–7.000 | 180.000–250.000 |
+| Hayalet Orman (67) | 6.000–10.000 | 250.000–300.000 |
+| Kızıl Orman (68) | 8.000–15.000 | 300.000–400.000 |
+| Örümcek katları (104/71/217) | 1.000–2.500 | mevcut davranış |
+| Sürgün Mağarası (72/73) | 3.000–6.000 | mevcut davranış |
+
+Yalnız 1–99 normal yaratıklar (boss altı rank) ve metinler kapsamdadır.
+Özel harita indekslerinde ana harita indeksi kullanılır. Boss/king, diğer
+haritalar ve 100+ yaratıklar önceki hesabı korur. Sıfır protolu normal
+yaratıklar da artık bu harita tabanından Yang alır.
+
+`mob_gold` / `mob_gold_buyer` 400 olarak kalır. Bu yeni aralıklar mevcut 400
+ayarında doğrudan ödemedir; eski %50 × %400 tekrar uygulanmaz. Global miktar
+ayarının sonradan değişmesi yeni tabanı 400'e göre orantılı ölçekler. Önceki
+4× açıklaması harita tabanı olmayan kaynaklar için geçerlidir. Kesim başına
+400.000 tavanı, nadir miktar bonusları ve boss hesabı korunur.
 
 ## At / binek / skill (notlar + kilit)
 

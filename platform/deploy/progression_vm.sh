@@ -69,6 +69,13 @@ snapshot() {
     if test -f npc-profile; then
         sha256 "$server/game/src/shopEx.cpp" /usr/home/share/bin/game
     fi
+    if test -f map-yang; then
+        while IFS= read -r file; do
+            if test -f "$server/game/src/$file"; then sha256 "$server/game/src/$file"; else echo "ABSENT $file"; fi
+        done <server-source-files.txt
+        sha256 /usr/home/share/bin/game
+        mariadb -N -B player -e "SELECT szName,lValue FROM quest WHERE dwPID=0 AND szName IN ('mob_gold','mob_gold_buyer') ORDER BY szName"
+    fi
 }
 db_snapshot() {
     mariadb -N -B player -e "SELECT * FROM shopex WHERE vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301) ORDER BY vnum; SELECT * FROM shopex_item WHERE shop_vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301) ORDER BY shop_vnum,item_vnum;"
@@ -90,6 +97,11 @@ restore() {
         cp -p previous-game /usr/home/share/bin/game || return 1
         cp -p previous-shopEx.cpp "$server/game/src/shopEx.cpp" || return 1
     fi
+    if test -f MAP_SERVER_CHANGED; then
+        cp -p previous-game /usr/home/share/bin/game || return 1
+        while IFS= read -r file; do cp -p "previous-server-src/$file" "$server/game/src/$file" || return 1; done <server-existing-files.txt
+        while IFS= read -r file; do rm -f "$server/game/src/$file"; done <server-new-files.txt
+    fi
     remove_objects || return 1
     while IFS= read -r file; do rm -f "$locale/$file"; done <install-files.txt
     if test -f previous.tar; then tar -xpf previous.tar -C "$locale" || return 1; fi
@@ -110,6 +122,21 @@ prepare)
         while IFS= read -r file; do test ! -e "$locale/$file"; done <new-files.txt
     fi
     health
+    if test -f map-yang; then
+        while IFS= read -r file; do sha256 "$server/game/src/$file"; done <server-existing-files.txt | cmp server-expected.sha256 -
+        while IFS= read -r file; do test ! -e "$server/game/src/$file"; done <server-new-files.txt
+        flags=$(mariadb -N -B player -e "SELECT COUNT(*) FROM quest WHERE dwPID=0 AND szName IN ('mob_gold','mob_gold_buyer') AND lValue=400")
+        test "$flags" = 2
+        mkdir previous-server-src server-bin
+        while IFS= read -r file; do cp -p "$server/game/src/$file" "previous-server-src/$file"; done <server-existing-files.txt
+        cp -p /usr/home/share/bin/game previous-game
+        cp -Rp "$server" server-build
+        while IFS= read -r file; do cp -p "server-source/$file" "server-build/game/src/$file"; done <server-source-files.txt
+        (cd server-build/game/src && gmake -j4 GAMEDIR="$stage/server-bin") >compile-game.log 2>&1
+        test -s server-bin/game
+        sha256 server-bin/game >map-server-candidate.sha256
+        while IFS= read -r file; do sha256 "server-source/$file"; done <server-source-files.txt >>map-server-candidate.sha256
+    fi
     if test -f npc-profile || test -f npc-stock; then db_snapshot >database-baseline.tsv; fi
     if test -f npc-stock; then
         sha256 database.sql expected-database.tsv database-verify.sql >database-candidate.sha256
@@ -168,6 +195,9 @@ install)
     snapshot >current.sha256
     cmp baseline.sha256 current.sha256
     while IFS= read -r file; do sha256 "input/$file"; done <install-files.txt | cmp candidate.sha256 -
+    if test -f map-yang; then
+        { sha256 server-bin/game; while IFS= read -r file; do sha256 "server-source/$file"; done <server-source-files.txt; } | cmp map-server-candidate.sha256 -
+    fi
     if test -f npc-stock; then
         sha256 database.sql expected-database.tsv database-verify.sql | cmp database-candidate.sha256 -
     fi
@@ -179,6 +209,13 @@ install)
     trap 'status=$?; trap - EXIT HUP INT TERM; restore || echo "ROLLBACK FAILED: operator required" >&2; exit "$status"' EXIT
     trap 'exit 130' HUP INT TERM
     stop_game </dev/null >install-stop.log 2>&1
+    if test -f map-yang; then
+        touch MAP_SERVER_CHANGED
+        cp -p server-bin/game /usr/home/share/bin/game
+        while IFS= read -r file; do cp -p "server-source/$file" "$server/game/src/$file"; done <server-source-files.txt
+        chown metin2:metin2 /usr/home/share/bin/game
+        chmod 755 /usr/home/share/bin/game
+    fi
     if test -f npc-profile || test -f npc-stock; then
         db_snapshot >database-current.tsv
         cmp database-baseline.tsv database-current.tsv
@@ -221,6 +258,10 @@ install)
     fi
     service metin2 start </dev/null >install-start.log 2>&1
     wait_health
+    if test -f map-yang; then
+        cmp server-bin/game /usr/home/share/bin/game
+        while IFS= read -r file; do cmp "server-source/$file" "$server/game/src/$file"; done <server-source-files.txt
+    fi
     while IFS= read -r file; do cmp "input/$file" "$locale/$file"; done <install-files.txt
     if test -f npc-profile; then
         cmp server-bin/game /usr/home/share/bin/game

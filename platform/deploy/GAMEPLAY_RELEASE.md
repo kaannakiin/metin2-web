@@ -1,5 +1,23 @@
 # Oyun paketi doğrulaması — 2026-10-21
 
+## Harita bazlı Yang — 20261021-081923
+
+`progression_release.py --map-yang --install`: onaylı 17 haritanın normal
+yaratık/metin Yang tabanları kuruldu. Tablo `PVP_HEDEF.md` Harita bazlı Yang
+bölümünde; 1–99 için, ölümün gerçekleştiği haritaya göre uygulanır. Sıfır
+protolu normal yaratıklar da kapsanır. Mevcut 400 miktar flag'lerinde temel
+aralıklar doğrudan uygulanır; eski %50 × %400 tekrar çarpılmaz.
+
+Boss hesabı, kapsam dışındaki haritalar, şans/seviye cezası, kişisel/nadir
+bonuslar ve 400.000 tavanı korunur. SQL/proto/istemci/görev değişmedi.
+`char_battle.cpp` ve `mid_pvp_yang.h` ayrı sunucu kopyasında derlendi; önceki
+canlı kaynak/binary/flag durumu hash ile korundu. Kurulum sonrası iki kaynak
+ve game binary birebir eşleşti, altı süreç/port sağlıklı. Oyun testi yapılmadı.
+
+VM `/usr/metin2-progression-20261021-081923`. Geri dönüş: `previous-game`
+ve `previous-server-src`; yeni eklenen header gerektiğinde kaldırılır.
+Kaynak UTF-8 dönüşümünde eski metin/karakter literal byte'ları aynen korundu.
+
 ## Büyük boy Güneş/Ay Özütü — 20261021-080602
 
 `progression_release.py --npc-stock --install`: yalnız aktif `shopex` /
