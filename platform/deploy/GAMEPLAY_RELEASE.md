@@ -1,5 +1,23 @@
 # Oyun paketi doğrulaması — 2026-10-21
 
+## Sınırsız dedektör ve eksik eşya telafisi — 20261021-114558
+
+`progression_release.py --detector --server-baseline d23c6f2f9 --install`.
+Canlı welcome 27989 veriyordu; fakat canlı item.cpp eski d23c6f2f9 hash'inde,
+sınırsızlık header'ı yoktu. Repodaki mevcut item.cpp/header düzeltmesi zorunlu
+derlenerek gerçek game binary'sine dahil edildi. 27989'un kullanım sayacı 0
+kalır; 76006 ve diğer eşya/soketler aynı davranır.
+
+`starter_support`, ilk-login hediyelerinden sonraki beş saniyelik döngüde
+eksik dedektörü bir kez verir. Eldeki dedektörü çoğaltmaz; dolu çantada yer
+açılınca tekrar dener. Ana beceri/at işleyişi ve diğer başlangıç hediyeleri aynı.
+
+Gerçek game + qc derlemesi, aday/canlı kaynak/binary/quest eşleşmesi ve altı
+süreç/port kontrolü geçti. Oyun testi yapılmadı. SQL/proto/istemci değişmedi.
+VM `/usr/metin2-progression-20261021-114558`; yedekler `previous-game`,
+`previous-server-src`, `previous.tar`. Seçili CPP'ler `gmake -W` ile derlenir;
+eski mtime/cached object yüzünden düzeltmenin atlanması engellenir.
+
 ## Harita Yang 2× — 20261021-113900
 
 `progression_release.py --map-yang --install`: aynı 17 haritanın normal

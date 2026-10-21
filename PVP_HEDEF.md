@@ -206,6 +206,12 @@ Ninja oku mühimmattır: 8000 ×200 verilir, efsun uygulanmaz. Şamana yelpaze v
 birlikte verilir; iki oynanış için de başlangıç seçeneği bulunur.
 
 Her yeni karaktere **1 × Metin Taşı Dedektörü (27989), sınırsız kullanım**.
+
+21 Ekim onarımı: sınırsızlık koruması gerçek game binary'sine dahil edilir.
+Önceki sonlu kullanımda dedektörünü kaybeden mevcut karakterlere, girişten
+sonraki beş saniyelik destek döngüsünde bir kez yenisi verilir. Elinde varsa
+ikinci kopya verilmez; envanter doluysa yer açılınca tekrar denenir. Yeni
+karakterlerin welcome hediyesi tamamlanmadan onarım çalıştırılmaz.
 Normal dedektörün kullanım sayacı 0'da tutulur; altı kullanımlık yok edilme koşuluna
 ulaşmaz. 76006 numaralı diğer dedektörün davranışı değişmez. İlk-login quest'i
 tamamlanmış mevcut karakterlerin eşyaları otomatik yeniden yazılmaz.

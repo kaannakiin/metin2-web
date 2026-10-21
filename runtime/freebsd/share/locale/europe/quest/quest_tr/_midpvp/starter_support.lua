@@ -1,6 +1,18 @@
 -- Support skills and a permanent military horse; main class skills stay earned.
 quest starter_support begin
     state start begin
+        function repair_detector()
+            if pc.getqf("detector_recovery_v1") == 1 then
+                return
+            end
+            if pc.count_item(27989) == 0 and pc.get_empty_inventory_count() > 0 then
+                pc.give_item2(27989, 1)
+            end
+            if pc.count_item(27989) > 0 then
+                pc.setqf("detector_recovery_v1", 1)
+            end
+        end
+
         function apply()
             -- Repair old characters even when the book was already delivered.
             if horse.get_level() < 30 then
@@ -46,6 +58,8 @@ quest starter_support begin
 
         when starter_support_refresh.timer begin
             starter_support.apply()
+            -- Wait until all first-login gifts have run to avoid duplicates.
+            starter_support.repair_detector()
             -- Also restores support skills after an in-session class reset.
         end
 

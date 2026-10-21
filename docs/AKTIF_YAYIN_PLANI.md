@@ -7,6 +7,9 @@ Destek becerileri 5. seviyede, login/levelup ve gerçek döngü zamanlayıcısı
 Kullanıcı bütün işleri sırayla uygulayıp iş bitiminde canlıya almamızı istedi.
 Oyun testi kullanıcıda; gerekli derleme ve dosya/servis kontrolleri yapılır.
 
+- [x] Sınırsız dedektör korumasını gerçek game binary'sine dahil et; biten
+      dedektörü giriş sonrası bir kez tamamla. Canlı onarım: `20261021-114558`.
+
 - [x] Harita Yang tablosunu bir kez daha 2× yap; harita ödeme tavanını
       800.000'e çıkar, boss/diğer kaynak tavanını 400.000 tut. Canlı: `20261021-113900`.
 

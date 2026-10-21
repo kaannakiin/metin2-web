@@ -1,4 +1,13 @@
-starter_support={["start"]=0,apply= function ()if horse . get_level ( ) < 30 then 
+starter_support={["start"]=0,repair_detector= function ()if pc . getqf ( "detector_recovery_v1" ) == 1 then 
+return 
+end 
+if pc . count_item ( 27989 ) == 0 and pc . get_empty_inventory_count ( ) > 0 then 
+pc . give_item2 ( 27989 , 1 ) 
+end 
+if pc . count_item ( 27989 ) > 0 then 
+pc . setqf ( "detector_recovery_v1" , 1 ) 
+end 
+end ,apply= function ()if horse . get_level ( ) < 30 then 
 horse . set_level ( 30 ) 
 end 
 if pc . getqf ( "horse_ready" ) == 0 then 

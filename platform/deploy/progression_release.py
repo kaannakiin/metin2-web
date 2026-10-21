@@ -19,6 +19,7 @@ BASE_COMMIT = '8ae9aadb3'
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--install', action='store_true')
+    parser.add_argument('--server-baseline', help='Git source baseline for server updates; defaults to HEAD')
     scope = parser.add_mutually_exclusive_group()
     scope.add_argument('--spawns-only', action='store_true', help='Install only the two access-boss spawn timers')
     scope.add_argument('--starter-ring', action='store_true', help='Install only the one-time starter ring quest')
@@ -26,7 +27,10 @@ def main():
     scope.add_argument('--metin-metal', action='store_true', help='Install only the approved Magic Metal metin drops')
     scope.add_argument('--npc-stock', action='store_true', help='Update only renewed NPC SQL stock; preserve quests and binaries')
     scope.add_argument('--map-yang', action='store_true', help='Build/install only the approved map Yang server sources')
+    scope.add_argument('--detector', action='store_true', help='Install unlimited detector server code and one-time recovery quest')
     args = parser.parse_args()
+    if args.server_baseline and not (args.map_yang or args.detector):
+        parser.error('--server-baseline requires --map-yang or --detector')
     release = datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')
     remote = '/home/m2web/progression-' + release
     stage = '/usr/metin2-progression-' + release
@@ -55,6 +59,10 @@ def main():
     if args.map_yang:
         files = []
         existing = []
+    if args.detector:
+        files = ['quest/quest_tr/_midpvp/starter_support.lua']
+        existing = list(files)
+        baseline = 'HEAD'
     expected = []
     for name in existing:
         previous = subprocess.check_output(['git', 'show', baseline + ':runtime/freebsd/share/locale/europe/' + name], cwd=ROOT)
@@ -74,10 +82,18 @@ def main():
         if args.map_yang:
             metadata['map-yang'] = 'map-specific Yang game binary and owned sources\n'
             metadata['data-only'] = 'no quest or locale data; game binary updated\n'
-            sources = ['char_battle.cpp', 'mid_pvp_yang.h']
+        if args.detector:
+            metadata['detector'] = 'unlimited normal detector and one-time missing-item recovery\n'
+        if args.map_yang or args.detector:
+            metadata['server-update'] = 'owned server sources and game binary\n'
+            sources = (['char_battle.cpp', 'mid_pvp_yang.h'] if args.map_yang
+                       else ['item.cpp', 'mid_pvp_detector.h'])
+            source_ref = args.server_baseline or 'HEAD'
+            subprocess.run(['git', 'rev-parse', '--verify', source_ref + '^{commit}'],
+                           cwd=ROOT, check=True, capture_output=True)
             source_existing, source_new, source_hashes = [], [], []
             for name in sources:
-                previous = subprocess.run(['git', 'show', 'HEAD:apps/server/game/src/' + name],
+                previous = subprocess.run(['git', 'show', source_ref + ':apps/server/game/src/' + name],
                                           cwd=ROOT, capture_output=True)
                 if previous.returncode == 0:
                     source_existing.append(name)
@@ -109,7 +125,7 @@ def main():
                 output.add(LOCALE / name, arcname='input/' + name, recursive=False)
             if args.npc_profile:
                 output.add(ROOT / 'apps/server/game/src/shopEx.cpp', arcname='server-source/shopEx.cpp', recursive=False)
-            if args.map_yang:
+            if args.map_yang or args.detector:
                 for name in sources:
                     output.add(ROOT / 'apps/server/game/src' / name, arcname='server-source/' + name, recursive=False)
             for name, value in metadata.items():

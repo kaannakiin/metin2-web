@@ -1,5 +1,26 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### Sınırsız metin dedektörü gerçek canlı onarımı — 2026-10-21
+
+- Kullanıcı başlangıç dedektörünün bittiğini bildirdi. Canlı derlenmiş welcome
+  gerçekten 27989 veriyor. Repodaki `item.cpp` SetSocket koruması ve
+  `mid_pvp_detector.h` 1022da374'ten beri var; ancak canlı item.cpp hash'i eski
+  d23c6f2f9 ile eşleşti ve header yoktu. Kaynakta var demek canlıda var demek değildi.
+- Mevcut koruma yalnız 27989'un socket0 sayacını 0 tutar; 76006 ve diğer
+  socket/eşyalar aynı. Bu iki gerçek kaynak game derlemesine dahil edilir.
+- Destek görevi, ilk-login hediyelerinden sonraki döngüde eksik dedektörü bir
+  kez tamamlar. Elde varsa çoğaltmaz; dolu çantada işaret koymadan tekrar dener.
+  Kullanılmış ama silinmemiş dedektör ilk kullanımda yeni sınırsız kurala geçer.
+- Sunucu kaynak yayını ortak `server-update` yoluna bağlandı. `--server-baseline`
+  açıkça eski canlı kaynak sürümünü doğrular. Her seçili CPP `gmake -W` ile
+  zorunlu derlenir; eski dosya mtime'ı yüzünden cached objenin kalması engellenir.
+  `--detector` yalnız bu iki kaynak/binary ve starter_support namespace'ini taşır.
+  Diğer oyun ayarları, SQL ve başlangıç hediyeleri korunur. Oyun testi kullanıcıda.
+- Canlı sürüm `20261021-114558`: gerçek game ve qc derlemeleri tamamlandı;
+  kaynak/binary/quest aday eşleşmeleri ve altı süreç/port doğrulandı. Eski
+  kaynak/binary `previous-game` / `previous-server-src`, görevler `previous.tar`
+  içinde; VM `/usr/metin2-progression-20261021-114558`.
+
 ### Harita Yang tabanları 2× — 2026-10-21
 
 - Kullanıcı mevcut harita Yang miktarlarını ikiye katlamamızı istedi. Aynı
