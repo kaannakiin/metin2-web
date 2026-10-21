@@ -1,5 +1,23 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### Market: büyük boy otomatik HP/SP özütleri — 2026-10-21
+
+- Kullanıcı markette büyük boy Güneş/Ay Özütü istedi. Gerçek proto ve sunucu
+  sabitleri doğrulandı: 72725 Güneş (7.000.000 HP), 72729 Ay (700.000 SP).
+  Her satın alım 1 adet, tanesi 100.000 Yang. Item manager yeni eşyada socket2'ye
+  dolu kapasiteyi atar; mevcut ShopEx sıfır soket şablonu bunu silmez.
+- Tek stok kaynağı `npc_profile.py stock()` güncellendi; tam/onarım SQL'leri,
+  fresh seed ve stok rehberi aynı profilden yenilendi. 13 sekme/169 ürün;
+  mevcut 167 ürünün fiyat/adet ve NPC eşleşmeleri aynı kalır.
+- `--npc-stock`, yalnız aktif SQL profilini kurar; görev/binary/istemci taşınmaz.
+  Önce canlı eski stok 13/167 birebir doğrulandı. Hazırlık/kurulum arası DB
+  değişikliği engellenir, sahip olunan 13 mağaza yedeklenir. SQL kurulduktan sonra
+  tüm satırlar kaynakla eşleşmeden sunucu başlatılmaz; hata halinde geri dönülür.
+  Oyun testi kullanıcıda.
+- Canlı kurulum `20261021-080602` tamamlandı. Kurulum içinde 13 sekme/169
+  ürün tüm fiyat/adet/efsun/soketleriyle doğrulandı; altı süreç/port sağlıklı.
+  Önceki SQL aynı VM sürüm dizininde `previous-database.sql` içinde.
+
 ### Büyülü Metal metin dropları — 2026-10-21
 
 - Kullanıcı ilk etapta 55–60 metinlere %5, 65–75'e %8, 80–90'a %12

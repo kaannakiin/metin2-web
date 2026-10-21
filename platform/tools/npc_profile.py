@@ -45,6 +45,7 @@ def stock():
                       15009, 15029, 15049, 15069, 15089], 25000)
     market = entries([27001, 27002, 27004, 27005], 1000, 50)
     market += entries([27003, 27006], 10000, 200)
+    market += entries([72725, 72729], 100000)
     market += entries([27102, 27105], 50000, 50)
     market += entries([22000, 22010], 10000, 10)
     market += entries([50200, 70038], 10000)
@@ -134,6 +135,27 @@ def repair_sql():
             'USE player;\nSTART TRANSACTION;\n' + shop_inserts() + 'COMMIT;\n')
 
 
+def snapshot():
+    tabs = sorted(stock(), key=lambda tab: tab[1])
+    rows = [['S', shop, name, npc] for npc, shop, name, items in tabs]
+    rows += [['I', shop, vnum, count, price, 0, 1] + [0] * 17
+             for npc, shop, name, items in tabs
+             for vnum, count, price in sorted(items)]
+    return '\n'.join('\t'.join(map(str, row)) for row in rows) + '\n'
+
+
+def snapshot_sql():
+    ids = ','.join(str(tab[1]) for tab in stock())
+    attrs = ','.join('attrtype%d,attrvalue%d' % (i, i) for i in range(7))
+    return (
+        "SELECT 'S',vnum,name,npc_vnum FROM shopex WHERE vnum IN (%s) ORDER BY vnum;\n"
+        "SELECT 'I',shop_vnum,item_vnum,`count`,price,price_vnum,price_type+0,"
+        "socket0,socket1,socket2,%s FROM shopex_item WHERE shop_vnum IN (%s) "
+        "ORDER BY shop_vnum,item_vnum;\n"
+        "SELECT 'CONFLICT',vnum,npc_vnum FROM shop WHERE npc_vnum IN (9001,9002,9003,9007,9008);\n"
+    ) % (ids, attrs, ids)
+
+
 def policy():
     data = json.loads((ROOT / 'platform/gameplay/phase3_loot.json').read_text())
     data['version'] = max(data['version'], 5)
@@ -179,6 +201,6 @@ def report():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('target', choices=['drops', 'sql', 'repair_sql', 'policy', 'report'])
+    parser.add_argument('target', choices=['drops', 'sql', 'repair_sql', 'snapshot', 'snapshot_sql', 'policy', 'report'])
     args = parser.parse_args()
     print(globals()[args.target](), end='')

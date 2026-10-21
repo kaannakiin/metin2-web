@@ -24,6 +24,7 @@ def main():
     scope.add_argument('--starter-ring', action='store_true', help='Install only the one-time starter ring quest')
     scope.add_argument('--npc-profile', action='store_true', help='Install the active renewed SQL shops and support quest')
     scope.add_argument('--metin-metal', action='store_true', help='Install only the approved Magic Metal metin drops')
+    scope.add_argument('--npc-stock', action='store_true', help='Update only renewed NPC SQL stock; preserve quests and binaries')
     args = parser.parse_args()
     release = datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')
     remote = '/home/m2web/progression-' + release
@@ -47,6 +48,9 @@ def main():
         files = ['mob_drop_item.txt']
         existing = list(files)
         baseline = '4f0c9a16b'
+    if args.npc_stock:
+        files = []
+        existing = []
     expected = []
     for name in existing:
         previous = subprocess.check_output(['git', 'show', baseline + ':runtime/freebsd/share/locale/europe/' + name], cwd=ROOT)
@@ -59,10 +63,16 @@ def main():
     subprocess.run(['ssh', '-o', 'BatchMode=yes', HOST, 'mkdir -m 700 ' + remote], check=True)
     with tempfile.TemporaryDirectory(prefix='m2-progression-') as temporary:
         archive = Path(temporary) / 'payload.tar.gz'
-        metadata = {'install-files.txt': '\n'.join(files) + '\n',
-                    'expected-files.txt': '\n'.join(existing) + '\n', 'expected.sha256': ''.join(expected)}
-        if args.spawns_only or args.metin_metal:
+        metadata = {'install-files.txt': ''.join(name + '\n' for name in files),
+                    'expected-files.txt': ''.join(name + '\n' for name in existing), 'expected.sha256': ''.join(expected)}
+        if args.spawns_only or args.metin_metal or args.npc_stock:
             metadata['data-only'] = 'selected runtime data; no quest or binary change\n'
+        if args.npc_stock:
+            metadata['npc-stock'] = 'active renewed NPC SQL stock only\n'
+            for target, filename in [('repair_sql', 'database.sql'), ('snapshot', 'expected-database.tsv'),
+                                     ('snapshot_sql', 'database-verify.sql')]:
+                metadata[filename] = subprocess.check_output(
+                    ['python3', str(ROOT / 'platform/tools/npc_profile.py'), target], cwd=ROOT, text=True)
         if args.starter_ring:
             metadata['starter-ring'] = 'one-time ring delivery\n'
         if args.npc_profile:

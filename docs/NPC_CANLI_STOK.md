@@ -125,6 +125,8 @@ Aynı ailelerin +0…+9 sürümleri metin drop gruplarından kaldırıldı.
 | Mavi İksir(O) | 27005 | — | 50 | 36.000 |
 | Kırmızı İksir(B) | 27003 | — | 200 | 80.000 |
 | Mavi İksir(B) | 27006 | — | 200 | 240.000 |
+| Güneş Özütü (B) | 72725 | — | 1 | 100.000 |
+| Ay Özütü (B) | 72729 | — | 1 | 100.000 |
 | Yeşil İksir(B) | 27102 | — | 50 | 187.500 |
 | Mor İksir(B) | 27105 | — | 50 | 187.500 |
 | Şehre Dönüş Kağıdı | 22000 | — | 10 | 10.000 |

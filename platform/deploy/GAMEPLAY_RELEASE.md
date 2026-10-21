@@ -1,5 +1,19 @@
 # Oyun paketi doğrulaması — 2026-10-21
 
+## Büyük boy Güneş/Ay Özütü — 20261021-080602
+
+`progression_release.py --npc-stock --install`: yalnız aktif `shopex` /
+`shopex_item` profili yenilendi. Market 9003 / sekme 301'e 72725 ve 72729,
+birer adet ve tanesi 100.000 Yang eklendi. Önceki 167 ürünün tüm seçkisi,
+fiyat/adetleri aynı; toplam 13 sekme/169 ürün. Dolu kapasiteyi mevcut item
+oluşturma kodu sağlar, sıfır SQL soket şablonu bunu ezmez.
+
+Eski canlı 13/167 profil salt okunur doğrulandı. Yeni SQL kurulmadan önce
+DB değişiklik kontrolü ve sahip olunan mağazaların yedeği alındı. Yeni 169 ürün
+fiyat/adet/para türü/soket/efsunlarıyla birebir eşleşti; altı süreç/port sağlıklı.
+VM `/usr/metin2-progression-20261021-080602`; geri dönüş `previous-database.sql`.
+Görev, binary, drop ve istemci değişmedi. Oyun testi kullanıcıda.
+
 ## Büyülü Metal — 20261021-073648
 
 `progression_release.py --metin-metal --install`: yalnız `mob_drop_item.txt`

@@ -139,6 +139,10 @@ sığar. Fiyatlar satın al/sat döngüsünden Yang üretmez: en az ürün geri 
 İlk ücretsiz yüzük/dedektör/at kitabından ayrı, markette ücretli yedekleri vardır.
 BK, Ruh Taşı ve zindan anahtarları markete konmaz.
 
+Market 9003 ayrıca büyük boy Güneş Özütü (72725) ve Ay Özütü (72729)
+satar: satın alım başına 1 adet, her biri 100.000 Yang. Mevcut otomatik
+HP/SP yenileme davranışı ve dolu kapasite başlangıcı korunur.
+
 Standart/at becerileri: 5. seviyede liderlik/madencilik/dönüşüm 40,
 kombo 2, diller 20, at çağırma 10, dört at saldırı becerisi 40. Ana sınıf
 becerileri değiştirilmez; BK → G → P hedefi korunur. Mevcut karakterler ve

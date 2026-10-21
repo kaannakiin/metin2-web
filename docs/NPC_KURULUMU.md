@@ -13,7 +13,12 @@ sırasıyla `20261020_npc_support.sql`, `20261021_npc_profile.sql` ve
 `docs/NPC_CANLI_STOK.md` ile eşleşmelidir. Fresh seed aynı profilin üretilmiş
 kopyasını içerir; eski stoklar yeniden eklenmez.
 
-Yayın yolu: `platform/deploy/progression_release.py --npc-profile` hazırlığı;
+Güncel stok yayını: `platform/deploy/progression_release.py --npc-stock --install`.
+Yalnız aktif SQL stoklarını günceller; görevler, binary ve istemci korunur.
+DB yedeği ve hazırlık/kurulum arası değişiklik kontrolü vardır. Tüm yeni satırlar
+fiyat/adet/efsun/soketleriyle eşleşmeden servisler başlatılmaz.
+
+İlk onarımın tarihî yayın yolu: `platform/deploy/progression_release.py --npc-profile` hazırlığı;
 `--install` ayrıca yedekli kurulum yapar. Bu sürümün baseline'ı `faaf95e85`tir;
 yeni sürümde canlı kaynaklarla baseline güncellenmeden eski paket tekrar
 uygulanmaz. Dosyalar/binary/DB değişmişse kurulum durur. Derleme ayrı kopyada

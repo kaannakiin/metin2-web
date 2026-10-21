@@ -92,7 +92,7 @@ restore() {
     fi
     remove_objects || return 1
     while IFS= read -r file; do rm -f "$locale/$file"; done <install-files.txt
-    tar -xpf previous.tar -C "$locale" || return 1
+    if test -f previous.tar; then tar -xpf previous.tar -C "$locale" || return 1; fi
     service metin2 start </dev/null >rollback-start.log 2>&1 || return 1
     wait_health
 }
@@ -110,7 +110,10 @@ prepare)
         while IFS= read -r file; do test ! -e "$locale/$file"; done <new-files.txt
     fi
     health
-    if test -f npc-profile; then db_snapshot >database-baseline.tsv; fi
+    if test -f npc-profile || test -f npc-stock; then db_snapshot >database-baseline.tsv; fi
+    if test -f npc-stock; then
+        sha256 database.sql expected-database.tsv database-verify.sql >database-candidate.sha256
+    fi
     if test -f npc-profile; then
         sha256 -q "$server/game/src/shopEx.cpp" | cmp server-source.sha256 -
         cp -p "$server/game/src/shopEx.cpp" previous-shopEx.cpp
@@ -153,11 +156,11 @@ prepare)
     fi
     quest_files "$locale/quest/object" | sed "s|^$locale/||" >>previous-files.txt
     LC_ALL=C sort -u previous-files.txt >previous-sorted.txt
-    tar -cpf previous.tar -C "$locale" -T previous-sorted.txt
+    if test -s previous-sorted.txt; then tar -cpf previous.tar -C "$locale" -T previous-sorted.txt; fi
     while IFS= read -r file; do sha256 "input/$file"; done <install-files.txt >candidate.sha256
     if test -n "$names"; then (cd compile && tar -czf ../compiled.tar.gz object); fi
     touch READY
-    echo 'READY: payload and rollback archived; requested quest builds complete; live unchanged.'
+    echo 'READY: payload checked; required preparation complete; live unchanged.'
     ;;
 install)
     test -f READY
@@ -165,6 +168,9 @@ install)
     snapshot >current.sha256
     cmp baseline.sha256 current.sha256
     while IFS= read -r file; do sha256 "input/$file"; done <install-files.txt | cmp candidate.sha256 -
+    if test -f npc-stock; then
+        sha256 database.sql expected-database.tsv database-verify.sql | cmp database-candidate.sha256 -
+    fi
     if test -f npc-profile; then
         sha256 server-bin/game server-source/shopEx.cpp | cmp server-candidate.sha256 -
     fi
@@ -173,7 +179,7 @@ install)
     trap 'status=$?; trap - EXIT HUP INT TERM; restore || echo "ROLLBACK FAILED: operator required" >&2; exit "$status"' EXIT
     trap 'exit 130' HUP INT TERM
     stop_game </dev/null >install-stop.log 2>&1
-    if test -f npc-profile; then
+    if test -f npc-profile || test -f npc-stock; then
         db_snapshot >database-current.tsv
         cmp database-baseline.tsv database-current.tsv
         # Only the thirteen renewed shops. Player inventory/skill data and
@@ -191,10 +197,17 @@ install)
         test -s previous-database.sql
         touch DATABASE_CHANGED
         mariadb player <database.sql >install-database.log 2>&1
-        shop_count=$(mariadb -N -B player -e 'SELECT COUNT(*) FROM shopex WHERE vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301)')
-        item_count=$(mariadb -N -B player -e 'SELECT COUNT(*) FROM shopex_item WHERE shop_vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301)')
-        test "$shop_count" = 13
-        test "$item_count" = 167
+        if test -f npc-stock; then
+            mariadb -N -B player <database-verify.sql >database-installed.tsv
+            cmp expected-database.tsv database-installed.tsv
+        else
+            shop_count=$(mariadb -N -B player -e 'SELECT COUNT(*) FROM shopex WHERE vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301)')
+            item_count=$(mariadb -N -B player -e 'SELECT COUNT(*) FROM shopex_item WHERE shop_vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301)')
+            test "$shop_count" = 13
+            test "$item_count" = 167
+        fi
+    fi
+    if test -f npc-profile; then
         touch SERVER_CHANGED
         cp -p server-bin/game /usr/home/share/bin/game
         cp -p server-source/shopEx.cpp "$server/game/src/shopEx.cpp"
