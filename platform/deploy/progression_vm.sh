@@ -6,11 +6,11 @@ stage=${2:?release directory}
 case "$stage" in /usr/metin2-progression-[0-9]*-[0-9]*) ;; *) exit 2 ;; esac
 cd "$stage"
 locale=/usr/home/share/locale/europe
+server=/usr/metin2/apps/server
 names='deviltower_zone devilcatacomb_zone dragonlair spider_dungeon midpvp_progression'
 if test -f data-only; then names=''; fi
 if test -f starter-ring; then names='starter_ring'; fi
-if test -f npc-support; then names='starter_support'; fi
-if test -f support-only; then names='starter_support'; fi
+if test -f npc-profile; then names='starter_support'; fi
 health() {
     ps -U metin2 -o command= | awk '
         { gsub(/^[ \t]+|[ \t]+$/, ""); sub(/ \(game\)$/, "") }
@@ -60,7 +60,18 @@ snapshot() {
     while IFS= read -r file; do
         if test -f "$locale/$file"; then sha256 "$locale/$file"; else echo "ABSENT $file"; fi
     done <install-files.txt
+    if test -f remove-files.txt; then
+        while IFS= read -r file; do
+            if test -f "$locale/$file"; then sha256 "$locale/$file"; else echo "ABSENT $file"; fi
+        done <remove-files.txt
+    fi
     quest_files "$locale/quest/object" | while IFS= read -r file; do sha256 "$file"; done
+    if test -f npc-profile; then
+        sha256 "$server/game/src/shopEx.cpp" /usr/home/share/bin/game
+    fi
+}
+db_snapshot() {
+    mariadb -N -B player -e "SELECT * FROM shopex WHERE vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301) ORDER BY vnum; SELECT * FROM shopex_item WHERE shop_vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301) ORDER BY shop_vnum,item_vnum;"
 }
 install_files() {
     while IFS= read -r file; do
@@ -74,6 +85,10 @@ restore() {
     stop_game </dev/null >rollback-stop.log 2>&1 || return 1
     if test -f DATABASE_CHANGED; then
         mariadb player <previous-database.sql >rollback-database.log 2>&1 || return 1
+    fi
+    if test -f SERVER_CHANGED; then
+        cp -p previous-game /usr/home/share/bin/game || return 1
+        cp -p previous-shopEx.cpp "$server/game/src/shopEx.cpp" || return 1
     fi
     remove_objects || return 1
     while IFS= read -r file; do rm -f "$locale/$file"; done <install-files.txt
@@ -89,13 +104,24 @@ prepare)
     tar -xzf payload.tar.gz
     if test -f data-only; then names=''; fi
     if test -f starter-ring; then names='starter_ring'; fi
-    if test -f npc-support; then names='starter_support'; fi
-    if test -f support-only; then names='starter_support'; fi
+    if test -f npc-profile; then names='starter_support'; fi
     while IFS= read -r file; do sha256 "$locale/$file"; done <expected-files.txt | cmp expected.sha256 -
     if test -f new-files.txt; then
         while IFS= read -r file; do test ! -e "$locale/$file"; done <new-files.txt
     fi
     health
+    if test -f npc-profile; then db_snapshot >database-baseline.tsv; fi
+    if test -f npc-profile; then
+        sha256 -q "$server/game/src/shopEx.cpp" | cmp server-source.sha256 -
+        cp -p "$server/game/src/shopEx.cpp" previous-shopEx.cpp
+        cp -p /usr/home/share/bin/game previous-game
+        mkdir server-bin
+        cp -Rp "$server" server-build
+        cp -p server-source/shopEx.cpp server-build/game/src/shopEx.cpp
+        (cd server-build/game/src && gmake -j4 GAMEDIR="$stage/server-bin") >compile-game.log 2>&1
+        test -s server-bin/game
+        sha256 server-bin/game server-source/shopEx.cpp >server-candidate.sha256
+    fi
     if test -n "$names"; then
     mkdir compile
     cp -p "$locale/quest/qc" "$locale/quest/quest_functions" compile/
@@ -122,6 +148,9 @@ prepare)
     snapshot >baseline.sha256
     : >previous-files.txt
     while IFS= read -r file; do test ! -f "$locale/$file" || echo "$file" >>previous-files.txt; done <install-files.txt
+    if test -f remove-files.txt; then
+        while IFS= read -r file; do test ! -f "$locale/$file" || echo "$file" >>previous-files.txt; done <remove-files.txt
+    fi
     quest_files "$locale/quest/object" | sed "s|^$locale/||" >>previous-files.txt
     LC_ALL=C sort -u previous-files.txt >previous-sorted.txt
     tar -cpf previous.tar -C "$locale" -T previous-sorted.txt
@@ -136,41 +165,55 @@ install)
     snapshot >current.sha256
     cmp baseline.sha256 current.sha256
     while IFS= read -r file; do sha256 "input/$file"; done <install-files.txt | cmp candidate.sha256 -
+    if test -f npc-profile; then
+        sha256 server-bin/game server-source/shopEx.cpp | cmp server-candidate.sha256 -
+    fi
     health
     touch INSTALL_STARTED
     trap 'status=$?; trap - EXIT HUP INT TERM; restore || echo "ROLLBACK FAILED: operator required" >&2; exit "$status"' EXIT
     trap 'exit 130' HUP INT TERM
     stop_game </dev/null >install-stop.log 2>&1
-    if test -f npc-support; then
-        # Only the five legacy shop registrations and two global event flags.
-        # Players, inventories and all other quest flags are excluded.
+    if test -f npc-profile; then
+        db_snapshot >database-current.tsv
+        cmp database-baseline.tsv database-current.tsv
+        # Only the thirteen renewed shops. Player inventory/skill data and
+        # unrelated NPC shops are not edited directly.
         {
             echo 'USE player; START TRANSACTION;'
-            echo 'DELETE FROM shop_item WHERE shop_vnum IN (1,2,3,6,7);'
-            echo 'DELETE FROM shop WHERE vnum IN (1,2,3,6,7);'
-            echo "DELETE FROM quest WHERE dwPID=0 AND szName IN ('mob_gold','mob_gold_buyer');"
-            mariadb-dump --compact --skip-add-locks --no-create-info --skip-lock-tables player shop \
-                --where='vnum IN (1,2,3,6,7)'
-            mariadb-dump --compact --skip-add-locks --no-create-info --skip-lock-tables player shop_item \
-                --where='shop_vnum IN (1,2,3,6,7)'
-            mariadb-dump --compact --skip-add-locks --no-create-info --skip-lock-tables player quest \
-                --where="dwPID=0 AND szName IN ('mob_gold','mob_gold_buyer')"
+            echo 'DELETE FROM shopex_item WHERE shop_vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301);'
+            echo 'DELETE FROM shopex WHERE vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301);'
+            mariadb-dump --compact --skip-add-locks --no-create-info --skip-lock-tables player shopex \
+                --where='vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301)'
+            mariadb-dump --compact --skip-add-locks --no-create-info --skip-lock-tables player shopex_item \
+                --where='shop_vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301)'
             echo 'COMMIT;'
         } >previous-database.sql
         test -s previous-database.sql
         touch DATABASE_CHANGED
         mariadb player <database.sql >install-database.log 2>&1
-        shop_count=$(mariadb -N -B player -e 'SELECT COUNT(*) FROM shop WHERE vnum IN (1,2,3,6,7)')
-        gold_query="SELECT COUNT(*) FROM quest WHERE dwPID=0 AND szName IN ('mob_gold','mob_gold_buyer') AND lValue=400"
-        gold_count=$(mariadb -N -B player -e "$gold_query")
-        test "$shop_count" = 0
-        test "$gold_count" = 2
+        shop_count=$(mariadb -N -B player -e 'SELECT COUNT(*) FROM shopex WHERE vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301)')
+        item_count=$(mariadb -N -B player -e 'SELECT COUNT(*) FROM shopex_item WHERE shop_vnum IN (101,102,103,111,112,113,201,202,203,211,212,213,301)')
+        test "$shop_count" = 13
+        test "$item_count" = 167
+        touch SERVER_CHANGED
+        cp -p server-bin/game /usr/home/share/bin/game
+        cp -p server-source/shopEx.cpp "$server/game/src/shopEx.cpp"
+        chown metin2:metin2 /usr/home/share/bin/game
+        chmod 755 /usr/home/share/bin/game
     fi
     remove_objects
     install_files
+    if test -f remove-files.txt; then
+        while IFS= read -r file; do rm -f "$locale/$file"; done <remove-files.txt
+    fi
     service metin2 start </dev/null >install-start.log 2>&1
     wait_health
     while IFS= read -r file; do cmp "input/$file" "$locale/$file"; done <install-files.txt
+    if test -f npc-profile; then
+        cmp server-bin/game /usr/home/share/bin/game
+        cmp server-source/shopEx.cpp "$server/game/src/shopEx.cpp"
+        test ! -e "$locale/shop_table_ex.txt"
+    fi
     touch INSTALLED
     trap - EXIT HUP INT TERM
     echo 'INSTALLED: selected data and quest namespaces; six processes and ports healthy.'

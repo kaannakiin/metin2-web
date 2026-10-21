@@ -2,10 +2,11 @@
 quest starter_support begin
     state start begin
         function apply()
+            -- Repair old characters even when the book was already delivered.
+            if horse.get_level() < 30 then
+                horse.set_level(30)
+            end
             if pc.getqf("horse_ready") == 0 then
-                if horse.get_level() < 30 then
-                    horse.set_level(30)
-                end
                 if horse.is_dead() then
                     horse.revive()
                 end
@@ -19,7 +20,7 @@ quest starter_support begin
                 end
             end
 
-            if pc.get_skill_group() == 0 then
+            if pc.get_level() < 5 then
                 return
             end
             -- Skill 130 follows horse level. Languages and combo use their
@@ -35,13 +36,17 @@ quest starter_support begin
         end
 
         when login begin
-            timer("starter_support_refresh", 5)
+            starter_support.apply()
+            loop_timer("starter_support_refresh", 5)
+        end
+
+        when levelup begin
+            starter_support.apply()
         end
 
         when starter_support_refresh.timer begin
             starter_support.apply()
             -- Also restores support skills after an in-session class reset.
-            timer("starter_support_refresh", 5)
         end
 
         when 20349.chat."Kalici atimi ve becerilerimi hazirla" begin

@@ -1,5 +1,9 @@
 # VM uygulama checklist — mid-pvp Faz 0/1
 
+Tarihî Faz 0/1 kaydıdır. Güncel NPC kurulumu: `progression_release.py --npc-profile`.
+Stok kaynağı `npc_profile.py stock()`; aktif tablolar `shopex` / `shopex_item`.
+Eski dosya mağazası ve eski shop trim/+9 SQL girişleri kaldırıldı.
+
 Agent VM’de `service metin2 restart` çalıştırmaz. Host/VM’de sırayla:
 
 ## 1. Kaynak sync + derleme (FreeBSD VM)
@@ -19,8 +23,7 @@ Canlı ağaca sync et (ch1 + ch99 yeterli).
 
 ```sh
 mysql -u … -p player < update_mid_pvp_refine.sql
-mysql -u … -p player < update_mid_pvp_shop_plus9.sql
-# trim opsiyonel: update_mid_pvp_shop_trim.sql
+mysql -u … -p player < migrations/20261020_npc_support.sql
 ```
 
 Dosyalar: `content/server/sql/`.

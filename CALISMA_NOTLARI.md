@@ -1,5 +1,31 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### Aktif mağaza yolu ve destek becerisi onarımı — 2026-10-21
+
+- Kullanıcı 5. seviyede destek/at becerilerinin gelmediğini ve silahçı/zırhçının
+  açılmadığını bildirdi; eski yapıları kaldırmamızı istedi. Önceki yayında
+  dosya/süreç kontrolü geçti, fakat bu mağazaların çalıştığı kanıtlanmış değildi.
+- Kök neden: açık `ENABLE_RENEWAL_SHOPEX`, DB `shopex` / `shopex_item` okuyor;
+  dosya okuyucusuna girmiyor. Bu tablolar boşken eski standart kayıtlar silinmişti.
+  `npc_profile.py stock()` artık aktif SQL stoklarını üretir. Metin mağazası,
+  eski +9/trim SQL girişleri ve tek seferlik NPC yayın betikleri kaldırıldı.
+  Fresh seed de eski stokları kurup silmek yerine aynı aktif 13 sekme/167 ürünü içerir.
+- Beceri görevi login ve levelup'ta doğrudan çalışır; gerçek `loop_timer` kullanır.
+  Standart/at becerileri 5. seviyede açılır; ana beceriler BK/G/P kalır.
+  Önceden teslim işareti olan karakterlerde eksik at seviyesi de 30'a onarılır.
+- Aktif ShopEx satın alma kodu boş SQL efsun şablonuyla doğal ortalama/beceri
+  zararını siliyordu. Doğal addon korunur; normal ekipman boş, açık SQL şablonu
+  öncelikli kalır. Paket/protokol değişmez; istemciyi tekrar yayımlamak gerekmez.
+- Kurulum `progression_release.py --npc-profile`: gerçek qc ve ayrı kopyada game
+  derlemesi, kaynak/binary/SQL hash koruması, yalnız sahip olunan tabloların yedeği,
+  eski dosyanın kaldırılması ve hata halinde geri dönüş. Diğer NPC'ler korunur.
+  `npc_profile_verify.py` canlı satırların fiyat/adet/efsun/soketleriyle tamamını
+  kanonik kaynakla karşılaştırır. Oyun testi kullanıcıda.
+- Canlı sürüm `20261021-072726`: gerçek qc ve game derlemesi tamamlandı;
+  dosya/binary ve altı süreç/port kontrolü geçti. Salt okunur DB karşılaştırması
+  13 sekme/167 ürünün tüm alanlarını birebir doğruladı; standart shop çakışması yok.
+  Yedekler aynı VM sürüm dizininde. İşletim rehberi: `docs/NPC_KURULUMU.md`.
+
 ### NPC, kalıcı at/standart beceriler, Yang ve APPLY düzeltmesi — 2026-10-20
 
 - Kullanıcı araştırılan mağazaların uygulanıp bütün işlerin canlıya alınmasını

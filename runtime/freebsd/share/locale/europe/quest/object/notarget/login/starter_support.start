@@ -1,1 +1,2 @@
-timer ( "starter_support_refresh" , 5 ) 
+starter_support . apply ( ) 
+loop_timer ( "starter_support_refresh" , 5 ) 

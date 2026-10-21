@@ -1,5 +1,9 @@
 # Silahçı, zırhçı ve market — ayrı NPC tasarımı
 
+21 Ekim düzeltmesi: aktif mağaza kaynağı `shopex` / `shopex_item` SQL tablolarıdır.
+Dosya tabanlı eski stok yolu kaldırıldı. Kesin stok ve fiyat kaynağı
+`npc_profile.py stock()`; aşağıdaki kısım tarihî araştırmadır.
+
 Güncelleme: kullanıcı bu önerilerin uygulanmasını, ayrıca 30 seviye silahların
 +9 satılıp metinlerden çıkarılmasını istedi. Kesin uygulanan seçki ve fiyatlar
 [NPC_CANLI_STOK.md](NPC_CANLI_STOK.md) içinde; aşağıdaki araştırmadaki
@@ -257,7 +261,7 @@ kuruldu. Altı servis süreci ve altı port sağlıklı; oyun testi kullanıcıd
 4. Her NPC için yalnız ilgili shop satırlarını yedekle/güncelle; diğer
    tüccarları topluca seed SQL'i ile sıfırlama.
 
-Yerel dayanak: `seed_shop_refine_pet.sql`, `update_mid_pvp_shop_plus9.sql`,
+Yerel dayanak: `seed_shop_refine_pet.sql`, `migrations/20261020_npc_support.sql`,
 sunucu item protosu, `welcome.lua`, `move_ring.quest` ve canlı salt okunur
-`player.shop` / `shop_item` karşılaştırması. Bu belge üç ana NPC için tasarım
+`player.shopex` / `shopex_item` karşılaştırması. Bu belge üç ana NPC için tasarım
 çalışmasıdır; Faz 3'ün tamamını bitmiş saymaz.

@@ -1,4 +1,27 @@
-# Oyun paketi doğrulaması — 2026-10-20
+# Oyun paketi doğrulaması — 2026-10-21
+
+## Aktif NPC SQL / beceri / at onarımı — 20261021-072726
+
+Kullanıcı mağazaları açamadı ve 5. seviyede destek becerileri gelmedi.
+20 Ekim kurulumundaki dosya/süreç doğrulaması mağaza işlevini kanıtlamıyordu:
+açık `ENABLE_RENEWAL_SHOPEX` boş `shopex` tablolarını okurken yanlışlıkla
+dosya mağazası yayımlanmıştı. Aşağıdaki 20 Ekim kayıtları tarihîdir.
+
+`progression_release.py --npc-profile --install` ile 13 aktif sekme/167 ürün,
+login/levelup + `loop_timer` destek görevi ve doğal addon kaybını önleyen
+ShopEx game derlemesi kuruldu. Standart/at becerileri 5. seviyede; ana beceriler
+BK/G/P. Eksik at seviyesi teslim işaretinden bağımsız onarılır. Eski metin
+mağazası canlıdan silindi. Diğer NPC/loot/Yang/istemci ayarları değiştirilmedi.
+
+Gerçek VM qc ve ayrı kopyada game derlemesi başarılı. Kaynak/nesne/binary
+eşleşmeleri ve altı süreç/port kurulumda doğrulandı. Canlı SQL satırları
+`npc_profile_verify.py` ile fiyat/adet/efsun/soketleri dahil kaynakla karşılaştırılır.
+Oyun testi yapılmadı; mağaza açma/satın alma ve karakter becerileri kullanıcıda.
+
+Host `/home/m2web/progression-20261021-072726`, VM
+`/usr/metin2-progression-20261021-072726`. Geri dönüş dosyaları:
+`previous.tar`, `previous-database.sql`, `previous-game`, `previous-shopEx.cpp`.
+Hazırlanıp kurulmayan `20261021-072536` aktif sürüm değildir.
 
 ## NPC / destek becerileri / kalıcı at / Yang / istemci — 20261020-172132
 

@@ -18,7 +18,7 @@ WELCOME = (
     ROOT
     / "runtime/freebsd/share/locale/europe/quest/quest_tr/_npc_talk_mission/welcome.lua"
 )
-SHOP_SQL = ROOT / "content/server/sql/update_mid_pvp_shop_plus9.sql"
+SHOP_SQL = ROOT / "content/server/sql/migrations/20261020_npc_support.sql"
 REFINE_SQL = ROOT / "content/server/sql/update_mid_pvp_refine.sql"
 SAFE_MAPS_HDR = ROOT / "apps/server/game/src/pvp_safe_maps.h"
 
@@ -141,16 +141,16 @@ def check_welcome() -> None:
 
 def check_shop_sql() -> None:
     text = SHOP_SQL.read_text(encoding="utf-8", errors="replace")
-    for shop in (1, 2, 6, 7):
-        if f"shop_vnum = {shop}" not in text and f"shop_vnum={shop}" not in text:
-            fail(f"shop SQL missing shop_vnum {shop}")
-            return
+    import npc_profile
+    if npc_profile.sql() != text:
+        fail("active shopex migration differs from npc_profile.stock()")
+        return
     # sample +9 early weapons from PVP_HEDEF
     for v in (49, 1019, 2039, 11229, 59, 1029):
         if str(v) not in text:
             fail(f"shop plus9 SQL missing sample vnum {v}")
             return
-    ok("update_mid_pvp_shop_plus9.sql shops 1/2/6/7 + sample +9 vnums")
+    ok("active shopex migration matches canonical stock and sample +9 vnums")
 
 
 def check_refine_sql() -> None:

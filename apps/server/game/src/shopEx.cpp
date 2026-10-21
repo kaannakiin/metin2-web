@@ -279,7 +279,30 @@ int CShopEx::Buy(LPCHARACTER ch, BYTE pos)
 			ch->PointChange(POINT_EXP, -static_cast<int>(dwPrice), false);
 	}
 	{
-		item->SetAttributes(r_item.aAttr);
+		TPlayerItemAttribute attributes[ITEM_ATTRIBUTE_MAX_NUM] = {};
+		bool hasTemplate = false;
+		for (BYTE i = 0; i < ITEM_ATTRIBUTE_MAX_NUM; ++i)
+			hasTemplate = hasTemplate || r_item.aAttr[i].bType || r_item.aAttr[i].sValue;
+
+		if (hasTemplate)
+			item->SetAttributes(r_item.aAttr);
+		else
+		{
+			// Keep the natural average/skill roll on addon weapons. Ordinary
+			// shop equipment remains blank unless its SQL template says otherwise.
+			for (BYTE i = 0; i < ITEM_ATTRIBUTE_MAX_NUM; ++i)
+			{
+				const BYTE type = item->GetAttributeType(i);
+				if (item->GetProto()->sAddonType != 0 &&
+					(type == APPLY_NORMAL_HIT_DAMAGE_BONUS || type == APPLY_SKILL_DAMAGE_BONUS
+#ifdef ENABLE_AVG_PVM_DISABLE
+					 || type == APPLY_ATTBONUS_MEDI_PVM
+#endif
+					))
+					attributes[i] = item->GetAttribute(i);
+			}
+			item->SetAttributes(attributes);
+		}
 
 		for (BYTE i = 0; i < ITEM_SOCKET_MAX_NUM; i++)
 			if (r_item.alSockets[i] != 0)

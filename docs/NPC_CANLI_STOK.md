@@ -137,8 +137,8 @@ Aynı ailelerin +0…+9 sürümleri metin drop gruplarından kaldırıldı.
 
 ## Destek, at ve Yang
 
-- Ana beceriler BK → G → P. Standart/at becerileri sınıf seçimi ardından
-  en geç beş saniye içinde tamamlanır; mevcut karakterler de kapsanır.
+- Ana beceriler BK → G → P. Standart/at becerileri 5. seviyeye ulaşınca
+  doğrudan tamamlanır; sınıf sıfırlamasından sonra en geç beş saniyede yenilenir.
 - Kalıcı seviye 30 askeri at ve bir çağırma kitabı (50053). Süreli
   bineğin yedi günlük süresi değiştirilmez. Kitap kaybolursa markette yedeği var.
 - Yang miktarı normal ve premium için 4 kat; 400.000 kill tavanı,
@@ -146,5 +146,5 @@ Aynı ailelerin +0…+9 sürümleri metin drop gruplarından kaldırıldı.
   ödeme tabanı 10.000/16.000/22.000/28.000, ±%20 ve kişisel çarpanlar ayrı.
 - Kutsama/efsun, BK/Ruh Taşı ve zindan anahtarları bu markete eklenmedi.
 
-Kaynak: `npc_profile.py`, `shop_table_ex.txt`, `20261020_npc_support.sql`;
+Kaynak: `npc_profile.py` → `shopex` / `shopex_item` SQL tabloları;
 standart beceri/at teslimi: `starter_support.lua`.

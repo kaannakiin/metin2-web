@@ -139,7 +139,7 @@ sığar. Fiyatlar satın al/sat döngüsünden Yang üretmez: en az ürün geri 
 İlk ücretsiz yüzük/dedektör/at kitabından ayrı, markette ücretli yedekleri vardır.
 BK, Ruh Taşı ve zindan anahtarları markete konmaz.
 
-Standart/at becerileri: sınıf grubu seçilince liderlik/madencilik/dönüşüm 40,
+Standart/at becerileri: 5. seviyede liderlik/madencilik/dönüşüm 40,
 kombo 2, diller 20, at çağırma 10, dört at saldırı becerisi 40. Ana sınıf
 becerileri değiştirilmez; BK → G → P hedefi korunur. Mevcut karakterler ve
 aynı oturumda grup değişimi de kapsanır. Yeni/eski karaktere kalıcı seviye 30
@@ -216,9 +216,11 @@ araştırma geçmişi `docs/NPC_MAGAZA_TASARIMI.md` içinde tutulur.
 | 301 | Market; günlük sarf ve yüzük/dedektör/at kitabı yedekleri |
 | 11   | boş                                                 |
 
-Güncel kaynak: `shop_table_ex.txt` ve `20261020_npc_support.sql`.
+Güncel kaynak: `npc_profile.py stock()` → `shopex` / `shopex_item` tabloları
+(`20261020_npc_support.sql`; mevcut kurulum onarımı `20261021_npc_profile.sql`).
 Eski 1/2/3/6/7 standart shop kayıtları aynı NPC'de ShopEx ile çakışmaması için
-silinir; diğer mağazalar korunur. Tarihî seed sonrası güncel migration uygulanır.
+silinir; diğer mağazalar korunur. Seed aynı aktif SQL stoklarını içerir.
+Dosya tabanlı `shop_table_ex.txt` kullanılmaz ve dağıtılmaz.
 
 ### Metin bereketi — 2026-10-20 (400 ≈ %100)
 
@@ -359,7 +361,7 @@ Dosya: `runtime/freebsd/share/locale/europe/mob_drop_item.txt` — +1/+2 çöp z
 
 **Küratörlü gear pct:** silah ~10–12, zırh ~8.
 
-**VM:** `mob_drop_item` + `item_proto` sync; `update_mid_pvp_shop_plus9.sql`; db/game restart.
+**VM:** `mob_drop_item` + `item_proto` sync; güncel `shopex` migration; db/game restart.
 
 ---
 
