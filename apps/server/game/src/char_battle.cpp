@@ -643,9 +643,8 @@ static int MidPvpScaleGold(LPCHARACTER pkAttacker, int iGold, bool useMapGold)
 	return static_cast<int>(ll);
 }
 
-static void MidPvpClampKillTotal(int & iTotalGold)
+static void MidPvpClampKillTotal(int & iTotalGold, const int cap)
 {
-	const int cap = GetMidPvpGoldKillCap();
 	if (iTotalGold > cap)
 		iTotalGold = cap;
 }
@@ -760,6 +759,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 	// --------- actual drop handling -------------
 	//
 	LPITEM item;
+	const int iKillCap = useMapGold ? MID_PVP_MAP_GOLD_CAP : GetMidPvpGoldKillCap();
 
 #ifdef ENABLE_GOLD10_PCT
 	int iGold10DropPct = 100;
@@ -775,7 +775,6 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 #endif
 
 		const int iSplitCount = number(25, 35);
-		const int iKillCap = GetMidPvpGoldKillCap();
 		const int iPieceCap = MAX(1, iKillCap / iSplitCount);
 
 		for (int i = 0; i < iSplitCount; ++i)
@@ -820,7 +819,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		//
 		// money bomb drop
 		//
-		const int iPieceCap = MAX(1, GetMidPvpGoldKillCap() / 10);
+		const int iPieceCap = MAX(1, iKillCap / 10);
 		for (int i = 0; i < 10; ++i)
 		{
 			int iGold = number(dwGoldMin, dwGoldMax);
@@ -856,8 +855,8 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		int iGold = number(dwGoldMin, dwGoldMax);
 		iGold = MidPvpScaleGold(pkAttacker, iGold, useMapGold);
 		iGold *= iGoldMultipler;
-		if (iGold > GetMidPvpGoldKillCap())
-			iGold = GetMidPvpGoldKillCap();
+		if (iGold > iKillCap)
+			iGold = iKillCap;
 
 		int iSplitCount = 0;
 
@@ -896,7 +895,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		}
 	}
 
-	MidPvpClampKillTotal(iTotalGold);
+	MidPvpClampKillTotal(iTotalGold, iKillCap);
 	DBManager::instance().SendMoneyLog(MONEY_LOG_MONSTER, GetRaceNum(), iTotalGold);
 }
 

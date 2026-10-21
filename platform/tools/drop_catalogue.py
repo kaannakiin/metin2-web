@@ -127,7 +127,8 @@ def render():
         'metin gruplarından çıkarıldı; boss grupları bu değişiklikle silinmedi.')
     put('- Yang onaylı 17 haritada normal yaratık/metin tabanlarıyla hesaplanır; '
         'aralıklar [hedef belgesinde](../PVP_HEDEF.md#harita-bazlı-yang--2026-10-21). '
-        'Global miktar flagleri 400; 400.000 tavanı ve düşme/seviye kuralları korunur.')
+        'Global miktar flagleri 400; harita tabanı tavanı 800.000, boss/diğer kaynak tavanı 400.000. '
+        'Düşme/seviye kuralları korunur.')
     put('- **Siam Bıçağı, Şeytani Pala, Yarı-İnsan Kılıç ve Mutluluk Yelpazesi 70 seviyedir.** '
         'Önceki özette 75 ailesiyle karıştırılmışlardı. Metinlerde kalırlar.')
     put('- Havalı Çelik Yay **2170**; Geyik Boynuzu Yay **2150** ve 30 seviyedir. '
@@ -204,7 +205,8 @@ def render():
     put('Yang bu statik eşya tablosundan ayrıdır. Onaylı haritalarda `mid_pvp_yang.h` '
         'tabanları uygulanır. Harita kapsamı dışındaki sıfır gold tanımlı metinlerde '
         '`500 + metin_seviyesi × 150` (±%20) eski hesabı korunur. Yang düşme ihtimali, '
-        'seviye farkı, kişisel bonuslar ve 400.000 tavanı geçerlidir.')
+        'seviye farkı ve kişisel bonuslar geçerlidir. Harita tabanında 800.000, '
+        'boss/diğer kaynaklarda 400.000 tavanı uygulanır.')
     put()
     put('## 5. Boss → sandık ve toplam ekipman şansı')
     put()

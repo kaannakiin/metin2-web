@@ -7,6 +7,9 @@ Destek becerileri 5. seviyede, login/levelup ve gerçek döngü zamanlayıcısı
 Kullanıcı bütün işleri sırayla uygulayıp iş bitiminde canlıya almamızı istedi.
 Oyun testi kullanıcıda; gerekli derleme ve dosya/servis kontrolleri yapılır.
 
+- [x] Harita Yang tablosunu bir kez daha 2× yap; harita ödeme tavanını
+      800.000'e çıkar, boss/diğer kaynak tavanını 400.000 tut. Canlı: `20261021-113900`.
+
 - [x] Silahçı/zırhçıyı tek sayfaya indir: 1/15/30 silah; 1/34/48 zırh ve
       azaltılmış kask/kalkan/takı. Eski sekmeler silindi. Canlı SQL: `20261021-085048`.
 

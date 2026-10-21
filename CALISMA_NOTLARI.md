@@ -1,5 +1,22 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### Harita Yang tabanları 2× — 2026-10-21
+
+- Kullanıcı mevcut harita Yang miktarlarını ikiye katlamamızı istedi. Aynı
+  17 haritanın normal yaratık/metin min/max değerlerinin tamamı 2× yapıldı.
+  Metinsiz örümcek/sürgün girdileri 0 kalır; yeni harita veya kaynak eklenmez.
+- Eski 400.000 tavanında Kızıl Orman ve diğer yüksek metin artışı kırpılacağı
+  için yalnız harita tabanlı ödemelerde tavan 800.000 oldu. Boss ve kapsam
+  dışındaki ödemeler eski 400.000 tavanını korur. Normal ödeme, para patlaması
+  parça sınırları ve toplam kaydı aynı seçilmiş tavanı kullanır.
+- Global miktar flagleri 400; olasılık/seviye farkı, kişisel bonuslar, NPC
+  fiyatları, droplar ve diğer sistemler aynı. Hedef ve rehberler güncellendi.
+  Yayın yolu `--map-yang`; ayrı kopyada game derlemesi, kaynak/binary/flag
+  değişiklik koruması ve önceki kaynak/binary yedeği. Oyun testi kullanıcıda.
+- Canlı sürüm `20261021-113900`: game derlemesi başarılı; kaynaklar ve binary
+  adayla birebir eşleşti, altı süreç/port sağlıklı. Önceki dosyalar aynı VM
+  sürüm dizininde `previous-game` ve `previous-server-src` içinde.
+
 ### Silahçı/zırhçı tek sayfa — 2026-10-21
 
 - Kullanıcı gizli sekmeleri ve ara seviyeleri istemedi. Silahlar yalnız

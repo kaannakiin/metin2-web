@@ -1,5 +1,19 @@
 # Oyun paketi doğrulaması — 2026-10-21
 
+## Harita Yang 2× — 20261021-113900
+
+`progression_release.py --map-yang --install`: aynı 17 haritanın normal
+yaratık/metin min/max değerleri tam 2× yapıldı. Harita tabanı kullanılan
+ödemelerin tavanı da 800.000; boss ve diğer kaynaklarda önceki 400.000 kalır.
+Normal ödeme, para patlaması parça limitleri ve toplam kaydı seçilmiş tavanı
+kullanır. Global miktar flagleri, düşme/seviye kuralları ve bonuslar aynı.
+
+Gerçek FreeBSD game derlemesi ayrı kopyada tamamlandı; iki kaynak ve binary
+canlıda adayla birebir eşleşti. Altı süreç/port sağlıklı. Oyun testi yapılmadı.
+VM `/usr/metin2-progression-20261021-113900`; geri dönüş `previous-game`
+ve `previous-server-src`. SQL/proto/görev/istemci değişmedi. Güncel tablo
+`PVP_HEDEF.md` Harita bazlı Yang bölümünde.
+
 ## Silahçı/zırhçı tek sayfa — 20261021-085048
 
 `progression_release.py --npc-stock --install`: silahçı 9001/9007 yalnız

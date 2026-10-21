@@ -94,7 +94,8 @@ Aynı ailelerin +0…+9 sürümleri metin drop gruplarından kaldırıldı.
   bineğin yedi günlük süresi değiştirilmez. Kitap kaybolursa markette yedeği var.
 - Yang, onaylı 17 haritada yaratık/metin türüne göre hesaplanır;
   aralıklar `PVP_HEDEF.md` Harita bazlı Yang bölümündedir.
-  Global miktar flagleri 400; düşüş ihtimali, seviye cezası ve 400.000 tavanı korunur.
+  Global miktar flagleri 400; harita tabanında 800.000, boss/diğer kaynaklarda 400.000 tavanı vardır.
+  Yang düşme ihtimali ve seviye cezası korunur.
 - Kutsama/efsun, BK/Ruh Taşı ve zindan anahtarları bu markete eklenmedi.
 
 Kaynak: `npc_profile.py` → `shopex` / `shopex_item` SQL tabloları;
