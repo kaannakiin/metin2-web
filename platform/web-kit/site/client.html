@@ -16,7 +16,8 @@ canvas#canvas{display:block;width:100%;height:100%;outline:0}
 </style>
 </head>
 <body>
-<canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+<canvas id="canvas" tabindex="0" aria-label="Metin2" oncontextmenu="event.preventDefault()"></canvas>
+<details id="m2w_help" style="position:fixed;top:10px;left:10px;z-index:25;max-width:min(85vw,420px);padding:8px 12px;background:#16130fee;border:1px solid #67533b;border-radius:8px"><summary id="m2w_help_title">Controls</summary><p id="m2w_help_text"></p></details>
 <div id="status">loading…</div>
 <div id="m2w_error"><div><b>The client has stopped.</b><pre id="m2w_error_text"></pre>Reload the page to start again.</div></div>
 <script>
@@ -45,6 +46,24 @@ var Module = {
   preRun: [function () {
     if (autoLogin) Module.FS.writeFile("/m2w_autologin", autoLogin);
     autoLogin = null;
+    Module.addRunDependency('m2w-login-ready');
+    var retry = document.createElement('button');
+    retry.textContent = m2w.config.lang === 'tr' ? 'Yeniden dene' : 'Retry';
+    retry.style.cssText = 'position:fixed;top:60%;left:50%;transform:translateX(-50%);z-index:31;display:none;padding:10px 20px';
+    document.body.appendChild(retry);
+    function prepare() {
+      retry.style.display = 'none';
+      m2w.prepareStartup().then(function () {
+        retry.remove();
+        Module.removeRunDependency('m2w-login-ready');
+      }, function () {
+        statusEl.className = '';
+        statusEl.textContent = m2w.config.lang === 'tr' ? 'Giriş verileri indirilemedi. Bağlantını kontrol edip yeniden dene.' : 'Login data could not be downloaded. Check your connection and retry.';
+        retry.style.display = 'block';
+      });
+    }
+    retry.onclick = prepare;
+    prepare();
   }],
   /// Engine files get `?v=<build time>`, so a new build is never served from cache.
   locateFile: function (p) { return p + "?v=__VERSION__"; },
@@ -88,6 +107,12 @@ window.addEventListener("error", function (ev) {
   if (!lang) (navigator.languages || [navigator.language]).forEach(function (l) { lang = lang || pick(l); });
   if (!lang) lang = pick("en") || packaged[0] || "";
   window.m2w.config.lang = lang;
+document.documentElement.lang = lang;
+document.getElementById('m2w_help_title').textContent = lang === 'tr' ? 'Kontroller ve giriş yardımı' : 'Controls and sign-in help';
+var mac = /Mac|iPhone|iPad/.test(navigator.platform || '');
+document.getElementById('m2w_help_text').textContent = lang === 'tr'
+  ? 'Tab / Shift+Tab: kullanıcı adı ve şifre arasında geçiş. Enter: giriş. Disk simgesi yalnız kullanıcı adını hatırlar; şifre saklanmaz. F1–F4: hatırlanan kullanıcı adını doldurur. ' + (mac ? 'Mac: ayarına göre Fn/🌐 + F1–F4 kullan. Sağ tık için iki parmakla tıkla. ⌘ kısayolları tarayıcıya aittir.' : 'Kısayollar yerine hesap alanlarına tıklayabilirsin. Ctrl+L ve Ctrl+R tarayıcıya aittir.')
+  : 'Tab / Shift+Tab: switch username and password. Enter: sign in. The disk icon remembers only the username; passwords are not saved. F1–F4: fill a saved username. ' + (mac ? 'Mac: depending on keyboard settings, use Fn/🌐 + F1–F4. Use a two-finger click for right-click. ⌘ shortcuts belong to the browser.' : 'You can click the account slots instead. Ctrl+L and Ctrl+R belong to the browser.');
   var scripts = (lang ? ["client.locale_" + lang + ".js"] : []).concat(["client.js"]);
   scripts.forEach(function (src) {
     var s = document.createElement("script");

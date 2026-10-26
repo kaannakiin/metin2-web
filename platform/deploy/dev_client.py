@@ -19,6 +19,13 @@ KIT_FILES = ('patchcheck.py', 'tools/build_gamelib.py', 'tools/incremental_compi
              'tools/dev_archive.py', 'tools/dev_protocol.py', 'tools/login_packet_layout.py',
              'tools/resp_packet_layout.py', 'tools/test_resp_wire.cpp', 'compat/resp_wire.h',
              'compat/runtime.js',
+             'site/preload.js', 'tools/test_prefetch.js',
+             'compat/pack_text.h', 'compat/textcodec.py',
+             'compat/text_encoding.json', 'compat/text_labels.json',
+             'tools/audit_text_encoding.py', 'tools/test_text_encoding.py', 'tools/test_pack_text.cpp',
+             'tools/test_link_inputs.py',
+             'tools/test_python_startup.py',
+             'tools/build_client_data.py', 'tools/rewrite_scripts.py', 'tools/link_client.py',
              'tools/script_patches.py', 'tools/uiscript_from_client.py',
              'bridge/test/dev.test.js')
 

@@ -50,4 +50,6 @@ run_step data python3.13 tools/build_client_data.py --no-private
 run_step link python3.13 webclient.py build --only link
 run_step snapshot python3.13 tools/dev_preview.py snapshot --root /work/dev/site \
     --build-root /work/kit/build/port
-run_step bridge-config python3.13 tools/dev_preview.py config --root /work/dev/bridge.json
+if [ "${M2W_PUBLIC_CANDIDATE:-0}" != 1 ]; then
+    run_step bridge-config python3.13 tools/dev_preview.py config --root /work/dev/bridge.json
+fi

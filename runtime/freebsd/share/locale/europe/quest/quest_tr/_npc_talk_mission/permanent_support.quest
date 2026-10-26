@@ -1,0 +1,20 @@
+quest permanent_support begin
+    state start begin
+        when login or levelup begin
+            local supports = {72731,72732,72733,72734,72735,72736,50827,50828,50829,50830,50831,50832,72737,72738}
+            for _, vnum in ipairs(supports) do
+                local key = "given_" .. vnum
+                if pc.getqf(key) == 0 then
+                    if pc.count_item(vnum) > 0 then
+                        pc.setqf(key, 1)
+                    elseif pc.get_empty_inventory_count() > 0 then
+                        local id = pc.give_item2(vnum, 1)
+                        if id ~= nil and id > 0 then
+                            pc.setqf(key, 1)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end

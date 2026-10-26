@@ -169,6 +169,25 @@ def copy_stdlib():
 SCRIPTS = os.path.join(ROOT, 'build', 'port', 'scripts3')
 
 
+def copy_text_codec():
+    """Install the shared decoder and its explicit file/translation contracts."""
+    names = ('textcodec.py', 'text_encoding.json', 'text_labels.json')
+    for name in names:
+        shutil.copy2(os.path.join(ROOT, 'compat', name), os.path.join(TARGET, name))
+    return len(names)
+
+
+def validate_text_tables():
+    """Check the actual package inputs before replacing the previous data set."""
+    from pathlib import Path
+    from audit_text_encoding import audit
+    result = audit(Path(SCRIPTS))
+    if result['errors']:
+        raise SystemExit('Text encoding contract failed:\n' + '\n'.join(result['errors']))
+    print('TEXT ENCODING: %d locale tables; %d label languages; strict decoding passed' %
+          (len(result['tables']), result['label_languages']))
+
+
 LOCALE_PACKS = os.path.join(ROOT, 'build', 'port', 'data_locale')
 SHARED_LOCALE_DIRECTORIES = ('common', 'ui')
 
@@ -207,6 +226,11 @@ def copy_scripts():
         os.makedirs(target_path, exist_ok=True)
 
         for name in file_list:
+            # This Python 2 stdlib copy would also shadow the real Python 3
+            # package through its ordinary filesystem loader, even after the
+            # pack import hook delegates collections to CPython.
+            if relative_one == '.' and name.lower() == 'collections.py':
+                continue
             shutil.copy2(os.path.join(root_node, name),
                          os.path.join(target_path, name))
             how_many += 1
@@ -609,6 +633,8 @@ def main():
         print('put the client there or fix the path in this script')
         return 1
 
+    validate_text_tables()
+
     # The target is deleted from scratch. Without that a file removed from the source stays in
     # the set and the "what is missing" measurement lies - the same shape of error
     # as the stale `.o` files.
@@ -676,6 +702,9 @@ def main():
         copied += stdlib_count
 
 
+    # Browser-only login readiness bridge; no credentials are written to it.
+    shutil.copyfile(os.path.join(ROOT, 'compat', 'web_ux.py'), os.path.join(TARGET, 'web_ux.py'))
+    copied += 1
     script_count = copy_scripts()
     if script_count < 0:
         print('\nWARNING: no rewritten game scripts')
@@ -771,6 +800,9 @@ def main():
     else:
         print('data from the corpus: %d files' % corpus_count)
         copied += corpus_count
+
+    copied += copy_text_codec()
+    print('text codec: generated Python UTF-8; locale table encodings from contract')
 
     languages = split_languages()
     print('language packages (outside client.data): ' + (', '.join(languages) or 'none'))

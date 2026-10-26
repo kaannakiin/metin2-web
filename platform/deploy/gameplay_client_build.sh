@@ -3,6 +3,7 @@ set -euo pipefail
 source /work/emsdk/emsdk_env.sh >/dev/null 2>&1
 cd /work/kit
 export M2W_DEV_PROTOCOL=source
+node --test tools/test_prefetch.js
 python3.13 tools/login_packet_layout.py
 python3.13 tools/resp_packet_layout.py
 python3.13 - <<'PY'

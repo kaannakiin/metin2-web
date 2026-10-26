@@ -342,6 +342,56 @@ MID_PVP_DETECTOR_PATCHES = [
 if os.environ.get('M2W_LEGACY_DETECTOR') != '1':
     PATCHES_SCRIPTS += MID_PVP_DETECTOR_PATCHES
 
+# A Python 2 collections.py still exists in the source packs. CPython 3 needs
+# its package (collections.abc), including when json imports it during boot.
+PATCHES_SCRIPTS += [
+    ('system.py',
+     'if level or "." in name:',
+     'if level or "." in name or name == "collections" or hasattr(sys.modules.get(name), "__path__"):',
+     'stdlib collections and package fromlist imports must use the Python 3 loader'),
+]
+
+# Web Python strings are Unicode. The source encoding was already resolved by
+# pack.Get; both locale loaders must preserve the final character of each row.
+PATCHES_SCRIPTS += [
+    ('localeInfo.py',
+     'def LoadLocaleFile(srcFileName, localeDict):',
+     'from textcodec import split_locale_row\n\ndef LoadLocaleFile(srcFileName, localeDict):',
+     'share locale row parsing without dropping an unterminated final character'),
+    ('localeInfo.py',
+     '\n\t\t\ttokens = line[:-1].split("\\t")',
+     '\n\t\t\ttokens = split_locale_row(line)',
+     'locale_game rows preserve LF, CRLF and an unterminated final line'),
+    ('localeInfo.py',
+     '\n\t\t\t\t\ttokens = line[:-1].split("\\t")',
+     '\n\t\t\t\t\ttokens = split_locale_row(line)',
+     'tower locale rows use the same lossless row parser'),
+    ('uiScriptLocale.py',
+     'def LoadLocaleFile(srcFileName, localeDict):',
+     'from textcodec import split_locale_row, ui_labels\n\ndef LoadLocaleFile(srcFileName, localeDict):',
+     'interface locale uses the shared text codec'),
+    ('uiScriptLocale.py',
+     'tokens = line[:-1].split("\\t")',
+     'tokens = split_locale_row(line)',
+     'locale_interface rows preserve their final character'),
+    ('uiScriptLocale.py',
+     'LoadLocaleFile(LOCALE_INTERFACE_FILE_NAME, locals())',
+     'LoadLocaleFile(LOCALE_INTERFACE_FILE_NAME, locals())\nlocals().update(ui_labels(app.GetLocalePath()))',
+     'install the same battle pass keys for every supported locale'),
+    ('uiMiniMap.py',
+     'self.wndBattlePassMenu.SetText("Savaş Bileti Seçiniz")',
+     'self.wndBattlePassMenu.SetText(uiScriptLocale.BATTLEPASS_SELECT_PASS)',
+     'battle pass title follows the selected language'),
+    ('uiMiniMap.py',
+     'self.wndBattlePassMenu.SetAcceptText("Ücretsiz")',
+     'self.wndBattlePassMenu.SetAcceptText(uiScriptLocale.BATTLEPASS_FREE)',
+     'battle pass free option follows the selected language'),
+    ('uiMiniMap.py',
+     'self.wndBattlePassMenu.SetCancelText("Premium")',
+     'self.wndBattlePassMenu.SetCancelText(uiScriptLocale.BATTLEPASS_PREMIUM)',
+     'battle pass premium option follows the selected language'),
+]
+
 # The PATCHES_SCRIPTS table describes places; these rules describe NAMES. Only
 # replacements that are unambiguous in the whole language and need no reading
 # of the context belong here - otherwise they would go into the table.
@@ -433,6 +483,19 @@ def apply_all(directory):
         print('  patch: %s <- %s' % (name, why_needed))
         how_many += 1
 
+    # Install web-only methods after the generated class is complete. Keep the
+    # mixed-encoding Windows source and its registry implementation untouched.
+    login = next((n for n in os.listdir(directory) if n.lower() == 'intrologin.py'), None)
+    if login:
+        path_str = os.path.join(directory, login)
+        content = io.open(path_str, encoding='utf-8', newline='').read()
+        marker = 'web_ux.install(LoginWindow)'
+        if marker not in content:
+            if 'class LoginWindow(' not in content:
+                raise SystemExit('Web UX: LoginWindow class missing')
+            with io.open(path_str, 'a', encoding='utf-8', newline='') as target:
+                target.write('\n\nimport web_ux\nweb_ux.install(LoginWindow)\n')
+            how_many += 1
     return how_many
 
 

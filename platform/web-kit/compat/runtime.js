@@ -582,6 +582,7 @@ m2w.eventsStart = function () {
     // `WM_CHAR`, not for a key state. `e.key` of length one is a character;
     // anything longer is a key name ("Enter", "F5").
     globalThis.addEventListener('keydown', function (e) {
+        if (m2w.gameKeyEvent && !m2w.gameKeyEvent(e)) return;
         var vk = 0;
         if (e.key === 'Backspace') vk = 0x08;
         else if (e.key === 'Tab') vk = 0x09;
@@ -601,6 +602,7 @@ m2w.eventsStart = function () {
         if (e.key.length === 1) push(0x0102, e.key.charCodeAt(0));
         else if (e.key === 'Enter') push(0x0102, 13);
         else if (e.key === 'Backspace') push(0x0102, 8);
+        else if (e.key === 'Tab') push(0x0102, 9);
 
         // Keys the browser uses for itself and the game for something
         // else. The rest stays with the page - F5, F12, Ctrl+... must work,
@@ -692,6 +694,7 @@ m2w.keysStart = function () {
 
     /// Records key event `e` as down (1) / up (0), with the either-side VK too.
     var set = function (e, value) {
+        if (value && m2w.gameKeyEvent && !m2w.gameKeyEvent(e)) return;
         var vk = map[e.code];
         if (vk !== undefined) state[vk] = value;
         // `Shift`, `Control`, `Alt` also exist as "either of the pair" -
@@ -867,6 +870,7 @@ m2w.dikStart = function () {
     var held = Object.create(null);
 
     document.addEventListener('keydown', function (e) {
+        if (m2w.gameKeyEvent && !m2w.gameKeyEvent(e)) return;
         var d = held[e.code];
         if (d === undefined) d = e.key === '"' ? 41 : map[e.code];
         if (d !== undefined) {
@@ -1177,6 +1181,8 @@ m2w.prefetch = m2w.prefetch || null;
 /// counts bytes on the wire). build_corpus.py makes sure no chunk starts
 /// with a BOM; this is the second line.
 m2w.fetchSync = function (url, expected) {
+    if (m2w.startupManifest && /\/manifest\.bin(?:\?|$)/.test('/' + url))
+        return m2w.startupManifest;
     try {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, false);
@@ -1219,6 +1225,62 @@ m2w.chunks = m2w.chunks || null;
 /// Creates the chunk cache once (`m2w.chunks`, budget `budgetMB` MB) with its
 /// eviction rule and opens the Cache Storage `m2w-corpus` (null where the
 /// origin has none - then chunks do not survive the session).
+m2w.chunkTask = function (task, milliseconds, label, controller) {
+    return new Promise(function (resolve, reject) {
+        var timer = setTimeout(function () {
+            if (controller) controller.abort();
+            reject(new Error(label + ' timeout'));
+        }, milliseconds);
+        Promise.resolve().then(task).then(function (value) {
+            clearTimeout(timer);
+            resolve(value);
+        }, function (error) {
+            clearTimeout(timer);
+            reject(error);
+        });
+    });
+};
+
+/// Bound both disk reads and complete HTTP bodies. Cache failures use the
+/// network; rejected or slow cache writes never hold a download slot open.
+m2w.loadChunk = function (url, storage) {
+    var valid = function (buffer) {
+        if (!buffer || !buffer.byteLength || buffer.byteLength > 4 * 1048576)
+            throw new Error('invalid chunk size');
+        return buffer;
+    };
+    var network = function () {
+        var controller = new AbortController();
+        return m2w.chunkTask(function () {
+            return fetch(url, { signal: controller.signal }).then(function (response) {
+                if (!response || !response.ok) throw new Error('HTTP ' + (response && response.status));
+                var type = response.headers && response.headers.get('content-type');
+                if (type && /text\/html/i.test(type)) throw new Error('HTML instead of chunk');
+                var copy = storage ? response.clone() : null;
+                return response.arrayBuffer().then(function (buffer) {
+                    return { buffer: valid(buffer), copy: copy };
+                });
+            });
+        }, 20000, 'chunk fetch', controller).then(function (result) {
+            if (storage) {
+                try { Promise.resolve(storage.put(url, result.copy)).catch(function () {}); } catch (e) {}
+            }
+            return { buffer: result.buffer, fromStorage: false };
+        });
+    };
+    if (!storage) return network();
+    return m2w.chunkTask(function () {
+        return Promise.resolve(storage.match(url)).then(function (hit) {
+            return hit ? hit.arrayBuffer().then(valid) : null;
+        });
+    }, 2000, 'chunk cache').catch(function () {
+        try { Promise.resolve(storage.delete(url)).catch(function () {}); } catch (e) {}
+        return null;
+    }).then(function (buffer) {
+        return buffer ? { buffer: buffer, fromStorage: true } : network();
+    });
+};
+
 m2w.chunkCacheStart = function (budgetMB) {
     if (m2w.chunks) return;
     // Measurement: `performance.getEntriesByType('resource')` for every
@@ -1233,6 +1295,7 @@ m2w.chunkCacheStart = function (budgetMB) {
         fromStorage: 0,
         fromNetwork: 0,
         used: new Set(),
+        pinned: new Set(),
         background: 0
     };
     // Makes room in the budget: FIRST the oldest already used, only then the
@@ -1250,7 +1313,7 @@ m2w.chunkCacheStart = function (budgetMB) {
             var it = state.map.keys();
             for (var r = it.next(); !r.done; r = it.next()) {
                 var k = r.value;
-                if (k === protectedName) continue;
+                if (k === protectedName || state.pinned.has(k)) continue;
                 if (pass === 0 && !state.used.has(k)) continue;
                 state.bytes -= state.map.get(k).length;
                 state.map.delete(k);
@@ -1271,7 +1334,8 @@ m2w.chunkCacheStart = function (budgetMB) {
             resolve(null);
             return;
         }
-        caches.open('m2w-corpus').then(function (c) { resolve(c); })
+        m2w.chunkTask(function () { return caches.open('m2w-corpus'); }, 2000, 'cache open')
+                                  .then(function (c) { resolve(c); })
                                   .catch(function () { resolve(null); });
     });
 };
@@ -1300,7 +1364,10 @@ m2w.chunkCachePut = function (name, bytes) {
     state.bytes += bytes.length;
     state.used.add(name);
     state.evict(name);
-    if (m2w.prefetch && m2w.prefetch.fetched) m2w.prefetch.fetched.add(name);
+    if (m2w.prefetch && m2w.prefetch.fetched) {
+        m2w.prefetch.fetched.add(name);
+        m2w.prefetch.failed.delete(name);
+    }
 };
 
 /// Fetches a chunk IN THE BACKGROUND - Cache Storage first, then the
@@ -1330,19 +1397,19 @@ m2w.chunkInBackground = function (url, name) {
             state.evict(name);
         }
         if (fromStorage) ++state.fromStorage; else ++state.fromNetwork;
+        if (m2w.prefetch) {
+            m2w.prefetch.fetched.add(name);
+            m2w.prefetch.failed.delete(name);
+            m2w.prefetch.lastProgress = performance.now();
+            if (fromStorage) m2w.prefetch.storageHits.add(name);
+        }
         state.inFlight.delete(name);
         --state.background;
     };
 
     state.storage.then(function (storage) {
-        var stored = storage ? storage.match(url) : Promise.resolve(null);
-        return Promise.resolve(stored).then(function (response) {
-            if (response) return response.arrayBuffer().then(function (b) { put(b, true); });
-            return fetch(url).then(function (response2) {
-                if (!response2 || !response2.ok) throw new Error('HTTP');
-                if (storage) { try { storage.put(url, response2.clone()); } catch (e) { } }
-                return response2.arrayBuffer().then(function (b) { put(b, false); });
-            });
+        return m2w.loadChunk(url, storage).then(function (result) {
+            put(result.buffer, result.fromStorage);
         });
     }).catch(function () { state.inFlight.delete(name); --state.background; });
 };
@@ -1369,6 +1436,7 @@ m2w.prefetchStart = function (base) {
     var p = m2w.prefetch = {
         base: base, groups: null, queue: [], queued: new Set(), fetched: new Set(),
         pending: [], active: 0, urgent: null, fromStorage: 0, fromNetwork: 0, errors: 0,
+        failed: new Map(), attempts: new Map(), waiting: new Set(), storageHits: new Set(),
         start: performance.now(), lastProgress: performance.now(), retry: 0,
         disabled: m2w.options.get('noprefetch') === '1'
     };
@@ -1381,7 +1449,7 @@ m2w.prefetchStart = function (base) {
         var it = state.map.keys();
         for (var r = it.next(); !r.done; r = it.next()) {
             var k = r.value;
-            if (keep && keep.has(k)) continue;
+            if ((keep && keep.has(k)) || state.pinned.has(k)) continue;
             if (!allowUnused && !state.used.has(k)) continue;
             state.bytes -= state.map.get(k).length;
             state.map.delete(k);
@@ -1395,7 +1463,7 @@ m2w.prefetchStart = function (base) {
     var reserve = function (name) {
         var keep = p.urgent && p.urgent.names.has(name) ? p.urgent.names : null;
         while (state.bytes + CHUNK > state.budget) {
-            if (evictOne(false, null)) continue;
+            if (evictOne(false, keep)) continue;
             if (keep && evictOne(true, keep)) continue;
             if (performance.now() - p.lastProgress > 15000 && evictOne(true, null)) {
                 p.lastProgress = performance.now();
@@ -1409,6 +1477,7 @@ m2w.prefetchStart = function (base) {
     var put = function (name, buffer) {
         state.bytes -= CHUNK;
         p.fetched.add(name);
+        p.failed.delete(name);
         p.lastProgress = performance.now();
         if (state.map.has(name)) return;
         var data = new Uint8Array(buffer);
@@ -1416,37 +1485,61 @@ m2w.prefetchStart = function (base) {
         state.bytes += data.length;
     };
     var load = function (storage, name) {
-        var url = base + name;
-        return Promise.resolve(storage ? storage.match(url) : null).then(function (hit) {
-            if (hit) {
+        return m2w.loadChunk(base + name, storage).then(function (result) {
+            if (result.fromStorage) {
                 ++p.fromStorage;
-                return hit.arrayBuffer();
-            }
-            return fetch(url).then(function (response) {
-                if (!response || !response.ok) throw new Error('HTTP ' + (response && response.status));
-                if (storage) { try { storage.put(url, response.clone()); } catch (e) { } }
+                p.storageHits.add(name);
+            } else {
                 ++p.fromNetwork;
-                return response.arrayBuffer();
-            });
+            }
+            return result.buffer;
         });
+    };
+    var pumpLater = function () {
+        if (!p.retry) p.retry = setTimeout(function () { p.retry = 0; pump(); }, 200);
     };
     var pump = function () {
         state.storage.then(function (storage) {
+            var blocked = 0;
             while (p.active < 3 && p.queue.length) {
                 var name = p.queue[0];
-                if (state.map.has(name) || state.inFlight.has(name)) { p.queue.shift(); continue; }
+                if (state.map.has(name)) {
+                    p.fetched.add(name);
+                    p.failed.delete(name);
+                    p.queue.shift();
+                    continue;
+                }
+                // Background reads may fail. Do not discard their queued work.
+                if (state.inFlight.has(name)) {
+                    p.queue.push(p.queue.shift());
+                    if (++blocked >= p.queue.length) { pumpLater(); return; }
+                    continue;
+                }
+                blocked = 0;
                 if (!reserve(name)) {
-                    if (!p.retry) p.retry = setTimeout(function () { p.retry = 0; pump(); }, 200);
+                    pumpLater();
                     return;
                 }
                 p.queue.shift();
                 ++p.active;
                 state.inFlight.add(name);
                 (function (n) {
+                    var attempt = (p.attempts.get(n) || 0) + 1;
+                    p.attempts.set(n, attempt);
                     load(storage, n).then(function (b) { put(n, b); }, function (e) {
                         state.bytes -= CHUNK;
                         ++p.errors;
                         console.warn('m2w corpus: prefetch ' + n + ' - ' + e);
+                        if (attempt < 3) {
+                            p.waiting.add(n);
+                            setTimeout(function () {
+                                p.waiting.delete(n);
+                                if (p.queue.indexOf(n) < 0) p.queue.push(n);
+                                pump();
+                            }, attempt * 1000);
+                        } else {
+                            p.failed.set(n, String(e));
+                        }
                     }).then(function () {
                         state.inFlight.delete(n);
                         --p.active;
@@ -1455,6 +1548,20 @@ m2w.prefetchStart = function (base) {
                 })(name);
             }
         });
+    };
+
+    m2w.retryPrefetchFailed = function () {
+        if (!p.groups && m2w.reloadGroups) m2w.reloadGroups();
+        if (p.urgent) {
+            p.urgent.start = performance.now();
+            p.urgent.timedOut = false;
+        }
+        p.failed.forEach(function (_, name) {
+            p.attempts.delete(name);
+            if (p.queue.indexOf(name) < 0) p.queue.push(name);
+        });
+        p.failed.clear();
+        pump();
     };
 
     /// Queues group `name` (at the front when `urgent`).
@@ -1490,9 +1597,13 @@ m2w.prefetchStart = function (base) {
             u.total = u.names.size;
         }
         var done = 0;
-        u.names.forEach(function (n) { if (state.map.has(n) || p.fetched.has(n)) ++done; });
+        // Download history is progress, not proof that a synchronous read can
+        // succeed now. Restore evicted chunks from disk before releasing C++.
+        if (u.total) state.pinned = new Set(u.names);
+        u.names.forEach(function (n) { if (state.map.has(n)) ++done; });
         u.done = done;
-        if ((p.groups && done >= u.total) || now - u.start > MAP_WAIT_MS) {
+        u.timedOut = now - u.start > MAP_WAIT_MS;
+        if (p.groups && done >= u.total) {
             console.log('m2w corpus: map ' + map + ' ' + done + '/' + u.total + ' chunks in ' +
                         Math.round(now - u.start) + ' ms');
             p.urgent = null;
@@ -1515,10 +1626,16 @@ m2w.prefetchStart = function (base) {
         }).catch(function () { });
     };
 
-    fetch(base + 'groups.txt', { cache: 'no-store' }).then(function (o) {
-        if (!o.ok) throw new Error('HTTP ' + o.status);
-        return o.text();
-    }).then(function (text) {
+    m2w.reloadGroups = function () {
+        if (p.loadingGroups) return p.loadingGroups;
+        p.groupError = null;
+        var controller = new AbortController();
+        p.loadingGroups = m2w.chunkTask(function () {
+            return fetch(base + 'groups.txt', { cache: 'no-store', signal: controller.signal }).then(function (o) {
+                if (!o.ok) throw new Error('HTTP ' + o.status);
+                return o.text();
+            });
+        }, 20000, 'corpus groups', controller).then(function (text) {
         var groups = {};
         text.split('\n').forEach(function (line) {
             var f = line.trim().split(/\s+/);
@@ -1532,15 +1649,24 @@ m2w.prefetchStart = function (base) {
         return groups;
     }).catch(function (e) {
         console.warn('m2w corpus: no groups.txt - no prefetch (' + e + ')');
-        return {};
+        p.groupError = String(e);
+        return null;
     }).then(function (groups) {
+        if (!groups) return;
         p.groups = groups;
         var pending = p.pending;
         p.pending = [];
-        ['boot', 'meta', 'motion'].forEach(function (g) { m2w.want(g, false); });
+        // The web shell prepares a small login working set first. The full
+        // startup groups are requested when the player actually signs in.
+        (m2w.startupStaged ? [] : ['boot', 'meta', 'motion']).forEach(function (g) { m2w.want(g, false); });
         pending.forEach(function (w) { m2w.want(w[0], w[1]); });
         state.storage.then(prune);
+    }).then(function () {
+        p.loadingGroups = null;
     });
+        return p.loadingGroups;
+    };
+    m2w.reloadGroups();
 };
 
 /// Hands the page the list of all chunk hashes and the corpus address

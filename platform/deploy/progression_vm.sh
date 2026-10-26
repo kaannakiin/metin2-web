@@ -7,6 +7,14 @@ case "$stage" in /usr/metin2-progression-[0-9]*-[0-9]*) ;; *) exit 2 ;; esac
 cd "$stage"
 locale=/usr/home/share/locale/europe
 server=/usr/metin2/apps/server
+select_server() {
+    if test -f server-root.txt; then
+        server=$(cat server-root.txt)
+        case "$server" in /usr/metin2-support-[0-9]*-[0-9]*/apps/server) ;; *) exit 2 ;; esac
+        test -d "$server"
+    fi
+}
+select_server
 names='deviltower_zone devilcatacomb_zone dragonlair spider_dungeon midpvp_progression'
 if test -f data-only; then names=''; fi
 if test -f starter-ring; then names='starter_ring'; fi
@@ -117,6 +125,10 @@ prepare)
     test ! -e INSTALL_STARTED
     sha256 -q payload.tar.gz | cmp payload.sha256 -
     tar -xzf payload.tar.gz
+    select_server
+    if test -f server-root.txt; then
+        cmp "$server/../../out/game" /usr/home/share/bin/game
+    fi
     if test -f data-only; then names=''; fi
     if test -f starter-ring; then names='starter_ring'; fi
     if test -f npc-profile; then names='starter_support'; fi

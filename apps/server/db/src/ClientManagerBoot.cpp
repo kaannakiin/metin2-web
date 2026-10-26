@@ -7,6 +7,7 @@
 
 #include "../../common/service.h"
 #include "../../common/tables.h"
+#include "../../common/pvp_support_proto.h"
 
 using namespace std;
 extern std::string g_stLocaleNameColumn;
@@ -695,6 +696,36 @@ bool CClientManager::InitializeItemTable()
 	}
 	//_______________________________________________________________________//
 
+	// Permanent support overlay: legacy text protos retain their original encoding.
+	// Both loaders apply the same policy; no packet/enum changes or player-item rewrite.
+	TItemTable permanentBase = {};
+	bool foundPermanentBase = false;
+	for (auto& table : m_vec_itemTable)
+	{
+		pvp_support::Configure(table, USE_AFFECT_PLUS, LIMIT_LEVEL);
+		if (table.dwVnum == 72731)
+		{
+			permanentBase = table;
+			foundPermanentBase = true;
+		}
+		if (table.dwVnum == 72737 || table.dwVnum == 72738)
+		{
+			sys_err("Permanent support vnum collision: %u", table.dwVnum);
+			return false;
+		}
+	}
+	if (!foundPermanentBase)
+		return false;
+	for (unsigned vnum = 72737; vnum <= 72738; ++vnum)
+	{
+		TItemTable table = permanentBase;
+		table.dwVnum = vnum;
+		pvp_support::Configure(table, USE_AFFECT_PLUS, LIMIT_LEVEL);
+		strlcpy(table.szName, vnum == 72737 ? "Permanent Green Potion" : "Permanent Purple Potion", sizeof(table.szName));
+		strlcpy(table.szLocaleName, vnum == 72737 ? "Ye\376il \335ksir+" : "Mor \335ksir+", sizeof(table.szLocaleName));
+		m_vec_itemTable.push_back(table);
+	}
+
 	// QUEST_ITEM_PROTO_DISABLE
 	// InitializeQuestItemTable();
 	// END_OF_QUEST_ITEM_PROTO_DISABLE
@@ -702,6 +733,8 @@ bool CClientManager::InitializeItemTable()
 	m_map_itemTableByVnum.clear();
 
 	itertype(m_vec_itemTable) it = m_vec_itemTable.begin();
+	// Appended support prototypes must be sorted before storing element pointers.
+	sort(m_vec_itemTable.begin(), m_vec_itemTable.end(), FCompareVnum());
 
 	while (it != m_vec_itemTable.end())
 	{
@@ -727,7 +760,6 @@ bool CClientManager::InitializeItemTable()
 		m_map_itemTableByVnum.insert(std::map<DWORD, TItemTable *>::value_type(item_table->dwVnum, item_table));
 	}
 
-	sort(m_vec_itemTable.begin(), m_vec_itemTable.end(), FCompareVnum());
 	return true;
 }
 

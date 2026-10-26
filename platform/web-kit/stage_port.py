@@ -88,6 +88,22 @@ REASON_SELECT = (
 
 PATCHES = [
     (
+        'UserInterface/PythonPlayerSkill.cpp',
+        '\t// Fix me\n'
+        '#if defined(ENABLE_CONQUEROR_LEVEL) && defined(ENABLE_STANDING_MOUNT)\n'
+        '\t// Standing mount \xfczerindeyken skill grade kontrol\xfcn\xfc atla\n'
+        '\tif (pkInstMain->IsMountingHorse() && !pkInstMain->IsMountingHoverBoard() && (GetSkillGrade(107) < 1 && GetSkillLevel(107) < 20))\n'
+        '#else\n'
+        '\tif (pkInstMain->IsMountingHorse() && (GetSkillGrade(109) < 1 && GetSkillLevel(109) < 20))\n'
+        '#endif\n'
+        '\t{\n'
+        '\t\treturn false;\n'
+        '\t}\n',
+        '\t// Support slots are layout-dependent: 109 is horse summon, not riding.\n'
+        '\t// Actor, per-skill weapon/mount checks and server eligibility decide use.\n',
+        'FIX: stale riding slot blocked all mounted skills on the mid-pvp layout',
+    ),
+    (
         'UserInterface/PythonNetworkStream.cpp',
         '#include "Packet.h"\n',
         '#include "Packet.h"\n#include "resp_wire.h"\n',
@@ -717,10 +733,14 @@ PATCHES = [
     (
         'UserInterface/PythonPackModule.cpp',
         '\t\t\t\treturn Py_BuildValue("s#",pData, file.Size());',
-        '\t\t\t\t// PORT: "s#" MEANS "DECODE AS UTF-8" IN PYTHON 3.\n\t\t\t\t//\n\t\t\t\t// In Python 2 `str` was a byte sequence and this line simply\n\t\t\t\t// returned them. In Python 3 `str` is text, so `Py_BuildValue`\n\t\t\t\t// has to know IN WHAT ENCODING these bytes are - and it assumes\n\t\t\t\t// UTF-8, because that is the default answer.\n\t\t\t\t//\n\t\t\t\t// And this is not UTF-8 data. The game language files are in the CODE\n\t\t\t\t// PAGE given in `locale.cfg` (here 1252). Symptom:\n\t\t\t\t//\n\t\t\t\t//     UnicodeDecodeError: utf-8 codec cannot decode byte 0x91\n\t\t\t\t//\n\t\t\t\t// 0x91 is the left apostrophe in CP1252 - a byte that in UTF-8 has no\n\t\t\t\t// right to stand alone.\n\t\t\t\t//\n\t\t\t\t// So it decodes with THE page the client itself set at start,\n\t\t\t\t// and does not guess. `errors="replace"` instead of an error, because a single\n\t\t\t\t// unexpected byte in a language file is to give one question\n\t\t\t\t// mark, not to overturn the loading of the whole language.\n\t\t\t\t{\n\t\t\t\tchar szEncoding[16];\n\t\t\t\tsnprintf(szEncoding, sizeof(szEncoding), "cp%u",\n\t\t\t\t\t\t LocaleService_GetCodePage());\n\t\t\t\treturn PyUnicode_Decode(static_cast<const char*>(pData),\n\t\t\t\t\t\t\t\t\t  file.Size(), szEncoding, "replace");\n\t\t\t\t}',
-        '"s#" means "decode as UTF-8" in Python 3, and the game language files '
-        'are in the code page from locale.cfg - it decodes with the one the '
-        'client set',
+        '\t\t\t\treturn M2W_DecodePackText(strFileName, pData, file.Size(), GetCodePage());',
+        'decode generated scripts and locale tables by source encoding, not display locale',
+    ),
+    (
+        'UserInterface/PythonPackModule.cpp',
+        '#include "AccountConnector.h"\n',
+        '#include "AccountConnector.h"\n#include "pack_text.h"\n',
+        'PORT: file text boundary uses the shared encoding contract',
     ),
     (
         'ScriptLib/PythonUtils.cpp',
@@ -921,14 +941,6 @@ def resolve_ci(root, rel):
     for part in rel.split('/'):
         path = find_ci(path, part)
     return path
-
-
-PATCHES.append((
-    'UserInterface/PythonPackModule.cpp',
-    'LocaleService_GetCodePage()',
-    'GetCodePage()',
-    'the fork renamed LocaleService_GetCodePage; it returns 1254 for the Turkish (cp1254) locale files',
-))
 
 
 _SERVER_ADDRESS = workspace.server_address()

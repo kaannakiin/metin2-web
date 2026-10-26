@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "generated_python": "utf-8-sig",
+  "locale_tables": ["locale_game.txt", "locale_interface.txt"],
+  "locales": {
+    "tr": "cp1254",
+    "en": "utf-8-sig",
+    "de": "utf-8-sig",
+    "pl": "utf-8-sig",
+    "cz": "utf-8-sig",
+    "hu": "utf-8-sig",
+    "pt": "utf-8-sig",
+    "ro": "utf-8-sig",
+    "fr": "utf-8-sig",
+    "es": "utf-8-sig",
+    "it": "utf-8-sig"
+  },
+  "unregistered_pack_text": "legacy-replace"
+}

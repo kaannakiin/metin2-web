@@ -1,5 +1,416 @@
 # Anka2 – Sunucu + Web (WASM) Çalışma Notları
 
+### BK okuma penceresinde beceriye göre adet — 2026-10-23 (canlı)
+
+- `uibkoku.py` bütün `50300` kitaplarını `GetItemCountByVnum` ile sayıyordu.
+  Kitabın beceri kimliği `socket[0]` içinde; farklı becerilerin kitapları aynı
+  eşya vnum'unu kullanır. Pencere bu ayrımı göstermediği için sayı yanıltıcıydı.
+- Sayaç artık seçilen Master becerinin kimliğiyle eşleşen kitapları, bütün
+  normal envanter slotlarında yığın adetleriyle toplar. Seçim yoksa, kitap
+  kalmadıysa veya beceri artık Master değilse kitap slotu temizlenir.
+- Sunucudaki `BKBul`, `/bkoku` tekli ve toplu okuma yolları zaten hem `50300`
+  hem beceri soketini kontrol ediyor; incelenen bu yollarda başka becerinin
+  kitabını tüketen bir eşleşme bulunmadı. Sunucu davranışı değiştirilmedi.
+- Python UI dosyası UTF-8 kaynak bildirimiyle kaydedildi; Türkçe mesajlar
+  korundu. Sekiz karışık envanter senaryosu yerelde ve host üzerinde geçti.
+- **Canlı sürüm `1792749080`:** kullanıcı yayını yetkilendirdi. Çalışan
+  `client.data` içindeki 2.224 dosya karşılaştırıldı; yalnız `/uibkoku.py`
+  değişti. `client.js` içinde yalnız paket metadata'sı (ofsetler/boyut),
+  HTML'de yalnız sürüm etiketleri güncellendi. Motor yeniden derlenmedi;
+  WASM SHA-256 `8779c916b81863e65cba21b8da17852cb0dde1ecbf5eced25c137e7b95f3937a`
+  aynı. Mevcut seçenek/karakter layout'ları birebir korundu.
+- Patchcheck 81/81, JS sözdizimi ve gerçek CPython 3.13 modül sözdizimi
+  kontrolü geçti. Public HTML 200/no-cache ve yeni sürüm; public JS 200;
+  public data içindeki düzeltilmiş modül doğrulanan adayla birebir eşleşti.
+  Kaynak overlay/scripts/scripts3/data kopyaları sonraki build için eşitlendi.
+  VM, corpus ve servisler değişmedi. Gerçek oyun testi kullanıcıda.
+- Yedek: `/home/m2web/backups/bk-count-8ryxb3q5/site` (üç yayın dosyası).
+  Yayın aracı: `platform/deploy/release_bk_count.py`; hata durumunda kaynak
+  girdileri ve yayın dosyalarını geri alır. Ruh taşı kontrolünde bulunan
+  ayrı sunucu doğrulama eksiği `docs/BECERI_OKUMA_INCELEMESI.md` içinde;
+  bu yayında sunucu davranışı değiştirilmedi.
+
+### Eski 11 eşyanın uygunsuz efsun temizliği — 2026-10-22 (uygulandı)
+
+- **SON DURUM — uygulandı:** kullanıcı “uygula bunları” diyerek hazırlanmış
+  kısa bakımı yetkilendirdi. 11 eşyadan 15 hatalı normal efsun kaldırıldı;
+  doğal Dolunay çifti, diğer geçerli efsunlar ve tüm diğer eşya alanları
+  önce/sonra tam satır karşılaştırmasıyla korundu. Canlı yeniden okumada
+  hedef 11 eşyada hatalı tür kalmadı. Yeni welcome görevi kuruldu ve kaynak
+  adayla eşleşti. Altı süreç ve altı port sağlıklı; 14 kapalı efsun izni
+  yeniden başlatma ile core'lara alındı. Yedek:
+  `/home/m2web/backups/item-attribute-cleanup-q4lv7_si`.
+- Servis açılışından sonra bakım SSH istemcisi kapanışta takıldı. Oyun
+  sağlığı bağımsız doğrulandı; yalnız bu bakım istemcisi kapatıldı. Kurulum
+  yeniden doğrulanıp tamamlandı işareti yazıldı. Bakım araçlarında SSH stdin
+  ve servis log yönlendirmesi düzeltildi. Tekrar oyun restart'ı gerekmedi.
+
+- Kullanıcı mevcut 11 eşyanın da temizlenmesini onayladı. Karakter/eşya/
+  uygunsuz bonus listesi `docs/EFSUN_ESKI_ESYA_TEMIZLIGI.md` içinde.
+- Hedef ID'ler sabit; bakım sırasında son kaydedilen efsunlar yeniden okunur.
+  Yalnız 14 kapalı türe ait hatalı normal bonuslar kaldırılır. Doğal Dolunay
+  çifti, geçerli bonuslar, soket/taş, nadir slotlar ve diğer alanlar korunur.
+  Boşluk bırakmadan normal slotları sıkıştırır; başka efsun üretmez.
+- Üç başlangıç silahı bonusunun görevdeki `63,10` çiftinden geldiği görüldü.
+  Kaynak/aday farkının yalnız bu üç çiftin kaldırılması olduğu doğrulandı;
+  gerçek qc derlemesi geçti. Yeni karakterlere tekrar genel canavar efsunu
+  verilmez. Görev adayı `/usr/home/attribute-cleanup-welcome-20261022`.
+- 5 yerel test geçti. Canlı eşya satırları salt okunur incelendi; **henüz
+  temizlenmedi**. Takılı/switchbot eşyaları bellekteyken DB'yi değiştirmek
+  güvenli değil; yedek/geri dönüş ve kısa bakım sağlayan tek komut hazır.
+  AGENTS.md otomatik VM restart'ını yasakladığı için operatör çalıştıracak.
+  Chrome testi yapılmadı. Satıcı paketi bu bakımdan bağımsız kalır.
+
+### Klasik dışı 14 efsunun rastgele havuzdan kapatılması — 2026-10-22
+
+- Kullanıcı hiçbir bonusun normal edinim/ekipman sınırları dışında gelmesini
+  istemiyor. Önceki 45 satırlık normalleştirmede bırakılan 14 türün tüm 12
+  normal/kostüm/tılsım izin sütunu sıfırlandı. Doğal silah ortalama/beceri
+  üretimi, sabit proto bonusları, diğer 45 tür ve 6–7 tablosu korunur.
+- Seed ve sınırlı geçiş aynı. Gerçek MariaDB geçici tablo testi ve canlı
+  uygulama öncesi/sonrası tam tablo karşılaştırması geçti. Canlı DB uygulandı;
+  bütün oyun core'larının yeni tabloyu alması için **GM `/reload p` gerekli**.
+  Otomatik VM restart'ı veya Chrome testi yapılmadı.
+- Yedek host `/home/m2web/backups/classic-attributes-rp0lju4k`:
+  before/after/rare JSON snapshot'ları ve yalnız 14 satırlık geri dönüş SQL'i.
+- Mevcut ilk beş slot taramasında 11 eşya (1 kalkan) bu türleri taşıyor.
+  Doğal silah ortalama/beceri slotlarının 13'ü hariç tutuldu. Mevcut eşyalara
+  dokunulmadı. Ayrıntı: `docs/EFSUN_KLASIK_IZINLER.md`.
+
+### Satıcı: Küre ve kalıcı destek yedekleri — 2026-10-22 (kuruluma hazır)
+
+- Kullanıcının son fiyatı: Kutsama Küresi `70024` **1.000.000 Yang**;
+  başlangıçtaki 14 kalıcı desteğin her biri **1.000 Yang**. Küçük/orta HP-SP,
+  süreli yeşil/mor ve iki dönüş kâğıdı kaldırılır; büyük HP-SP ve özütler kalır.
+- Market 24 ürün; diğer dört mağaza aynı. Beş mağazada 110 ürün. Profil,
+  iki SQL, fresh seed, hedef ve stok rehberi güncellendi.
+- Kürenin eski NPC geri satışı 30 milyondu. `CItem::GetShopBuyPrice` yalnız
+  bu vnum için mevcut değer ile 500.000'in küçüğünü kullanır; al-sat açığı
+  kapanır. İstemci paketi ve eski binary protolar değiştirilmez.
+- Üç yerel test ve gerçek FreeBSD game derlemesi geçti. Aday:
+  `/usr/metin2-progression-20261022-202621` (`READY`). Kurulu kalıcı destek
+  binary'sinin kaynak ağacı kullanıldı ve önceki binary ile eşleşmesi
+  doğrulandı; `/usr/metin2/apps/server` eski kaldığından kullanılmadı.
+- **Canlı satıcı henüz değişmedi.** `AGENTS.md` gereği restart operatör adımı:
+  `docs/NPC_MARKET_KURULUM.md` ve host `install_npc_market_host.sh`.
+  Browser testi kullanıcının isteğiyle kullanıcıda.
+
+### Seçenekler panelinin eksik web dosyaları — 2026-10-22
+
+- **SON DURUM — yeniden canlı:** yapı `1792700594`. Aşağıdaki geri alma
+  sonrasında, çalışan paketin 166 layout'u birebir korundu; yalnız sekiz
+  seçenek layout'u eklendi. Tüm 2.216 eski data dosyasının hash'i aynı,
+  eklenenler tam sekiz dosya; WASM aynı. Patchcheck 81/81, 178 sözdizimi
+  kontrolü, 8 layout yürütme, Python açılışı ve protokol kontrolü geçti.
+  28 aday/canlı dosya eşleşti. Yedek: `/home/m2web/backups/options-I8lX62jP/site`.
+  Oyunda karakter girişi ve Seçenekler açma testi kullanıcıda; yeni Chrome
+  testi yapılmadı. Yayın scripti eski paket dosyalarının değişmesini reddeder.
+
+- **GERİ ALINDI:** kullanıcı `1792700164` sonrası karakter seçiminden dünyaya
+  giremediğini bildirdi. Önceki `/home/m2web/backups/options-Ltk1V6WH/site`
+  geri yüklendi; 29 dosyanın yedek/canlı hash eşitliği doğrulandı. Hatalı
+  paket `/home/m2web/backups/options-failed-KcjXBxow` içinde korundu.
+  Satıcı çalışması durduruldu; tekrar yayın yapmadan giriş regresyonunun
+  nedeni belirlenmeli. Chrome/oyun testi kullanıcının isteğiyle kullanıcıda.
+- Paketlerin dosya bazında karşılaştırması kök nedeni gösterdi: mevcut
+  `/UIScript/CharacterWindow.py` yeniden üretim sırasında eski corpus
+  kaynağından geldi; `leader_board` / `passive_expanded_btn` eklemesi ve
+  title kontrollerindeki tuple→list düzeltmesi kayboldu. `content/client/packs/root/uiscript/characterwindow.py`
+  bu düzeltmeyi içeriyor; yeniden üretimde doğru kaynak/overlay korunmalı.
+  Ayrıca istek dışında dört `UIScript/track/*` layout'u eklenmişti.
+  Yerel yayın scriptine tüm mevcut data dosyalarının hash'ini koruyan ve
+  yalnız sekiz seçenek layout'u eklenmesine izin veren kapsam kontrolü
+  eklendi. Hatalı aday bu kontrolden geçemez; yeni yayın yapılmadı.
+
+- Kullanıcı: oyun içinde Ayarlar → Seçenekler'e basınca oyun kapanıyor.
+  `uisystem.py` gelişmiş paneli açıyor; panel ilk oluşturulurken
+  `UIScript/advanced_game_options/game_option_0.py` ve diğer kategorileri okuyor.
+- Build hostunda `build/port/uiscript3/UIScript/advanced_game_options/game_option_0.py`
+  bulunmadığı doğrulandı. `uiscript_from_client.py` yalnız üst dizindeki
+  dosyaları alıyordu; alt dizinler hem kopyalama hem bölme/sözdizimi
+  denetimi dışında kalıyordu. `ui.py` layout okuma hatasında `exception.Abort`
+  çağırdığı için bu eksik, bildirilen kapanmanın güçlü adayıdır.
+- Yerel düzeltme: alt dizinleri yollarını koruyarak dahil et; Python 2→3,
+  tamsayı bölme ve sözdizimi denetimini tüm layout'lara uygula. Bytecode
+  dosyalarını dışarıda bırak; lib2to3 başarısızlığında build'i durdur.
+- Üç yerel regresyon testi geçti: iç içe layout/aynı adlı dosyalar/kodlama/
+  koordinat dönüşümü, alt dizinde sözdizimi hatası ve bytecode dışlama.
+  Bu testlerde dönüştürücü bağımlılıkları taklittir; gerçek container build'i
+  veya oyun içi kabul testi yerine geçmez.
+- Durum: **canlıya yayınlandı**, yapı `1792700164`. Gerçek container'da
+  patchcheck 81/81, 178 layout sözdizimi kontrolü, 8 gelişmiş ayar layout'unun
+  yürütülmesi, Python başlangıç testi ve source protokol kontrolü geçti.
+  Sekiz dosyanın public data ve dosya indeksinde bulunduğu doğrulandı;
+  28 aday/canlı dosya hash'i eşleşti. Public HTML 200/no-cache ve yeni sürüm
+  etiketi doğrulandı. WASM aynı kaldı: `8779c916b81863e65cba21b8da17852cb0dde1ecbf5eced25c137e7b95f3937a`.
+  Yedek: `/home/m2web/backups/options-Ltk1V6WH/site`.
+  Corpus, VM ve servisler değişmedi. Yayın scriptleri `release_options_*.sh`.
+  **Oyun içi/Chrome testi kullanıcıda**; kullanıcı testin kendisine bırakılmasını
+  istedi. Gerçek kapanma hata yığını henüz alınmadı.
+
+### Kalıcı destek uygulaması — 2026-10-22 (kuruluma hazır)
+
+- Kullanıcı hazır sürüm koşulunu kaldırdı: yeşil/mor kalıcı iksir de oluşturuluyor.
+  `72737` saldırı hızı +30, `72738` hareket hızı +40; toplam 14 destek, hepsi
+  seviye 1. Eski süreli nesneler silinmiyor. Şebnem/iksir değerleri ayrı korunuyor.
+- DB ve istemci yükleyicileri aynı `pvp_support_proto.h` politikasını uygular;
+  eski kodlamalı/binary protolar değişmeden altı şebnemin sınırı 1 olur ve iki
+  yeni iksir oluşturulur. İki header byte eşitliği kontrol edilmelidir.
+- `USE_AFFECT_PLUS` yanlış Value1 indekslemesi düzeltildi. Kalıcı etkiler
+  aktif envanter nesnesinden geri kurulur, yinelenen/orphan etkiler temizlenir.
+  Ölüm temizliği mevcut 549/550 korumasını kullanır; bu iki tür süre tüketmez.
+- Ayrı `permanent_support` quest'i yeni/eski karaktere nesne başına bir kez
+  verir; boş yer yoksa sonraki login/levelup'ta devam eder. `welcome` eski
+  süreli destekleri ve saç kostümünü artık vermez.
+- İzole VM adayı: `/usr/metin2-support-20261022-190014`; son kaynaklarla game/db
+  ve gerçek quest derlemesi/testi geçti. Web: 359 nesne, sıfır hata; patchcheck,
+  Python başlangıç/import ve paket kontrolleri geçti. Corpus 1370 parça aynı.
+  İstemci hash'leri `/home/m2web/dev/support-client.sha256` ile sabitlendi.
+- `previous/` içinde canlı binary/quest/efsun tablosu yedeği hazır. **Canlı
+  henüz değiştirilmedi.** AGENTS.md 49. satır gereği otomatik VM restart yok.
+  Operatörün tek kurulum komutu ve doğrulama: `docs/KALICI_DESTEK_KURULUM.md`.
+  Gerçek ölüm/dirilme/relogin kabulü kurulum sonrası yapılmalı.
+- `char_item.cpp` / `char_affect.cpp` eski çoklu kodlamalı string baytları
+  aynı derlenmiş baytları üreten üç haneli octal kaçışlarla yazıldı; yeni kod
+  native edit aracıyla düzenlenebilir. Oyun metinleri yeniden kodlanmadı.
+
+### Önceki sade ekipman tasarımı — 2026-10-22 (yukarıdaki uygulamayla güncellendi)
+
+- Kullanıcı son kararı: standart ekipmana ek yalnız binek, gövde kostümü,
+  silah kostümü ve çağrılan basit pet. Tılsım/saç ve diğer ek güç yuvaları kapalı.
+  Önceki tılsım onayı geçersiz. Paket/enum değiştiren flag kapatılmayacak.
+- Başlangıçtaki dört Ejderha Tanrı desteği + kritik/delici otuzluk yerine
+  `72731–72736` birer adet; altı `50827–50832` şebnem de birer kalıcı nesne.
+  Ölüm/login/kanal değişiminde aktiflik korunacak, tekrar kullanım katlamayacak.
+- Proto incelemesi: hazır + ailesi var; şebnemler şu an level 55. Başlangıçta
+  kullanım için level 1'e çekilecek. Mor/yeşil iksirin hazır perması bulunmadı;
+  kullanıcının “varsa” koşulu nedeniyle yeni perma iksir bu kapsama eklenmedi.
+- Kanıt: `USE_AFFECT_PLUS`, etki 549/550, ölümde korunan 500–599 aralığı.
+  Uygulama öncesi `char_item.cpp` ön kontrolündeki Value1/Value0 ayrımı,
+  60 yıllık süre sabiti, nesne/etki/kilit senkronu ve teslim tekilliği ele alınacak.
+- O andaki durum: tasarım hazırdı, yeni davranışlar henüz uygulanmamıştı.
+  `PVP_HEDEF.md` güncellendi; ayrıntı `docs/BASLANGIC_KALICI_DESTEK_TASARIMI.md`.
+
+### Normal efsun dağılımı / sabit değerler — 2026-10-22
+
+- Kullanıcı kararı: sekiz ekipmanın normal efsun izinleri klasik referansa;
+  değerler sabit, HP 3000. Kostüm/tılsım da sabit değerleri kullanır, izinleri korunur.
+- `seed_item_attr.sql` içinde 45 tür düzeltildi. 14 anomali satırı, 39 nadir satır,
+  seçim ağırlıkları ve doğal ortalama/beceri üretimi korundu. Oyuncu eşyaları
+  topluca değiştirilmez. Ayrıntı: `docs/EFSUN_NORMAL_DUZENLEME.md`.
+- Mevcut DB için `content/server/sql/migrations/20261022_normal_attributes.sql`;
+  bootstrap seed canlıda çalıştırılmaz. Yerel regresyon: 8/8 başarılı.
+- MariaDB 10.11.19 üzerinde yalnız geçici tabloyla geçiş, tekrar uygulama ve
+  eksik satırda durma testleri başarılı. Canlı normal tablonun 59 satırı önce/sonra
+  aynı; 14 ertelenen satır ve 59 satırın ağırlık/ek yuva izinleri korunuyor.
+- Durum: **repo hazır, canlıya uygulanmadı**. Canlı MariaDB sürümü 10.11.19,
+  normal satır sayısı 59 salt okunur sorguyla görüldü. SQL sonrası mevcut
+  `/reload p` akışı efsun tablolarını da core'lara taşır; `/reload a` taşımaz.
+  Servis restartı / otomatik yayın yapılmadı.
+
+### Tarayıcı küçülünce envanter / skill barının kırpılması — 2026-10-22
+
+- Neden: taskbar `SCREEN_HEIGHT - 37`, envanter `SCREEN_WIDTH - 212` /
+  `SCREEN_HEIGHT - 610` ile ilk yüklemede yerleşir. `OnSizeChange` C++ ekran
+  ölçülerini değiştirir, fakat bu Python pencerelerinin yerleşimini yenilemez.
+- Web'de mantıksal oyun masaüstü başlangıçta sabitlenir; canvas tarayıcının
+  güncel alanına en-boy oranı korunarak sığdırılır ve ortalanır. Yeniden
+  boyutlandırma, fullscreen ve visualViewport değişimleri aynı yolu kullanır.
+  Yeni pencere oranında kenarlarda boşluk olabilir; HUD ekran dışına çıkmaz.
+- Fare mevcut canvas rect'i / buffer / UI scale dönüşümünü kullanır; yeni
+  canvas konumu ve ölçeğiyle eşleşmeye devam eder. Gizli sekmenin duraklatma
+  davranışı ve mevcut render cap / UI scale seçimi korunur.
+- Başlangıçta küçük tarayıcı için, render cap izin verdiği ölçüde en az
+  800×640 mantıksal alan seçilir. C++ veya cp1254 pack kaynağı değiştirilmedi.
+- Durum: **canlıda**, yapı `v=1792692377`. 22 Node, 4 Python testi,
+  81/81 stage yaması, Python 3.13 açılışı ve protokol kontrolleri başarılı;
+  28 aday/canlı dosyanın hash'i eşleşti. Corpus ve servisler değişmedi.
+- Özel önizlemede 900×650, 600×650, 1200×300, 400×800 ve eski boyuta dönüş
+  doğrulandı. Fare %90 noktasında aynı mantıksal koordinatları verdi.
+  İlk açılış 400×300 olduğunda 800×640 mantıksal masaüstü 375×300 CSS alana
+  sığdı. Public adreste 650×650 → 1200×300 → 1200×736 geçişlerinde mantıksal
+  alan 1200×736 kaldı; canvas tamamı görünürdü, motor hata katmanı boştu.
+  Envanter/taskbar ilk konumlarının sınır içinde kalması regresyon testiyle
+  kontrol edildi; gerçek hesapla envanter açma testi henüz yapılmadı.
+- Geri dönüş yedeği: `/home/m2web/backups/web-ux-qLXUVIvx/site`.
+
+### Web giriş UX'i ve ilk ziyaret yüklemesi — 2026-10-22
+
+- Durum: **canlıya yayınlandı ve public adreste boş önbellekle doğrulandı**.
+- `runtime.js` Tab için eksik `WM_CHAR(9)` mesajını gönderir. HTML yardım
+  kontrolleri ve tarayıcı Cmd/Ctrl kısayolları oyun tarafından yutulmaz.
+- `compat/web_ux.js` manifestten giriş ekranının çalışma kümesini çıkarıp
+  **asenkron** hazırlar; manifest ve bu parçalar hazır olmadan motor başlamaz.
+  Mevcut corpus'ta 6 parça / 24 MiB; önce başlangıçta 61 parça / 239,4 MiB
+  geliyordu. Corpus yerleşimi/hash'leri değişmedi. Boot/meta/motion, giriş
+  isteğinde hazırlanır; Python auth bağlantısını RAM hazır olana kadar bekletir.
+- Web hesap yuvaları yalnız kullanıcı adı saklar; şifreler saklanmaz.
+  localStorage yazımı doğrulanmadan başarı mesajı verilmez. Kaydet/yükle/sil
+  tooltip'leri ve Mac Fn/Globe, Tab/Enter, tarayıcı kısayolları yardımı eklendi.
+  `compat/web_ux.py` sadece üretilen web LoginWindow'a bağlanır; cp1254 kaynak
+  pack'leri değiştirilmez. Bridge dosyaları şifre içermez.
+- Harita hazır kontrolü indirme geçmişi yerine anlık RAM'i denetler; gereken
+  parçalar korunur. 60 saniye sonunda körlemesine senkron okumaya geçilmez;
+  indirme hatası/yeniden deneme çubukta gösterilir.
+- Yerel ve son container testleri: 19 Node, 4 Python; patchcheck 81/81;
+  üretilmiş Python 3.13 açılış testi ve source protokol kontrolleri başarılı.
+- Önizlemede kullanıcı adı → Tab → şifre gerçek tuşlarla doğrulandı.
+  Kullanıcı adı localStorage yazma/silme doğrulaması geçti; hazırlık tamamlanana
+  kadar auth bağlantısı açılmadı. Sahte hesapla beklenen giriş hatası alındı;
+  bu akış boyunca senkron XHR 0. Corpus grup indeksi de 20 s süre sınırı ve
+  yeniden denemeyle korunur.
+- Son public yapı `v=1792689159`; 28 aday/canlı dosyanın hash'i eşleşti.
+  Cache Storage boşaltıldı, HTTP cache kapatıldı ve SW atlandı: ilk ekran
+  motor+dil+corpus transferi **303.386.639 → 85.878.887 bayt** (yaklaşık %71,7
+  azalma). İlk ekranda RAM'de 8 parça / 32 MiB; bunun 6 parça / 24 MiB'ı
+  zorunlu küme, kalanı mevcut C++ komşu-parça ön-yüklemesi. Senkron XHR 0;
+  corpus/motor HTTP hatası 0. Eski `/favicon.ico` 404'ü bu kapsamda değişmedi.
+  İlk motor hazırlığında 1.641 ms ana-thread görevi hâlâ var; ağ beklemesi
+  kaldırıldı, bütün CPU/GPU hazırlama işi sıfırlanmış sayılmaz.
+- Public adreste de gerçek Tab/Enter, asenkron 61-parça hazırlığı ve sahte
+  hesapla beklenen auth hatası doğrulandı; hazırlık+auth boyunca senkron XHR 0.
+  Kalan boot/meta/motion verisi silinmedi: kullanıcı giriş yaptığında hazırlanır.
+  Gerçek hesapla harita/oynanış testi henüz yapılmadı.
+- Yayın: `platform/deploy/release_web_ux_build.sh` + `release_web_ux_host.sh`.
+  Geri dönüş yedeği `/home/m2web/backups/web-ux-7Pdnfdvm/site`.
+  Aday WASM SHA-256:
+  `8c9c66220c47e3b932f9be64e7e3a32a6795516f121ef22755a2c4396d779d36`.
+  Engine-only yayın, 1370 değişmemiş corpus parçasını korur; CDN yüklemesi,
+  VM veya production servis restart'ı gerektirmez.
+
+### Askerî atta becerilerin sessizce engellenmesi — 2026-10-21
+
+- Kullanıcı Sura, askerî at ve kılıç ile at becerilerinin animasyon bile
+  başlatmadığını; kombonun çalıştığını doğruladı.
+- `PythonPlayerSkill.cpp::__CanUseSkill` eski 107/109 yuvalarını binicilik
+  sanıyordu. Yohara kapalı olduğundan 109 okunuyor; gerçek C++ destek
+  tablosunda 109 = At Çağırma (131), seviyesi 10. Eski koşul 20 beklediği
+  için tüm at üstü becerileri kullanım denetiminden önce reddediyordu.
+- Web stage düzeltmesi bu eski genel kontrolü kaldırır. Actor, observer,
+  beceriye özel at/silah, güvenli alan, SP ve sunucu yetki kontrolleri korunur.
+  cp1254 kaynak dosyası dönüştürülmedi; Windows kaynak düzeltmesi açık kalır.
+  Sura için yay gerektiren Ok Sağanağı kısıtlaması değiştirilmedi.
+- Regresyon testi gerçek C++ fonksiyonunu önce/sonra derleyip mevcut
+  109 = 131 eşlemesini ve 10 seviyelik çağırma ile eski ret/yeni geçişi
+  doğrular; observer modunda, actorsüz veya kullanım kilitli durumda ret verir.
+- **Canlı:** `release_horse_skills.sh` ile derlendi ve sürüm `1792614571`
+  yayımlandı. Patchcheck 81/81; link `UNEXPECTED: none`; gerçek Python 3.13
+  açılış testi geçti. 28 aday/canlı dosyanın hash'i eşleşti. Public HTML,
+  JS, WASM ve preload HTTP 200; public WASM SHA-256
+  `8c9c66220c47e3b932f9be64e7e3a32a6795516f121ef22755a2c4396d779d36`.
+  Yedek `/home/m2web/backups/text-encoding-gp13cKLh/site`.
+- Corpus değişmedi; CDN yüklemesi ve servis restartı yapılmadı.
+  `M2W_PUBLIC_CANDIDATE=1` yalnız önizleme bridge config üretimini atlar;
+  aday dosyalar yayın karşılaştırması için saklanır. Özel önizlemenin
+  18731/18732 portları kapalı doğrulandı. Oyun içi doğrulama kullanıcıda.
+
+### Oyun verileri 60/61 çubuğu: sonlanmayan ön yükleme — 2026-10-21
+
+- Kullanıcı oyun çalışırken yalnız `Oyun verileri 60/61 (75 diskten)`
+  çubuğunun kaldığını doğruladı. Bu bir oyun/ana döngü donması değildi.
+- Başlangıç grupları meta 17 + motion 19 + boot 25 = 61 farklı chunk.
+  Public uçta 61 HEAD isteğinin tamamı HTTP 200; her gruptan birer tam
+  4 MB chunk GET ile indirildi ve adındaki SHA-256 önekiyle eşleşti.
+  Kalıcı eksik/engelli Cloudflare dosyası bulunmadı. HEAD yanıtında
+  Content-Length olmaması boş dosya olarak yorumlanmadı. Kullanıcının
+  önceki isteğinin tam hata sebebi bu incelemede yakalanmadı.
+- İstemcide yeniden üretilebilir açıklar bulundu: başarısız prefetch tekrar
+  kuyruğa alınmıyordu; ağ/cache isteğinin süre sınırı yoktu; başka bir
+  background isteğinde görülen chunk kuyruktan düşüyordu ve o istek
+  başarısızsa tamamlanamıyordu. Background başarıları da fetched set'inde
+  tutulmadığından bellekten atılınca ilerleme kaybolabiliyordu.
+- Ortak `loadChunk` cache açılışı/okumasına 2 s, tüm HTTP gövdesine 20 s
+  sınır koyar. Bozuk/okunamayan cache ağdan denenir; başarısız cache yazımı
+  indirme slotunu tutmaz. Prefetch en fazla üç deneme yapar; başarısızlık
+  kalırsa açık hata ve `Tekrar dene` düğmesi gösterir. Slot/bellek rezervi
+  her sonuçta bırakılır; başka isteğin kuyruğu kaybolmaz.
+- Çubuktaki disk sayısı artık yalnız başlangıç grubundaki farklı başarılı
+  chunk'ları sayar. Harita grubunun disk okumaları 61 toplamına karışmaz.
+- Dokuz Node regresyon testi: geçici/kalıcı hata, takılan HTTP gövdesi,
+  cache open/read, boş cache, reddedilen cache yazımı, ortak background
+  isteği, eviction ve hata/yeniden deneme arayüzü. Yerelde ve public
+  package kapısında 9/9 geçti; gerçek Python 3.13 açılış testi de geçti.
+- **Canlı:** sürüm `1792614094`; 28 dosya aday/canlı hash eşleşmesi,
+  public JS/preload HTTP 200 ve hash doğrulaması. Yedek:
+  `/home/m2web/backups/text-encoding-jIjWJkUb/site`. Yalnız JS/ön yükleme
+  değişti; WASM `7bd48809...`, corpus, Cloudflare ayarları ve servisler aynı.
+  Özel önizleme kapalı kaldı. Yeni davranış için açık oyun sayfası yenilenmeli.
+
+### Canlı açılış hatası: collections/JSON import onarımı — 2026-10-21
+
+- Kullanıcı ilk metin yayınının `RunMain Error` ile açılmadığını bildirdi.
+  Önce `/home/m2web/backups/text-encoding-7pcQ09rg/site` geri yüklendi;
+  önceki `8bc22aa3...` motor/site eşleşmeleri doğrulandı. Servis restartı yok.
+- Kök neden: root pack'teki Python 2 `collections.py`, Python 3'ün
+  `collections` paketini gölgeliyordu. Ayrıca pack import kancası
+  `from json import scanner` gibi paket içi fromlist importlarında cache'deki
+  üst modülü erken döndürüyordu. JSON'u erken yükleyen yeni çözücü bu iki
+  eski uyumsuzluğu açılışta tetikledi; traceback import'u da asıl hatayı örttü.
+- Data üretimi root `collections.py` dosyasını artık kopyalamaz. Import
+  kancası `collections`, dotted/relative importlar ve `__path__` taşıyan
+  gerçek paketleri CPython'a bırakır. Oyun modüllerinin pack yolu korunur.
+- `test_python_startup.py`, gerçek dönüştürülmüş `system.py` import kancasını
+  temiz `-I -S` oturumunda çalıştırır: pack'te eski collections varmış gibi
+  davranırken textcodec/JSON/collections.abc/traceback ve oyun fixture'ı
+  birlikte yüklenir; asıl istisnanın gösterilebildiği de doğrulanır.
+  31 yerel test ve container'daki gerçek Python 3.13 testi başarılı.
+- `build_text_startup.sh` özel önizleme açmadan betikleri yeniler. Yayın
+  betiği artık bu açılış testini zorunlu çalıştırır ve pakette eski
+  collections dosyasının bulunmadığını denetler.
+- **Düzeltilmiş canlı yayın:** yedek
+  `/home/m2web/backups/text-encoding-DQsglLWg/site`; 28 aday/canlı dosya
+  hash'i eşleşti. Public sürüm `1792612335`. İnternetten alınan HTML/JS/data
+  HTTP 200; JS SHA-256 `0f4a2b021e7f8388f8bdc77c99a4395723de2c733d941ae0d54f1b60a3a7399e`,
+  data `e5781e078539835689cfc26b752a7e50c0b3c067662c9b8579594630a9e7fa68`.
+  WASM değişmedi (`7bd48809...`); corpus aynı, CDN yüklemesi yok.
+- Özel önizleme kapalı kaldı; localhost 18731 yanıt vermiyor. Kullanıcı
+  tarayıcı/oyun kabulünü yapacak; HTTP/hash testi görsel oyun kabulü değildir.
+
+### Metin kodlama geçişi: ilk web paketi — 2026-10-21
+
+- Savaş bileti örneğinin kaynağı doğrulandı: üretilen `uiMiniMap.py` UTF-8
+  doğruydu; `pack.Get` dosyayı cp1254 çözüp Python `compile()` öncesinde
+  `SavaÅŸ` / `Ãœcretsiz` biçiminde bozuyordu. Dosya kodlaması görüntüleme
+  kod sayfasından ayrıldı; ağ protokolü aynı kaldı.
+- Ortak `compat/textcodec.py` ve `text_encoding.json`: UTF-8 üretilen betikler,
+  cp1254 Türkçe ve UTF-8 diğer 10 dilin 22 ana tablosu. Kayıtlı metin hatalıysa
+  kaynak/offset ile durur. Henüz taşınmayan eski `.txt` dosyaları önceki
+  kod sayfası/replace davranışını açık geçiş kuralıyla korur.
+- `.py` native hızlı yolu decoder import etmez. İlk önizlemede görülen
+  `json → collections → pack.Get` bootstrap döngüsü giderildi; native
+  C++/CPython testi bu yükleme sırasını kapsar. Son WASM/data tekrar derlendi.
+- Locale yükleyicileri ortak satır ayrıştırıcısına geçti: son satırda LF yoksa
+  `line[:-1]` yüzünden harf silinmez. LF/CRLF/BOM ve eski coding başlıklarının
+  UTF-8 üretimle uyumu testli. Kaynak cp1254/CRLF dosyaları topluca çevrilmedi.
+- Savaş bileti başlığı/Ücretsiz/Premium artık anahtar; `text_labels.json`
+  11 dilde karşılık verir. Web semantic patch'leri yalnız Python 3 çıktısını
+  değiştirir. Sunucu ve Windows yolu sonraki kapsamda.
+- Salt okunur `tools/audit_text_encoding.py` ilk envanteri çıkarır: 22 tabloda
+  kodlama hatası/U+FFFD yok; 654 yinelenen satır ve dil başına çok sayıda
+  eksik anahtar mevcut. Bunlar otomatik düzeltilmedi. Data build gerçek
+  girdilerde kodlamayı/yeni çeviri anahtarlarını kontrol eder; hata varsa
+  önceki data çıktısını silmeden durur.
+- İlk 29 araç testi, 80/80 stage yaması, WASM engine, protokol/RESP,
+  data/link başarılı. Repo ve `/home/m2web/kit` değişiklikleri eşitlendi.
+- Kullanıcı canlı yayın ve özel önizlemenin kapanmasını istedi. İlk yayın
+  kontrolü public package yeniden link edildiğinde hash farkıyla durdu;
+  canlı dosyalar değişmedi. Neden: cache'deki `main_web.o` / `link_data.o`
+  ilk linkte sona eklenirken sonraki linkte genel listeden başka sırayla
+  giriyordu. `collect_objects` bu ikisini artık hariç tutar; `compile_entry`
+  her seferinde sona ekler. Ek regresyon testi ve yeniden link başarılı;
+  public paket ile önizleme motoru artık birebir aynı. Son araç testi toplamı
+  30/30 başarılı; diff whitespace kontrolü temiz.
+- **Canlı:** `platform/deploy/publish_text_encoding.sh` ile yedekli yayın
+  tamamlandı. Önceki site: `/home/m2web/backups/text-encoding-7pcQ09rg/site`.
+  28 public dosyanın aday/canlı hash'i eşleşti; WASM SHA-256
+  `7bd48809cd6e2f6dc266193df9ae42bf833e1523473acdbe06dfa170298d10e7`.
+  1370 immutable corpus chunk aynı; CDN yüklemesi ve servis restartı yok.
+- Public HTML ve sürümlü WASM HTTP 200; HTML `no-cache`, sürüm `1792611852`.
+  İnternetten indirilen WASM hash'i de aynı. Public HTML'de preview ayarı yok.
+- Özel HTTP önizlemesi, dev bridge ve yerel SSH tüneli kapatıldı;
+  localhost 18731 artık yanıt vermiyor. Kullanıcı tarayıcı/oyun doğrulamasını
+  kendisi yapacak. Ayrıntı ve sonraki kapsam: `docs/METIN_KODLAMA_PLANI.md`.
+
 ### Sınırsız metin dedektörü gerçek canlı onarımı — 2026-10-21
 
 - Kullanıcı başlangıç dedektörünün bittiğini bildirdi. Canlı derlenmiş welcome

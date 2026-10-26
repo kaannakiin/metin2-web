@@ -245,6 +245,10 @@ class MainStream(object):
 	def SetGamePhase(self):
 		try:
 			import game
+			import uiInventory
+			import uiAffectShower
+			import pvp_support_ui
+			pvp_support_ui.install(uiInventory, uiAffectShower)
 			self.popupWindow.Close()
 			self.SetPhaseWindow(game.GameWindow(self))
 		except:

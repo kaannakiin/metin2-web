@@ -84,10 +84,13 @@ def tool_name(name):
 
 
 def collect_objects():
-    """Every .o under obj/gamelib (sorted per directory)."""
+    """Engine objects only; compile_entry supplies entry objects last, every time."""
+    entry_objects = {os.path.join(OBJDIR, name + '.o')
+                     for name in ('main_web', 'link_data')}
     objs = []
     for root, _d, files in os.walk(OBJDIR):
-        objs += [os.path.join(root, f) for f in sorted(files) if f.endswith('.o')]
+        objs += [os.path.join(root, f) for f in sorted(files)
+                 if f.endswith('.o') and os.path.join(root, f) not in entry_objects]
     return objs
 
 
@@ -239,6 +242,7 @@ def main():
         # screen measures, end of game). The pre-js loads at the glue module level,
         # BEFORE HEAPU8/FS - the file only defines functions (Phase C, group 2).
         '--pre-js', os.path.join(COMPAT, 'runtime.js'),
+        '--pre-js', os.path.join(COMPAT, 'web_ux.js'),
         # M2W_SAFE_HEAP=1 in the environment: every memory read/write is
         # checked, and a write to NULL (address 0) stops AT THE PLACE of the
         # write with a call trace - instead of "corrupted heap (address zero)"

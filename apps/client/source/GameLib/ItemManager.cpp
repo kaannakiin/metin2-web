@@ -3,6 +3,7 @@
 #include "../eterLib/ResourceManager.h"
 
 #include "ItemManager.h"
+#include "pvp_support_proto.h"
 
 static DWORD s_adwItemProtoKey[4] =
 {
@@ -352,6 +353,7 @@ bool CItemManager::LoadItemTable(const char *c_szFileName)
 
 	for (DWORD i = 0; i < dwElements; ++i, ++table)
 	{
+		pvp_support::Configure(*table, CItemData::USE_AFFECT_PLUS, CItemData::LIMIT_LEVEL);
 		CItemData * pItemData;
 		DWORD dwVnum = table->dwVnum;
 
@@ -398,6 +400,23 @@ bool CItemManager::LoadItemTable(const char *c_szFileName)
 		}
 	}
 
+	TItemMap::iterator base = m_ItemMap.find(72731);
+	if (base == m_ItemMap.end())
+	{
+		delete [] pbData;
+		return false;
+	}
+	for (DWORD vnum = 72737; vnum <= 72738; ++vnum)
+	{
+		CItemData::TItemTable permanent = *base->second->GetTable();
+		permanent.dwVnum = vnum;
+		pvp_support::Configure(permanent, CItemData::USE_AFFECT_PLUS, CItemData::LIMIT_LEVEL);
+		_snprintf(permanent.szName, sizeof(permanent.szName), "%s", vnum == 72737 ? "Permanent Green Potion" : "Permanent Purple Potion");
+		_snprintf(permanent.szLocaleName, sizeof(permanent.szLocaleName), "%s", vnum == 72737 ? "Ye\376il \335ksir+" : "Mor \335ksir+");
+		CItemData* data = MakeItemData(vnum);
+		data->SetDefaultItemData(vnum == 72737 ? "icon/item/27102.tga" : "icon/item/27105.tga");
+		data->SetItemTableData(&permanent);
+	}
 	delete [] pbData;
 	return true;
 }

@@ -68,18 +68,25 @@ Aynı ailelerin +0…+9 sürümleri metin drop gruplarından kaldırıldı.
 
 | Ürün | VNUM | Seviye | Adet | Yang |
 | --- | --- | --- | --- | --- |
-| Kırmızı İksir(K) | 27001 | — | 50 | 4.000 |
-| Kırmızı İksir(O) | 27002 | — | 50 | 12.000 |
-| Mavi İksir(K) | 27004 | — | 50 | 12.000 |
-| Mavi İksir(O) | 27005 | — | 50 | 36.000 |
 | Kırmızı İksir(B) | 27003 | — | 200 | 80.000 |
 | Mavi İksir(B) | 27006 | — | 200 | 240.000 |
 | Güneş Özütü (B) | 72725 | — | 1 | 100.000 |
 | Ay Özütü (B) | 72729 | — | 1 | 100.000 |
-| Yeşil İksir(B) | 27102 | — | 50 | 187.500 |
-| Mor İksir(B) | 27105 | — | 50 | 187.500 |
-| Şehre Dönüş Kağıdı | 22000 | — | 10 | 10.000 |
-| Geri Dönüş Kağıdı | 22010 | — | 10 | 15.000 |
+| Kutsama Küresi | 70024 | — | 1 | 1.000.000 |
+| Ejderha Tanrı Yaşam + | 72731 | 1 | 1 | 1.000 |
+| Ejderha Tanrı Saldırı + | 72732 | 1 | 1 | 1.000 |
+| Ejderha Tanrı Zekası + | 72733 | 1 | 1 | 1.000 |
+| Ejderha Tanrı Savunma + | 72734 | 1 | 1 | 1.000 |
+| Kritik Vuruş + | 72735 | 1 | 1 | 1.000 |
+| Delici Vuruş + | 72736 | 1 | 1 | 1.000 |
+| Yeşil İksir+ | 72737 | 1 | 1 | 1.000 |
+| Mor İksir+ | 72738 | 1 | 1 | 1.000 |
+| Kırmızı Şebnem+ | 50827 | 1 | 1 | 1.000 |
+| Turuncu Şebnem+ | 50828 | 1 | 1 | 1.000 |
+| Sarı Şebnem+ | 50829 | 1 | 1 | 1.000 |
+| Yeşil Şebnem+ | 50830 | 1 | 1 | 1.000 |
+| Mavi Şebnem+ | 50831 | 1 | 1 | 1.000 |
+| Beyaz Şebnem+ | 50832 | 1 | 1 | 1.000 |
 | Paket | 50200 | — | 1 | 10.000 |
 | Cesaret Pelerini | 70038 | — | 1 | 10.000 |
 | Eekin Yüzüğü | 40004 | — | 1 | 50.000 |
@@ -96,7 +103,10 @@ Aynı ailelerin +0…+9 sürümleri metin drop gruplarından kaldırıldı.
   aralıklar `PVP_HEDEF.md` Harita bazlı Yang bölümündedir.
   Global miktar flagleri 400; harita tabanında 800.000, boss/diğer kaynaklarda 400.000 tavanı vardır.
   Yang düşme ihtimali ve seviye cezası korunur.
-- Kutsama/efsun, BK/Ruh Taşı ve zindan anahtarları bu markete eklenmedi.
+- Kutsama Küresi 1.000.000 Yang; NPC geri satışı en fazla 500.000 Yang.
+- 14 kalıcı başlangıç desteğinin yedekleri birer adet 1.000 Yang.
+- Küçük/orta HP-SP, süreli yeşil/mor ve iki dönüş kâğıdı stoktan çıkarıldı.
+- Efsun nesneleri, BK/Ruh Taşı ve zindan anahtarları farmda kalır.
 
 Kaynak: `npc_profile.py` → `shopex` / `shopex_item` SQL tabloları;
 standart beceri/at teslimi: `starter_support.lua`.

@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import hashlib
 import io
 from pathlib import Path
+import re
 import subprocess
 import tarfile
 import tempfile
@@ -20,15 +21,26 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--install', action='store_true')
     parser.add_argument('--server-baseline', help='Git source baseline for server updates; defaults to HEAD')
+    parser.add_argument('--npc-resale-baseline', help='SHA-256 of the installed item.cpp before the sphere resale fix')
+    parser.add_argument('--npc-server-root', help='Source tree of the installed permanent-support game build')
     scope = parser.add_mutually_exclusive_group()
     scope.add_argument('--spawns-only', action='store_true', help='Install only the two access-boss spawn timers')
     scope.add_argument('--starter-ring', action='store_true', help='Install only the one-time starter ring quest')
     scope.add_argument('--npc-profile', action='store_true', help='Install the active renewed SQL shops and support quest')
     scope.add_argument('--metin-metal', action='store_true', help='Install only the approved Magic Metal metin drops')
     scope.add_argument('--npc-stock', action='store_true', help='Update only renewed NPC SQL stock; preserve quests and binaries')
+    scope.add_argument('--npc-market', action='store_true', help='Update NPC stock and build the sphere resale cap')
     scope.add_argument('--map-yang', action='store_true', help='Build/install only the approved map Yang server sources')
     scope.add_argument('--detector', action='store_true', help='Install unlimited detector server code and one-time recovery quest')
     args = parser.parse_args()
+    if args.npc_market:
+        if not re.fullmatch(r'[a-f0-9]{64}', args.npc_resale_baseline or ''):
+            parser.error('--npc-market requires --npc-resale-baseline SHA256')
+        if not re.fullmatch(r'/usr/metin2-support-\d{8}-\d{6}/apps/server', args.npc_server_root or ''):
+            parser.error('--npc-market requires --npc-server-root /usr/metin2-support-ID/apps/server')
+        args.npc_stock = True
+    elif args.npc_resale_baseline or args.npc_server_root:
+        parser.error('--npc-resale-baseline/--npc-server-root require --npc-market')
     if args.server_baseline and not (args.map_yang or args.detector):
         parser.error('--server-baseline requires --map-yang or --detector')
     release = datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')
@@ -105,6 +117,17 @@ def main():
             metadata['server-existing-files.txt'] = ''.join(name + '\n' for name in source_existing)
             metadata['server-new-files.txt'] = ''.join(name + '\n' for name in source_new)
             metadata['server-expected.sha256'] = ''.join(source_hashes)
+        if args.npc_market:
+            sources = ['item.cpp']
+            metadata.update({
+                'server-update': 'sphere NPC resale cap and game binary\n',
+                'data-only': 'NPC SQL and game binary; no quest or locale changes\n',
+                'server-source-files.txt': 'item.cpp\n',
+                'server-existing-files.txt': 'item.cpp\n',
+                'server-new-files.txt': '',
+                'server-root.txt': args.npc_server_root + '\n',
+                'server-expected.sha256': 'SHA256 (' + args.npc_server_root + '/game/src/item.cpp) = ' + args.npc_resale_baseline + '\n',
+            })
         if args.npc_stock:
             metadata['npc-stock'] = 'active renewed NPC SQL stock only\n'
             for target, filename in [('repair_sql', 'database.sql'), ('snapshot', 'expected-database.tsv'),
@@ -125,7 +148,7 @@ def main():
                 output.add(LOCALE / name, arcname='input/' + name, recursive=False)
             if args.npc_profile:
                 output.add(ROOT / 'apps/server/game/src/shopEx.cpp', arcname='server-source/shopEx.cpp', recursive=False)
-            if args.map_yang or args.detector:
+            if args.map_yang or args.detector or args.npc_market:
                 for name in sources:
                     output.add(ROOT / 'apps/server/game/src' / name, arcname='server-source/' + name, recursive=False)
             for name, value in metadata.items():

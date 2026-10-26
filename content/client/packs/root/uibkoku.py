@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 if __USE_DYNAMIC_MODULE__:
 	import pyapi
 
@@ -98,7 +99,7 @@ class BKOku(ui.ScriptWindow):
 
 	def butonlar(self, func):
 		if self.aktifslot == None:
-			chat.AppendChat(1,"<Sistem> Önce geliþtirmek istediðin beceriyi seç!")
+			chat.AppendChat(1,"<Sistem> Ã–nce geliÅŸtirmek istediÄŸin beceriyi seÃ§!")
 			return
 		skillIndexx = player.GetSkillIndex(int(self.aktifslot+1))
 		if func == 1:
@@ -121,8 +122,27 @@ class BKOku(ui.ScriptWindow):
 			#JOB_WOLFMAN : {1 : (170, 171, 172, 173, 174, 175, 0, 0, 137, 0, 138, 0, 139, 0,), "SUPPORT" : (122, 123, 121, 124, 125, 129, 0, 0, 130, 131,),}
 		}
 
+	def __GetSelectedBookCount(self):
+		if self.aktifslot is None:
+			return 0
+		skillSlot = self.aktifslot + 1
+		if player.GetSkillGrade(skillSlot) != 1:
+			return 0
+		skillIndex = player.GetSkillIndex(skillSlot)
+		if not skillIndex:
+			return 0
+		count = 0
+		for cell in xrange(player.INVENTORY_SLOT_COUNT):
+			if player.GetItemIndex(cell) == 50300 and player.GetItemMetinSocket(cell, 0) == skillIndex:
+				count += player.GetItemCount(cell)
+		return count
+
 	def yenile(self):
-		self.bkslot.SetItemSlot(0, 50300, player.GetItemCountByVnum(50300))
+		bookCount = self.__GetSelectedBookCount()
+		if bookCount:
+			self.bkslot.SetItemSlot(0, 50300, bookCount)
+		else:
+			self.bkslot.ClearSlot(0)
 		self.kotuslot.SetItemSlot(2, 71001, player.GetItemCountByVnum(71001))
 		self.munzevislot.SetItemSlot(3, 71094, player.GetItemCountByVnum(71094))
 
@@ -156,14 +176,14 @@ class BKOku(ui.ScriptWindow):
 		skillGrade = player.GetSkillGrade(value+1)
 		if skillGrade == 1:
 			self.aktifslot = value
-			chat.AppendChat(1,"<Sistem> Artýk okumaya baþlayabilirsin!")
+			chat.AppendChat(1,"<Sistem> ArtÄ±k okumaya baÅŸlayabilirsin!")
 			for i in xrange(0,6):
 				if i == value:
 					self.skillslot.ActivateSlot(i, wndMgr.COLOR_TYPE_WHITE)
 				else:
 					self.skillslot.DeactivateSlot(i)
 		else:
-			chat.AppendChat(1,"<Sistem> Sadece Master düzeyinde olan becerileri seçebilirsin!")
+			chat.AppendChat(1,"<Sistem> Sadece Master dÃ¼zeyinde olan becerileri seÃ§ebilirsin!")
 			return
 	
 	def OnPressEscapeKey(self):

@@ -128,6 +128,16 @@ bir dosya kaynakta silinirse overlay'den de kaldırılır. Model/texture/harita 
 runtime `uiscript` değişiklikleri bu komutun kapsamında değildir; ilgili corpus
 veya runtime veri adımları ayrıca çalıştırılmalıdır.
 
+Metin kodlama geçişi: dev eşitlemesi `compat/pack_text.h`, `textcodec.py`,
+`text_encoding.json`, `text_labels.json` ve ilgili üretim/test araçlarını da
+taşır. Decoder/header değişince `cpp`, çeviri/semantic patch değişince `ui`
+çalıştır. İkisi de değişmişse önce `ui`, sonra `cpp` ile son snapshot'ı üret.
+Data adımı 22 ana locale tablosunun açık kodlamasını ve yeni savaş bileti
+anahtarlarını doğrular; hata varsa önceki data çıktısını silmeden durur.
+Salt okunur kaynak envanteri:
+`python3 platform/web-kit/tools/audit_text_encoding.py content/client/packs`.
+Kapsam ve kabul testleri: [METIN_KODLAMA_PLANI.md](../../docs/METIN_KODLAMA_PLANI.md).
+
 Build ara çıktıları halen ortak kit ağacındadır. Geliştirme ve release build'ini
 aynı anda çalıştırma. Önizleme snapshot'ı ancak tüm build adımları başarılı
 olduğunda değiştirilir; başarısız build önceki önizlemeyi korur.
@@ -144,6 +154,11 @@ HTTP logu `/home/m2web/dev/preview.log`; bridge logu `docker logs m2web-dev-brid
 
 Yerel testler: `python3 -B -m unittest discover -s platform/web-kit/tools -p 'test_*.py'`.
 Object cache testleri sistemdeki `clang++` veya `c++` ile gerçek derleme yapar.
+
+Corpus indirme kuyruğu ve çubuğu:
+`node --test platform/web-kit/tools/test_prefetch.js`. Ağ/cache hataları ve
+süre aşımı gerçek zaman beklemeden fake clock ile sınanır. Public paket
+üretimi de aynı dokuz testi çalıştırır; görsel oyun kabulü ayrı kalır.
 
 Release için mevcut `package` → `publish` akışı kullanılır. Önizleme klasörü
 canlıya kopyalanmaz.

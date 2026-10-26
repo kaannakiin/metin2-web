@@ -17,6 +17,7 @@
 #include "mid_pvp_detector.h"
 #include "item_manager.h"
 #include "affect.h"
+#include "pvp_support.h"
 #include "DragonSoul.h"
 #include "buff_on_attributes.h"
 #include "belt_inventory_helper.h"
@@ -741,6 +742,8 @@ int CItem::FindEquipCell(LPCHARACTER ch, int iCandidateCell)
 
 void CItem::ModifyPoints(bool bAdd)
 {
+	if (pvp_support::DisabledEquipment(GetType(), GetSubType()))
+		return;
 	int accessoryGrade;
 
 	if (false == IsAccessoryForSocket())
@@ -1169,6 +1172,8 @@ void CItem::ModifyPoints(bool bAdd)
 
 bool CItem::IsEquipable() const
 {
+	if (pvp_support::DisabledEquipment(GetType(), GetSubType()))
+		return false;
 	switch (this->GetType())
 	{
 		case ITEM_COSTUME:
@@ -1540,6 +1545,9 @@ long long CItem::GetShopBuyPrice()
 int CItem::GetShopBuyPrice()
 #endif
 {
+	// Market sells this sphere for 1M; the legacy 30M resale creates Yang.
+	if (GetVnum() == 70024)
+		return std::min<decltype(GetProto()->dwShopBuyPrice)>(GetProto()->dwShopBuyPrice, 500000);
 	return GetProto()->dwShopBuyPrice;
 }
 
@@ -2499,7 +2507,7 @@ bool CItem::IsItemBlendPlus()
 
 bool CItem::IsItemDragonGodPlus()
 {
-	if (GetVnum() >= 72731 && GetVnum() <= 72736)
+	if (GetVnum() >= 72731 && GetVnum() <= 72738)
 		return true;
 	return false;
 }

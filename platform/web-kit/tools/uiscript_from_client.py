@@ -72,7 +72,7 @@ def spellings_from_client():
     `ui.py` resolves the difference when opening anyway.
     """
     import re
-    formula = re.compile(r'[Uu][Ii][Ss]cript/([A-Za-z0-9_]+\.py)')
+    formula = re.compile(r'[Uu][Ii][Ss]cript/([A-Za-z0-9_/]+\.py)')
     found_items = {}
     for root_node, _k, names in os.walk(SCRIPTS3):
         for n in names:
@@ -84,6 +84,18 @@ def spellings_from_client():
                 name = m.group(1)
                 found_items.setdefault(name.lower(), name)
     return found_items
+
+
+def relative_files(directory):
+    """Keep nested layouts under their original relative paths."""
+    result = []
+    for root_node, directories, names in os.walk(directory):
+        directories[:] = sorted(n for n in directories if n != '__pycache__')
+        for name in sorted(names):
+            if name.endswith(('.pyc', '.pyo')):
+                continue
+            result.append(os.path.relpath(os.path.join(root_node, name), directory))
+    return result
 
 
 def main():
@@ -106,9 +118,8 @@ def main():
     if not os.path.isdir(CLIENT_UISCRIPT):
         print('no %s - run: python tools/build_corpus.py --unpack-only' % CLIENT_UISCRIPT)
         return 1
-    source_items = ['uiscript/' + n for n in sorted(os.listdir(CLIENT_UISCRIPT))
-                    if os.path.isfile(os.path.join(CLIENT_UISCRIPT, n))]
-    read_file = lambda n: io.open(os.path.join(CLIENT_UISCRIPT, n.split('/')[-1]), 'rb').read()
+    source_items = relative_files(CLIENT_UISCRIPT)
+    read_file = lambda n: io.open(os.path.join(CLIENT_UISCRIPT, n), 'rb').read()
     print('source: the user client (%s)' % os.path.relpath(CLIENT_UISCRIPT, ROOT))
     if not source_items:
         print('the source has no uiscript/ directory')
@@ -125,10 +136,10 @@ def main():
 
     without_spelling = []
     for name in source_items:
-        flat = name.split('/')[-1]
-        target_encoding = spelling.get(flat.lower(), flat)
-        if flat.lower() not in spelling:
-            without_spelling.append(flat)
+        target_encoding = spelling.get(name.lower(), name)
+        if name.lower() not in spelling:
+            without_spelling.append(name)
+        os.makedirs(os.path.dirname(os.path.join(directory, target_encoding)), exist_ok=True)
 
         data_bytes = read_file(name)
 
@@ -142,19 +153,20 @@ def main():
         # once already broke the language files.
         #
         # So they go BYTE FOR BYTE.
-        if not flat.lower().endswith('.py'):
+        if not name.lower().endswith('.py'):
             io.open(os.path.join(directory, target_encoding), 'wb').write(data_bytes)
             continue
 
+        import rewrite_scripts
         try:
-            content = data_bytes.decode('utf-8')
+            content = data_bytes.decode('utf-8-sig')
         except UnicodeDecodeError:
             # The same order as in rewrite_scripts.py: UTF-8 first,
             # only then CP949. A file that already is UTF-8 stays
             # untouched.
-            import rewrite_scripts
             content = ''.join(rewrite_scripts._decode_line(l)
                               for l in data_bytes.splitlines(keepends=True))
+        content = rewrite_scripts.normalize_utf8_cookie(content)
         io.open(os.path.join(directory, target_encoding), 'w', encoding='utf-8',
                 newline=chr(10)).write(content)
 
@@ -168,11 +180,15 @@ def main():
         capture_output=True, text=True)
     print('files rewritten by lib2to3: %d'
           % sum(1 for l in r.stderr.splitlines() if 'Refactored ' in l))
+    if r.returncode:
+        print(r.stderr)
+        return 1
 
     # --- division --------------------------------------------------------
     integer_total, kept_total = 0, 0
     all_names = set()
-    for n in sorted(os.listdir(directory)):
+    generated_files = relative_files(directory)
+    for n in generated_files:
         if not n.endswith('.py'):
             continue
         path_str = os.path.join(directory, n)
@@ -195,7 +211,7 @@ def main():
     # I check it here, not in the browser - a syntax error in a window
     # description shows up there as "Failed to load script file" and nothing more.
     bad = []
-    for n in sorted(os.listdir(directory)):
+    for n in generated_files:
         if not n.endswith('.py'):
             continue
         content = io.open(os.path.join(directory, n), encoding='utf-8').read()

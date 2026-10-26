@@ -123,6 +123,78 @@ Dosyalar: `content/server/sql/seed_shop_refine_pet.sql`, `content/server/sql/upd
 - Reroll seviye dağılımı lv4/lv5’e kaydırıldı (`item_attribute.cpp` ChangeAttribute).
 - Doğal high/low attr tabloları hafif iyileştirildi (`constants.cpp`).
 
+### Normal efsun dağılımı ve sabit değerler — 2026-10-22 kararı
+
+Kullanıcı kararı: normal efsunların ekipman izinleri klasik dağılıma çekilir;
+değerleri tek kademeye sabitlenir. **Maks. HP = 3000**. Sabit değerler,
+aynı normal tabloyu kullanan kostümlerde de geçerlidir. Tılsıma ilişkin önceki
+onay aşağıdaki sade ekipman kararıyla geçersizdir: tılsım oyunda kullanılmayacak.
+Normalleştirme SQL'inde kalan tılsım/saç sütunları sistemin açık tutulduğu
+anlamına gelmez; erişim ve kullanım kapatması ayrı uygulanır. Sekiz standart ekipmanın izinleri
+değişir: silah, gövde zırhı, bilezik, ayakkabı, kolye, kask, kalkan, küpe.
+
+- Statlar +12; SP +80; saldırı hızı %8; hareket/büyü hızı %20;
+  HP/SP üretimi %30; zehirleme/sersemletme/yavaşlatma %8;
+  kritik/delici/yarı insan %10; beş yaratık ırkına karşı güç %20.
+- HP/SP emme ve SP çalma %10; blok/ok savuşturma %15;
+  silah savunmaları ve ateş/şimşek/büyü/rüzgâr direnci %15;
+  yansıtma %10; zehir direnci %5; EXP/Yang/eşya düşürme şansı %20;
+  saldırı değeri +50; bağışıklık açık/kapalı.
+- HP yalnız zırh/bilezik/ayakkabı/kolye; statlar silah/kalkan;
+  bağışıklık yalnız kalkan; zehirleme silah/kask; saldırı değeri yalnız zırh.
+  Tam dağılım: `content/server/sql/migrations/20261022_normal_attributes.sql`.
+- Araştırmada farklı sürümlerde değişen satırlar için güncel resmî referans
+  seçildi: zırhta SP; kolyede SP üretimi, SP emme ve SP çalma açık;
+  küpede zehir direnci %5. Kaynaklar: `docs/EFSUN_PVP_KARSILASTIRMASI.md`.
+- **Son kullanıcı kararı:** hiçbir efsun klasik edinim/ekipman sınırlarının
+  dışında rastgele gelmez. Ayrı karar bekleyen 14 tür (dört sınıfa karşı güç,
+  dört sınıf direnci, genel canavar gücü, ortalama/beceri hasarı ve direnci,
+  düz savunma) normal 1–5 ve kostüm/tılsım rastgele havuzlarından kapatılır.
+  Bu satırların 12 ekipman izin sütunu sıfır olur. Doğal silah ortalama/beceri
+  üretimi, sabit proto bonusları ve ayrı 6–7 tablosu bu geçişte korunur.
+  Mevcut oyuncu eşyaları otomatik silinmez/dönüştürülmez; uygunsuz efsun
+  taşıyanlar önce salt okunur sayılır.
+  Kullanıcı sonrasında belirlenen 11 eşyadaki bu uygunsuz normal efsunların
+  temizlenmesini onayladı: eşya/soket/geçerli bonuslar ve doğal Dolunay
+  ortalama/beceri çifti korunur, yalnız hatalı türler kaldırılır. Başlangıç
+  görevi de silahlara genel canavar bonusunu elle eklemeyecek.
+  Toplam 45 standart satır düzeltilir; 14 bekleyen satır korunur.
+- Doğal ortalama/beceri çifti (`item_addon.cpp`), 6–7 havuzu,
+  eşyanın proto özellikleri ve mevcut oyuncu eşyaları değiştirilmez.
+  Yeni kurallar efsun üretimi/yenilemesi için geçerlidir; eski bonusların
+  toplu dönüşümü ayrı karar gerektirir. Sabit değer, efsun türünü garanti etmez.
+- Bu değişiklik SQL verisidir; motor/istemci derlemesi gerekmez. Canlı DB ve
+  sunucunun belleğe aldığı efsun tablosu aynı bakımda güncellenmelidir.
+
+### Ek ekipman ve kalıcı başlangıç desteği — 2026-10-22 kararı
+
+Standart sekiz ekipman korunur. Ek sistemler yalnız **binek, gövde/zırh kostümü,
+silah kostümü ve çağrılan basit pet** olacak. Saç kostümü, element tılsımları
+(Ateş/Karanlık vb.), kuşak, aura, simya, güç veren yüzük/kemer ve ilave güç
+yuvaları kapalıdır. Basit pet mevcut çağrılabilir Bambi gibi pet hattıdır;
+ayrı büyüyen pet/ölüm/besleme sistemi eklenmez. Paket/enum uyumunu etkileyen
+feature flag'ler kapatılmadan edinim, kullanım ve arayüz sınırlandırılır.
+
+Başlangıçtaki dört Ejderha Tanrı nesnesi ve Kritik/Delici Vuruş, otuzar süreli
+nesne yerine **birer kalıcı nesne** olarak verilir. Altı şebnem de birer kalıcı
+nesne olarak başlangıca eklenir. Bir kez etkinleştirildiğinde ölüm, çıkış/giriş,
+kanal/harita değişimi veya sunucu yeniden başlaması nedeniyle kaybolmaz.
+Mevcut `+` nesne ailesi kullanılacak; başlangıç şebnemleri 1. seviyeden açılır.
+Bu 12 destek nesnesinin bonusları mevcut `+` protolarındaki değerlerdir;
+aynı bonus tekrar kullanım/yeniden girişle birikmez.
+
+Son kullanıcı onayıyla kalıcı yeşil/mor iksir de eklenecek: `72737` saldırı
+hızı +30, `72738` hareket hızı +40. Her biri 1. seviyeden kullanılır ve birer
+adet verilir. Toplam destek seti 14 nesnedir. Süreli iksirler korunur; aynı
+bonusun süreli ve kalıcı iksirden birlikte alınması engellenir.
+Kırmızı/turuncu şebnem ile Kritik/Delici Vuruş+ farklı bonus aileleridir;
+mevcut değerleri koruyunca birlikte kritik +%40 ve delici +%40 verirler.
+
+Durum: kapsam ve davranış tasarımı; bu yeni başlangıç/ekipman kapatma işleri
+henüz oyun koduna veya canlıya uygulanmadı. Ayrıntı ve kabul kontrolleri:
+`docs/BASLANGIC_KALICI_DESTEK_TASARIMI.md`. Normal efsun SQL düzeltmesi ise
+ayrı olarak repo içinde hazır, 8 yerel kontrol ve geçici MariaDB testi geçti.
+
 ### Shop / drop matrisi (orta-kolay, 2026-10-17)
 
 **2026-10-21 tek sayfa revizyonu:** Silahçı yalnız başlangıç (1), 15 ve 30
@@ -142,7 +214,7 @@ Mağaza eşyalarına elle başlangıç bonusu veya sabit yüksek ortalama eklenm
 
 ShopEx, ana/ikinci köy silahçı ve zırhçılarını ayrı NPC kimlikleriyle aynı
 seçkiye bağlar: her NPC yalnız 1 sayfa açar. Silah 18 ürün/30 hücre,
-zırh 25 ürün/37 hücre; market 17 ürün. Yerleşim gerçek DB yükleme sırasıyla
+zırh 25 ürün/37 hücre; market 24 ürün (22 Ekim revizyonu). Yerleşim gerçek DB yükleme sırasıyla
 ilk 40 hücrede doğrulanır. Fiyatlar satın al/sat döngüsünden Yang üretmez: en az ürün geri satışının
 2 katı (ekipman), 1,25 katı (sarf), ayrıca seçilen taban fiyat.
 İlk ücretsiz yüzük/dedektör/at kitabından ayrı, markette ücretli yedekleri vardır.
@@ -151,6 +223,15 @@ BK, Ruh Taşı ve zindan anahtarları markete konmaz.
 Market 9003 ayrıca büyük boy Güneş Özütü (72725) ve Ay Özütü (72729)
 satar: satın alım başına 1 adet, her biri 100.000 Yang. Mevcut otomatik
 HP/SP yenileme davranışı ve dolu kapasite başlangıcı korunur.
+
+**2026-10-22 satıcı revizyonu:** Kutsama Küresi (70024) tek adet **1.000.000
+Yang**. NPC'ye geri satış en fazla **500.000 Yang**; eski protodaki 30 milyon
+Yang bu ürün için uygulanmaz. Başlangıçta verilen 14 kalıcı desteğin
+(72731–72738, 50827–50832) yedekleri birer adet **1.000 Yang** olur.
+Küçük/orta kırmızı-mavi iksirler (27001, 27002, 27004, 27005), süreli büyük
+yeşil/mor iksirler (27102, 27105), Şehre/Geri Dönüş Kâğıdı (22000, 22010)
+satıcıdan kaldırılır. Büyük kırmızı-mavi iksir ve Güneş/Ay özütleri kalır.
+Oyuncuların mevcut eşyaları silinmez. Market tek sayfada 24 ürün taşır.
 
 Standart/at becerileri: 5. seviyede liderlik/madencilik/dönüşüm 40,
 kombo 2, diller 20, at çağırma 10, dört at saldırı becerisi 40. Ana sınıf
@@ -555,7 +636,8 @@ Canlıya alınacak orta-kolay zincir profili:
 | -------------------------------------- | ------ | ------------------------------------------------------------------ |
 | Normal / Zırhlı / Asker At             | Açık   | klasik quest zorunlu değil (orta-kolay)                            |
 | Özel binek + görünüm                   | Bağla  | `ENABLE_MOUNT_*`, change look; PvM tavan düşük                     |
-| Basitleştirilmiş pet                   | Bağla  | `ENABLE_GROWTH_PET_SYSTEM`; enum/kitap bug’ı düzelt veya skill kıs |
+| Çağrılan basit pet                     | Açık   | Bambi gibi mevcut basit pet hattı; tek aktif pet |
+| Büyüyen pet sistemi                   | Kapalı | ayrı seviye/kitap/besleme güç sistemi yok |
 | Full resmi pet 100 lv / ölüm / besleme | Kapalı | gereksiz karmaşa                                                   |
 
 ### Ekipman
@@ -564,8 +646,9 @@ Canlıya alınacak orta-kolay zincir profili:
 | -------------------------------- | ------ | ------------------------------------- |
 | Switchbot / otomatik efsun (1–5) | Bağla  | `ENABLE_RENEWAL_SWITCHBOT`            |
 | +9 refine (fail yok eder)        | Açık   | mid-pvp % tablosu                     |
-| Kostüm / saç / silah kostüm      | Açık   | görünüm ağırlıklı                     |
-| Kuşak (güç)                      | Kapalı | kozmetik istersen Sonra               |
+| Gövde kostümü / silah kostümü    | Açık   | izin verilen iki kostüm yuvası        |
+| Saç kostümü / element tılsımı    | Kapalı | 2026-10-22 sade ekipman kararı        |
+| Kuşak / güç yüzüğü / güç kemeri  | Kapalı | ilave ekipman güç yuvası yok          |
 | Simya (güç)                      | Kapalı |                                       |
 | 6–7 efsun                        | Kapalı |                                       |
 | Aura (güç)                       | Kapalı | flag’li kod var; 1. sürümde güç verme |

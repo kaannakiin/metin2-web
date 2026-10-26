@@ -12,6 +12,13 @@ WEAPONS_30 = [299, 1179, 2159, 3219, 5119, 7169]
 BASES_30 = [v - 9 for v in WEAPONS_30]
 OWNED_SHOPS = (101, 102, 103, 111, 112, 113, 201, 202, 203, 211, 212, 213, 301)
 P = catalogue.proto('item')
+PERMANENT_SUPPORT_IDS = tuple(range(72731, 72739)) + tuple(range(50827, 50833))
+# Match the installed permanent-support loader overlay; the legacy proto stays intact.
+for _vnum in PERMANENT_SUPPORT_IDS:
+    P[_vnum] = dict(P.get(_vnum, P[72731]))
+    P[_vnum].update(Vnum=str(_vnum), LimitType0='LEVEL', LimitValue0='1', Flags='NONE')
+# CItem::GetShopBuyPrice caps the sphere's effective NPC resale at this amount.
+P[70024] = dict(P[70024], ShopBuyPrice='500000')
 
 
 def entries(ids, minimum, count=1):
@@ -39,11 +46,10 @@ def stock():
         bodies += entries([base + offset for base in [11200, 11400, 11600, 11800]], price)
     defensive = entries([12229, 12369, 12509, 12649, 13029], 75000)
     jewels = entries([14009, 14089, 16009, 16089, 17009, 17109, 15009, 15089], 25000)
-    market = entries([27001, 27002, 27004, 27005], 1000, 50)
-    market += entries([27003, 27006], 10000, 200)
+    market = entries([27003, 27006], 10000, 200)
     market += entries([72725, 72729], 100000)
-    market += entries([27102, 27105], 50000, 50)
-    market += entries([22000, 22010], 10000, 10)
+    market += entries([70024], 1000000)
+    market += entries(PERMANENT_SUPPORT_IDS, 1000)
     market += entries([50200, 70038], 10000)
     market += entries([40004, 27989], 50000)
     market += entries([50053], 10000)
@@ -159,6 +165,7 @@ def policy():
 
 def report():
     names = catalogue.read_names('item', 'tr')
+    names.update({72737: 'Yeşil İksir+', 72738: 'Mor İksir+'})
     lines = ['# NPC stokları — uygulanan orta-kolay profil', '',
              'Silahçı 9001 ve 9007 aynı seçki; zırhçı 9002 ve 9008 aynı seçki.',
              'Her NPC tek sayfa açar; Market 9003 ayrı kalır.',
@@ -189,7 +196,10 @@ def report():
               '  aralıklar `PVP_HEDEF.md` Harita bazlı Yang bölümündedir.',
               '  Global miktar flagleri 400; harita tabanında 800.000, boss/diğer kaynaklarda 400.000 tavanı vardır.',
               '  Yang düşme ihtimali ve seviye cezası korunur.',
-              '- Kutsama/efsun, BK/Ruh Taşı ve zindan anahtarları bu markete eklenmedi.', '',
+              '- Kutsama Küresi 1.000.000 Yang; NPC geri satışı en fazla 500.000 Yang.',
+              '- 14 kalıcı başlangıç desteğinin yedekleri birer adet 1.000 Yang.',
+              '- Küçük/orta HP-SP, süreli yeşil/mor ve iki dönüş kâğıdı stoktan çıkarıldı.',
+              '- Efsun nesneleri, BK/Ruh Taşı ve zindan anahtarları farmda kalır.', '',
               'Kaynak: `npc_profile.py` → `shopex` / `shopex_item` SQL tabloları;',
               'standart beceri/at teslimi: `starter_support.lua`.', '']
     return '\n'.join(lines)

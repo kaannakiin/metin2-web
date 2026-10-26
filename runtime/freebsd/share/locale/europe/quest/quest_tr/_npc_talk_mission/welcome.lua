@@ -14,21 +14,12 @@ quest welcome begin
 			pc.give_item2(72726, 1)
 			pc.give_item2(72730, 1)
 			pc.give_item2(70038, 1)
-			pc.give_item2(27102, 50)
-			pc.give_item2(27105, 50)
-			pc.give_item2(71027, 30)
-			pc.give_item2(71028, 30)
-			pc.give_item2(71029, 30)
-			pc.give_item2(71030, 30)
-			pc.give_item2(71044, 30)
-			pc.give_item2(71045, 30)
+			-- permanent_support delivers the 14 permanent items once, including old characters.
 
 			if pc.get_sex() == 0 then
 				pc.give_item2(41003, 1)
-				pc.give_item2(45005, 1)
 			elseif pc.get_sex() == 1 then
 				pc.give_item2(41004, 1)
-				pc.give_item2(45006, 1)
 			end
 
 			local job = pc.get_job()
@@ -38,11 +29,11 @@ quest welcome begin
 			elseif job == 2 or job == 3 then
 				primary_stat = 4 -- INT / sura and shaman
 			end
-			local weapon_bonus = {primary_stat,8,7,5,15,5,16,5,63,10}
+			local weapon_bonus = {primary_stat,8,7,5,15,5,16,5}
 			if job == 2 then
-				weapon_bonus = {4,8,9,10,15,5,16,5,63,10}
+				weapon_bonus = {4,8,9,10,15,5,16,5}
 			elseif job == 3 then
-				weapon_bonus = {4,8,9,20,15,5,16,5,63,10}
+				weapon_bonus = {4,8,9,20,15,5,16,5}
 			end
 			local armor_bonus = {1,1000,9,10,29,10,30,10}
 			local helm_bonus = {10,20,11,20,18,10,41,8}

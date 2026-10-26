@@ -13,6 +13,8 @@
 #include "desc_manager.h"
 #include "packet.h"
 #include "affect.h"
+#include "item.h"
+#include "pvp_support.h"
 #include "skill.h"
 #include "start_position.h"
 #include "mob_manager.h"
@@ -1439,7 +1441,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly/* = false*/
 
 	if (-1 == pos)
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Çok fazla eþya taþýyorsun."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("\307ok fazla e\376ya ta\376\375yorsun."));
 		return false;
 	}
 #endif
@@ -1692,7 +1694,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item
 	DWORD pos = GetEmptyInventory(item->GetSize());
 
 	if (-1 == pos) {
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Çok fazla eþya taþýyorsun."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("\307ok fazla e\376ya ta\376\375yorsun."));
 		return false;
 	}
 #endif
@@ -2210,7 +2212,7 @@ bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
 		{
 			if (get_global_time() < GetQuestFlag("snake_lair.refine_time"))
 			{
-				ChatPacket(CHAT_TYPE_INFO, "Yýlan Tapýnaðý Demircisi için her 24 saatte bir ödül alabilirsin."); // Custom
+				ChatPacket(CHAT_TYPE_INFO, "Y\375lan Tap\375na\360\375 Demircisi i\347in her 24 saatte bir \366d\374l alabilirsin."); // Custom
 				return false;
 			}
 		}
@@ -2646,6 +2648,8 @@ bool CHARACTER::CheckTimeUsed(LPITEM item)
 
 bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 {
+	if (pvp_support::DisabledEquipment(item->GetType(), item->GetSubType()) && !item->IsEquipped())
+		return false;
 	int iLimitRealtimeStartFirstUseFlagIndex = -1;
 	int iLimitTimerBasedOnWearFlagIndex = -1;
 
@@ -2696,7 +2700,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 	// @fixme402 (IsLoadedAffect to block affect hacking)
 	if (!IsLoadedAffect())
 	{
-		ChatPacket(CHAT_TYPE_INFO, "Etkiler henüz yüklenmedi!");
+		ChatPacket(CHAT_TYPE_INFO, "Etkiler hen\374z y\374klenmedi!");
 		return false;
 	}
 
@@ -2704,6 +2708,18 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 	if (item->GetType() == ITEM_GROWTH_PET && item->GetSubType() == PET_BAG)
 		iLimitRealtimeStartFirstUseFlagIndex = -1;
 #endif
+
+	if (pvp_support::IsPermanent(item->GetVnum()))
+		return pvp_support::Toggle(this, item);
+
+	// Includes all sizes of the ordinary speed potions and unique speed items.
+	if ((item->GetType() == ITEM_USE || item->GetType() == ITEM_UNIQUE) && item->GetSubType() == USE_ABILITY_UP)
+	{
+		int apply = item->GetValue(0);
+		if ((apply == APPLY_ATT_SPEED || apply == APPLY_MOV_SPEED) &&
+			FindAffect(AFFECT_MALL_PLUS, aApplyInfo[apply].bPointType))
+			return false;
+	}
 
 	// After the initial use of an item, time is deducted even if it is not used.
 	if (-1 != iLimitRealtimeStartFirstUseFlagIndex)
@@ -2900,7 +2916,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					return false;
 				}
 				AddAffect(AFFECT_AUTO_HUNT, POINT_NONE, 0, AFF_NONE, 60 * 60 * 24 * item->GetValue(0), 0, false);
-				ChatPacket(CHAT_TYPE_INFO, "Etki %d gün süreyle eklendi.", item->GetValue(0));
+				ChatPacket(CHAT_TYPE_INFO, "Etki %d g\374n s\374reyle eklendi.", item->GetValue(0));
 				item->SetCount(item->GetCount() - 1);
 				return true;
 			}
@@ -2909,7 +2925,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			{
 				if (item->GetVnum() == 50051 || item->GetVnum() == 50052 || item->GetVnum() == 50053 || item->GetVnum() == 50049)
 				{
-					ChatPacket(CHAT_TYPE_INFO, "Bineðin Varken Atýný Çaðýramazsýn.");
+					ChatPacket(CHAT_TYPE_INFO, "Bine\360in Varken At\375n\375 \307a\360\375ramazs\375n.");
 					return false;
 				}
 			}
@@ -3263,7 +3279,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				{
 					if (GetLevel() < 15)
 					{
-						ChatPacket(CHAT_TYPE_INFO, "15·¹º§ ÀÌÇÏ¿¡¼­´Â »ç¿ëÇÒ ¼ö ¾ø½À´Ï´Ù.");
+						ChatPacket(CHAT_TYPE_INFO, "15\267\271\272\247 \300\314\307\317\277\241\274\255\264\302 \273\347\277\353\307\322 \274\366 \276\370\275\300\264\317\264\331.");
 						return false;
 					}
 				}
@@ -3401,7 +3417,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				{
 					if (IsPolymorphed())
 					{
-						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ÂºÂ¯Â½Ã…ÃžÃŸÂ¿Â¡Â´Ã‚ ÃƒÂ¥Ã€Â» Ã€ÄžÃ€Â»Â¼Ã¶ Â¾Ã¸Â½Ã€Â´ÃžÂ´Ã™."));
+						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("\302\272\302\257\302\275\303\205\303\236\303\237\302\277\302\241\302\264\303\202 \303\203\302\245\303\200\302\273 \303\200\304\236\303\200\302\273\302\274\303\266 \302\276\303\270\302\275\303\200\302\264\303\236\302\264\303\231."));
 						return false;
 					}
 	
@@ -3466,7 +3482,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						{
 							if (GetExchange() || IsOpenSafebox() || GetShopOwner() || GetMyShop() || IsCubeOpen() || GetShop())
 							{
-								ChatPacket(CHAT_TYPE_INFO, "Tüm pencereleri kapat!");
+								ChatPacket(CHAT_TYPE_INFO, "T\374m pencereleri kapat!");
 								return false;
 							}
 							int val = item->GetValue(0);
@@ -3481,12 +3497,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								if (reduced_time > 10) {
 									SetQuestFlag("biologist.item_delay", current_time + reduced_time);
 				
-									ChatPacket(CHAT_TYPE_COMMAND, "Güncelleme Zamaný 0 %d", reduced_time);
+									ChatPacket(CHAT_TYPE_COMMAND, "G\374ncelleme Zaman\375 0 %d", reduced_time);
 									item->SetCount(item->GetCount() - 1);
 				
-									ChatPacket(CHAT_TYPE_INFO, "Eþyayý teslim etme bekleme süresi baþarýyla kýsaltýldý.");
+									ChatPacket(CHAT_TYPE_INFO, "E\376yay\375 teslim etme bekleme s\374resi ba\376ar\375yla k\375salt\375ld\375.");
 								} else {
-									ChatPacket(CHAT_TYPE_INFO, "Bekleme süresi zaten maksimum düzeyde kýsaltýldý.");
+									ChatPacket(CHAT_TYPE_INFO, "Bekleme s\374resi zaten maksimum d\374zeyde k\375salt\375ld\375.");
 									return false;
 								}
 							} else if (type == 1) {
@@ -3503,12 +3519,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								if (reduced_time > 10) {
 									SetQuestFlag(delay_flag_key, current_time + reduced_time);
 				
-									ChatPacket(CHAT_TYPE_COMMAND, "Güncelleme Zamaný 1 %d", reduced_time);
+									ChatPacket(CHAT_TYPE_COMMAND, "G\374ncelleme Zaman\375 1 %d", reduced_time);
 									item->SetCount(item->GetCount() - 1);
 				
-									ChatPacket(CHAT_TYPE_INFO, "Eþyayý teslim etme bekleme süresi baþarýyla kýsaltýldý.");
+									ChatPacket(CHAT_TYPE_INFO, "E\376yay\375 teslim etme bekleme s\374resi ba\376ar\375yla k\375salt\375ld\375.");
 								} else {
-									ChatPacket(CHAT_TYPE_INFO, "Bekleme süresi zaten maksimum düzeyde kýsaltýldý.");
+									ChatPacket(CHAT_TYPE_INFO, "Bekleme s\374resi zaten maksimum d\374zeyde k\375salt\375ld\375.");
 									return false;
 								}
 							}
@@ -3520,7 +3536,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						{
 							if (GetExchange() || IsOpenSafebox() || GetShopOwner() || GetMyShop() || IsCubeOpen() || GetShop())
 							{
-								ChatPacket(CHAT_TYPE_INFO, "Tüm pencereleri kapat!");
+								ChatPacket(CHAT_TYPE_INFO, "T\374m pencereleri kapat!");
 								return false;
 							}
 							int val = item->GetValue(0);
@@ -3529,33 +3545,33 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							if (type == 0) {
 								int take_chance = GetQuestFlag("biologist.take_chance");
 								if (take_chance == max_increase || take_chance > max_increase) {
-									ChatPacket(CHAT_TYPE_INFO, "Teslim etme þansý zaten maksimum seviyede!");
+									ChatPacket(CHAT_TYPE_INFO, "Teslim etme \376ans\375 zaten maksimum seviyede!");
 									return false;
 								}
 								SetQuestFlag("biologist.take_chance", take_chance+val);
 								item->SetCount(item->GetCount()-1);
 				
-								ChatPacket(CHAT_TYPE_INFO, "Teslim etme þansý %25 artýrýldý.");
+								ChatPacket(CHAT_TYPE_INFO, "Teslim etme \376ans\375 %25 art\375r\375ld\375.");
 				
 								int new_chance = GetQuestFlag("biologist.take_chance");
 				
-								ChatPacket(CHAT_TYPE_INFO, "Mevcut Þans: %d", new_chance);
-								ChatPacket(CHAT_TYPE_COMMAND, "Güncelleme Þansý 0 %d", new_chance);
+								ChatPacket(CHAT_TYPE_INFO, "Mevcut \336ans: %d", new_chance);
+								ChatPacket(CHAT_TYPE_COMMAND, "G\374ncelleme \336ans\375 0 %d", new_chance);
 							} else if (type == 1) {
 								int take_chance = GetQuestFlag("collector.take_chance");
 								if (take_chance == max_increase || take_chance > max_increase) {
-									ChatPacket(CHAT_TYPE_INFO, "Teslim etme þansý zaten maksimum seviyeye çýkarýldý!");
+									ChatPacket(CHAT_TYPE_INFO, "Teslim etme \376ans\375 zaten maksimum seviyeye \347\375kar\375ld\375!");
 									return false;
 								}
 								SetQuestFlag("collector.take_chance", take_chance+val);
 								item->SetCount(item->GetCount()-1);
 				
-								ChatPacket(CHAT_TYPE_INFO, "Teslim etme þansý %25 artýrýldý.");
+								ChatPacket(CHAT_TYPE_INFO, "Teslim etme \376ans\375 %25 art\375r\375ld\375.");
 				
 								int new_chance = GetQuestFlag("collector.take_chance");
 				
-								ChatPacket(CHAT_TYPE_INFO, "Mevcut Þans: %d", new_chance);
-								ChatPacket(CHAT_TYPE_COMMAND, "Güncelleme Þansý 1 %d", new_chance);
+								ChatPacket(CHAT_TYPE_INFO, "Mevcut \336ans: %d", new_chance);
+								ChatPacket(CHAT_TYPE_COMMAND, "G\374ncelleme \336ans\375 1 %d", new_chance);
 							}
 							break;
 						}
@@ -3638,7 +3654,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 #ifdef ENABLE_SUNG_MAHI_TOWER
 							if (!IS_SUNG_MAHI_ENABLE_ITEM(GetMapIndex(), item->GetVnum()))
 							{
-								ChatPacket(CHAT_TYPE_INFO, "Bu tür iksiri burada kullanamazsýn.");
+								ChatPacket(CHAT_TYPE_INFO, "Bu t\374r iksiri burada kullanamazs\375n.");
 								return false;
 							}
 #endif
@@ -3720,7 +3736,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								if (item->GetVnum() == 50085 || item->GetVnum() == 50086)
 								{
 									if (test_server)
-										ChatPacket(CHAT_TYPE_INFO, "Ay Keki veya Tohum kullanýldý.");
+										ChatPacket(CHAT_TYPE_INFO, "Ay Keki veya Tohum kullan\375ld\375.");
 
 									SetUseSeedOrMoonBottleTime();
 								}
@@ -4917,12 +4933,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									{
 										if (test_server == false)
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("¾ÆÁ÷ »ç¿ëÇÒ ¼ö ¾ø½À´Ï´Ù."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("\276\306\301\367 \273\347\277\353\307\322 \274\366 \276\370\275\300\264\317\264\331."));
 											return false;
 										}
 										else
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Å×½ºÆ® ¼­¹ö ½Ã°£Á¦ÇÑ Åë°ú"));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("\305\327\275\272\306\256 \274\255\271\366 \275\303\260\243\301\246\307\321 \305\353\260\372"));
 										}
 									}
 									
@@ -5264,7 +5280,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							{
 								if (GetExchange() || GetMyShop() || GetShopOwner() || IsOpenSafebox() || IsCubeOpen())
 								{
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("°Å·¡Ã¢,Ã¢°í µîÀ» ¿¬ »óÅÂ¿¡¼­´Â ±ÍÈ¯ºÎ,±ÍÈ¯±â¾ïºÎ ¸¦ »ç¿ëÇÒ¼ö ¾ø½À´Ï´Ù."));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("\260\305\267\241\303\242,\303\242\260\355 \265\356\300\273 \277\254 \273\363\305\302\277\241\274\255\264\302 \261\315\310\257\272\316,\261\315\310\257\261\342\276\357\272\316 \270\246 \273\347\277\353\307\322\274\366 \276\370\275\300\264\317\264\331."));
 									return false;
 								}
 								
@@ -5716,7 +5732,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 #ifdef ENABLE_SUNG_MAHI_TOWER
 							if (!IS_SUNG_MAHI_ENABLE_ITEM(GetMapIndex(), item->GetVnum()))
 							{
-								ChatPacket(CHAT_TYPE_INFO, "Bu tür iksiri burada kullanamazsýn.");
+								ChatPacket(CHAT_TYPE_INFO, "Bu t\374r iksiri burada kullanamazs\375n.");
 								return false;
 							}
 #endif
@@ -5815,7 +5831,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 #ifdef ENABLE_SUNG_MAHI_TOWER
 						if (!IS_SUNG_MAHI_ENABLE_ITEM(GetMapIndex(), item->GetVnum()))
 						{
-							ChatPacket(CHAT_TYPE_INFO, "Bu tür iksiri burada kullanamazsýn.");
+							ChatPacket(CHAT_TYPE_INFO, "Bu t\374r iksiri burada kullanamazs\375n.");
 							return false;
 						}
 #endif
@@ -6388,7 +6404,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								case USE_ADD_ATTRIBUTE:
 									if (ITEM_COSTUME == item2->GetType())
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("¨ùO¨ù¨¬A¡í ¨¬?¡Æ©¡CO ¨ùo ¨ú©ª¢¥A ¨ú¨¡AIAUAO¢¥I¢¥U."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("\250\371O\250\371\250\254A\241\355 \250\254?\241\306\251\241CO \250\371o \250\372\251\252\242\245A \250\372\250\241AIAUAO\242\245I\242\245U."));
 										return false;
 									}
 
@@ -6798,7 +6814,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			
 						if (GetQuestFlag("collection.percent_up"))
 						{
-							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Zaten yüzdesini artýrdýn."));
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Zaten y\374zdesini art\375rd\375n."));
 							return false;
 						}
 			
@@ -7133,7 +7149,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						switch (dwVnums[i])
 						{
 						case CSpecialItemGroup::GOLD:
-							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("µ· %lld HATA_VERDIGINDE_LOCALE_EKLE."), static_cast<long long>(dwCounts[i]));
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("\265\267 %lld HATA_VERDIGINDE_LOCALE_EKLE."), static_cast<long long>(dwCounts[i]));
 							break;
 						case CSpecialItemGroup::EXP:
 							break;
@@ -7152,7 +7168,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				}
 				else
 				{
-					ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("lCa«°Íµ?lnR?L?lrlú¨R??."));
+					ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("lCa\253\260\315\265?lnR?L?lrl\372\250R??."));
 					return false;
 				}
 			}
@@ -7375,15 +7391,13 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 		int apply_type;
 		if (item->GetType() == ITEM_BLEND)
 			apply_type = aApplyInfo[item->GetSocket(0)].bPointType;
-		else if (item->GetType() == ITEM_USE && (item->GetSubType() == USE_AFFECT || item->GetSubType() == USE_AFFECT_PLUS))
+		else if (item->GetType() == ITEM_USE && item->GetSubType() == USE_AFFECT)
 			apply_type = aApplyInfo[item->GetValue(1)].bPointType;
 		else
 			apply_type = aApplyInfo[item->GetValue(0)].bPointType;
 
 		if ((item->IsItemBlend() && FindAffect(AFFECT_BLEND_PLUS, apply_type))
-			|| (item->IsItemBlendPlus() && FindAffect(AFFECT_BLEND, apply_type))
 			|| (item->IsItemDragonGod() && FindAffect(AFFECT_MALL_PLUS, apply_type))
-			|| (item->IsItemDragonGodPlus() && FindAffect(AFFECT_MALL, apply_type))
 		)
 		{
 			LocaleChatPacket(CHAT_TYPE_INFO, 399, "");
@@ -7884,7 +7898,7 @@ bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, BYTE count)
 		return false;
 	}
 
-	// Güvenlik: SwitchBot'tan Special Inventory'ye transfer engeli (Item Duplication önleme)
+	// G\374venlik: SwitchBot'tan Special Inventory'ye transfer engeli (Item Duplication \366nleme)
 #ifdef ENABLE_SPECIAL_INVENTORY
 	if (Cell.IsSwitchbotPosition())
 	{
@@ -9759,7 +9773,7 @@ void CHARACTER::AutoGiveItem(LPITEM item, bool longOwnerShip)
 		return;
 	}
 
-	// Güvenlik: Ölü, stun veya NPC karakterlere item verilemez
+	// G\374venlik: \326l\374, stun veya NPC karakterlere item verilemez
 	if (IsDead() || IsStun() || !IsPC())
 	{
 		M2_DESTROY_ITEM(item);
@@ -9808,11 +9822,11 @@ void CHARACTER::AutoGiveItem(LPITEM item, bool longOwnerShip)
 			if (!item2)
 				continue;
 
-			// Beceri kitaplarý için socket kontrolü de yapýlmalý (socket[0]'daki skill vnum'ý)
-			// Farklý skill vnum'larýna sahip beceri kitaplarý birleþtirilmemeli
+			// Beceri kitaplar\375 i\347in socket kontrol\374 de yap\375lmal\375 (socket[0]'daki skill vnum'\375)
+			// Farkl\375 skill vnum'lar\375na sahip beceri kitaplar\375 birle\376tirilmemeli
 			if (item2->GetVnum() == item->GetVnum())
 			{
-				// Beceri kitaplarý için socket[0] kontrolü (skill vnum)
+				// Beceri kitaplar\375 i\347in socket[0] kontrol\374 (skill vnum)
 				if (item->IsSkillBook())
 				{
 					if (item2->GetSocket(0) != item->GetSocket(0))
@@ -10044,7 +10058,7 @@ LPITEM CHARACTER::AutoGiveItem(DWORD dwItemVnum, BYTE bCount, int iRarePct, bool
 #endif
 #endif
 {
-	// Güvenlik: Ölü, stun veya NPC karakterlere item verilemez
+	// G\374venlik: \326l\374, stun veya NPC karakterlere item verilemez
 	if (IsDead() || IsStun() || !IsPC())
 		return NULL;
 	
@@ -10409,7 +10423,7 @@ LPITEM CHARACTER::AutoGiveItem(DWORD dwItemVnum, BYTE bCount, int iRarePct, bool
 	}
 	else
 	{
-		// Memory leak önleme: Inventory dolu ise item yere düþürülüyor
+		// Memory leak \366nleme: Inventory dolu ise item yere d\374\376\374r\374l\374yor
 		item->AddToGround(GetMapIndex(), GetXYZ());
 		item->StartDestroyEvent();
 
@@ -10636,7 +10650,7 @@ bool CHARACTER::CanReceiveItem(LPCHARACTER from, LPITEM item) const
 					return false;
 				}
 	
-				// At Doyduðunda Beslenmesini Engelleyin
+				// At Doydu\360unda Beslenmesini Engelleyin
 				unsigned char horselevel = from->GetHorseLevel();
 				if (from->GetHorseHealth() >= c_aHorseStat[horselevel].iMaxHealth)
 				{
@@ -11456,7 +11470,7 @@ bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TI
 		LPITEM atakanxd = GetWear(WEAR_BODY);
 		if (atakanxd && (atakanxd->GetVnum() >= 11901 && atakanxd->GetVnum() <= 11914))
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Binek üzerinde gelinlik veya smokin varken kostüm giyemezsin."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Binek \374zerinde gelinlik veya smokin varken kost\374m giyemezsin."));
 			return false;
 		}
 	}
@@ -11466,7 +11480,7 @@ bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TI
 		LPITEM atakan = GetWear(WEAR_COSTUME_BODY);
 		if (atakan && (atakan->GetType() == ITEM_COSTUME && atakan->GetSubType() == COSTUME_BODY))
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Binek üzerinde gelinlik veya smokin varken kostüm giyemezsin."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Binek \374zerinde gelinlik veya smokin varken kost\374m giyemezsin."));
 			return false;
 		}
 	}

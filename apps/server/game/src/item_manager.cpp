@@ -16,6 +16,7 @@
 #include "locale_service.h"
 #include "item.h"
 #include "item_manager.h"
+#include "pvp_equipment.h"
 #include "DragonSoul.h"
 #include "cube.h"
 #include "../../common/service.h"
@@ -168,6 +169,10 @@ LPITEM ITEM_MANAGER::CreateItem(DWORD vnum, DWORD count, DWORD id, bool bTryMagi
 	const TItemTable* table = GetTable(vnum);
 
 	if (NULL == table)
+		return NULL;
+
+	// Block new drops/rewards/purchases, while still loading owned legacy items.
+	if (id == 0 && pvp_support::DisabledEquipment(table->bType, table->bSubType))
 		return NULL;
 
 	LPITEM item = NULL;
@@ -1517,7 +1522,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 
 	if (GetDropPerKillPct(100, 2000, iDeltaPercent, "2006_drop") >= number (1, iRandRange))
 	{
-		sys_log(0, "À°°¢º¸ÇÕ DROP EVENT ");
+		sys_log(0, "\300\260\260\242\272\270\307\325 DROP EVENT ");
 
 		const static DWORD dwVnum = 50037;
 
@@ -1527,7 +1532,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 
 	if (GetDropPerKillPct(100, 2000, iDeltaPercent, "2007_drop") >= number (1, iRandRange))
 	{
-		sys_log(0, "À°°¢º¸ÇÕ DROP EVENT ");
+		sys_log(0, "\300\260\260\242\272\270\307\325 DROP EVENT ");
 
 		const static DWORD dwVnum = 50043;
 

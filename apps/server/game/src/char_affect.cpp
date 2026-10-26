@@ -15,6 +15,7 @@
 #include "arena.h"
 #include "horsename_manager.h"
 #include "item.h"
+#include "pvp_support.h"
 #include "DragonSoul.h"
 #include "../../common/service.h"
 
@@ -438,7 +439,7 @@ int CHARACTER::ProcessAffect()
 		else
 		{
 #endif
-		if ( --pkAff->lDuration <= 0 )
+		if (!pvp_support::PermanentAffect(pkAff->dwType) && --pkAff->lDuration <= 0)
 		{
 			bEnd = true;
 		}
@@ -623,6 +624,8 @@ void CHARACTER::LoadAffect(DWORD dwCount, TPacketAffectElement * pElements)
 
 	for (DWORD i = 0; i < dwCount; ++i, ++pElements)
 	{
+		if (pvp_support::PermanentAffect(pElements->dwType))
+			continue; // Rebuilt once from owned, active items below.
 		if (pElements->dwType == SKILL_MUYEONG)
 			continue;
 
@@ -702,6 +705,7 @@ void CHARACTER::LoadAffect(DWORD dwCount, TPacketAffectElement * pElements)
 
 	StartAffectEvent();
 
+	pvp_support::Restore(this);
 	m_bIsLoadedAffect = true;
 
 	ComputePoints(); // @fixme156
@@ -728,7 +732,7 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 		LocaleChatPacket(CHAT_TYPE_INFO, 82, "");
 	// END_OF_CHAT_BLOCK
 
-	if (IsDead())	//@fixme000
+	if (IsDead() && !(pvp_support::PermanentAffect(dwType) && !IsLoadedAffect()))
 		return false;
 
 	if (lDuration == 0)
@@ -749,7 +753,7 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 		case SKILL_CHEONGRANG:	// Indigowolfseele
 #endif
 #ifdef ENABLE_NINETH_SKILL
-		case SKILL_CHEONUN:		// Ätherschild
+		case SKILL_CHEONUN:		// \304therschild
 #endif
 		{
 			const CAffect * pkAffect = FindAffect(dwType);
@@ -784,7 +788,7 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 
 		if (lApplyValue < pkAffect->lApplyValue)
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("(%s) Becerisi engellendi. (%ld%%) deðeri kullanmýþ olduðunuz (%ld%%) deðerden daha düþük."), CSkillManager::instance().Get(dwType)->szName, lApplyValue, pkAffect->lApplyValue);
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("(%s) Becerisi engellendi. (%ld%%) de\360eri kullanm\375\376 oldu\360unuz (%ld%%) de\360erden daha d\374\376\374k."), CSkillManager::instance().Get(dwType)->szName, lApplyValue, pkAffect->lApplyValue);
 			return false;
 		}
 	}

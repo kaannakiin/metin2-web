@@ -1,0 +1,57 @@
+{
+  "tr": {
+    "BATTLEPASS_SELECT_PASS": "Savaş Bileti Seçiniz",
+    "BATTLEPASS_FREE": "Ücretsiz",
+    "BATTLEPASS_PREMIUM": "Premium"
+  },
+  "en": {
+    "BATTLEPASS_SELECT_PASS": "Select a Battle Pass",
+    "BATTLEPASS_FREE": "Free",
+    "BATTLEPASS_PREMIUM": "Premium"
+  },
+  "de": {
+    "BATTLEPASS_SELECT_PASS": "Kampfpass auswählen",
+    "BATTLEPASS_FREE": "Kostenlos",
+    "BATTLEPASS_PREMIUM": "Premium"
+  },
+  "pl": {
+    "BATTLEPASS_SELECT_PASS": "Wybierz przepustkę bojową",
+    "BATTLEPASS_FREE": "Darmowa",
+    "BATTLEPASS_PREMIUM": "Premium"
+  },
+  "cz": {
+    "BATTLEPASS_SELECT_PASS": "Vyberte si bitevní pas",
+    "BATTLEPASS_FREE": "Zdarma",
+    "BATTLEPASS_PREMIUM": "Premium"
+  },
+  "hu": {
+    "BATTLEPASS_SELECT_PASS": "Válassz csatabérletet",
+    "BATTLEPASS_FREE": "Ingyenes",
+    "BATTLEPASS_PREMIUM": "Prémium"
+  },
+  "pt": {
+    "BATTLEPASS_SELECT_PASS": "Seleciona um passe de batalha",
+    "BATTLEPASS_FREE": "Grátis",
+    "BATTLEPASS_PREMIUM": "Premium"
+  },
+  "ro": {
+    "BATTLEPASS_SELECT_PASS": "Alege un permis de luptă",
+    "BATTLEPASS_FREE": "Gratuit",
+    "BATTLEPASS_PREMIUM": "Premium"
+  },
+  "fr": {
+    "BATTLEPASS_SELECT_PASS": "Choisissez un passe de combat",
+    "BATTLEPASS_FREE": "Gratuit",
+    "BATTLEPASS_PREMIUM": "Premium"
+  },
+  "es": {
+    "BATTLEPASS_SELECT_PASS": "Selecciona un pase de batalla",
+    "BATTLEPASS_FREE": "Gratis",
+    "BATTLEPASS_PREMIUM": "Premium"
+  },
+  "it": {
+    "BATTLEPASS_SELECT_PASS": "Seleziona un pass battaglia",
+    "BATTLEPASS_FREE": "Gratuito",
+    "BATTLEPASS_PREMIUM": "Premium"
+  }
+}
